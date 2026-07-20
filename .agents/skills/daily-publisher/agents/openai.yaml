@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Publisher"
+  short_description: "仅根据 Daily Study 总结生成小红书发布文案包"
+  default_prompt: "Use $daily-publisher to turn a Daily Study Markdown summary into a Xiaohongshu publishing package."

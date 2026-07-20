@@ -1,0 +1,23 @@
+{
+    "area": 100.0,
+    "cost_per_mu": 475.0,
+    "total_cost": 47500.0,
+    "items": [
+        {
+            "name": "种子",
+            "cost_per_mu": 60.0
+        },
+        {
+            "name": "肥料",
+            "cost_per_mu": 220.0
+        },
+        {
+            "name": "植保",
+            "cost_per_mu": 95.0
+        },
+        {
+            "name": "灌溉",
+            "cost_per_mu": 100.0
+        }
+    ]
+}

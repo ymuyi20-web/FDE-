@@ -1,0 +1,9 @@
+# Local Python environments and secrets
+.venv/
+integrations/gemini_mcp/.venv/
+.env
+*.key
+
+# Python cache
+__pycache__/
+*.py[cod]

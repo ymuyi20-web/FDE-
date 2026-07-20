@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Study"
+  short_description: "将当天学习事实整理为标准化 Markdown 总结"
+  default_prompt: "Use $daily-study to turn today's learning evidence into a standardized Markdown summary."

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FDE农业AI实战营</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">F</span>
+      <div><strong>FDE实战营</strong><small>农业AI学习项目</small></div>
+    </div>
+    <nav id="nav">
+      <button class="nav-item active" data-view="today">今日任务</button>
+      <button class="nav-item" data-view="roadmap">6周路线</button>
+      <button class="nav-item" data-view="week1">第一周</button>
+      <button class="nav-item" data-view="practice">实操训练</button>
+      <button class="nav-item" data-view="resources">学习资源</button>
+      <button class="nav-item" data-view="review">每日复盘</button>
+    </nav>
+    <p class="sidebar-note">原则：看课不超过40%，每天必须留下可运行产出。</p>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div><p class="eyebrow">杨其琛的转型实验</p><h1 id="view-title">今日任务</h1></div>
+      <div class="status"><span id="status-dot"></span><span id="risk-label">尚未评估</span></div>
+    </header>
+
+    <section class="view active" id="today">
+      <div class="metrics">
+        <article><span>总进度</span><strong id="total-progress">0%</strong></article>
+        <article><span>累计学习</span><strong><span id="total-hours">0</span> h</strong></article>
+        <article><span>完成任务</span><strong id="done-count">0 / 14</strong></article>
+        <article><span>当前里程碑</span><strong>命令行原型</strong></article>
+      </div>
+      <div class="progress-track"><div id="progress-bar"></div></div>
+      <div class="two-col">
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">第1周 · 第1天</p><h2>环境、变量与输入输出</h2></div><span class="tag">5小时</span></div>
+          <div id="today-tasks" class="task-list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>今日验收</h2><span class="tag warn">必须完成</span></div>
+          <ul class="checklist plain">
+            <li>程序能接收姓名、面积和亩产</li>
+            <li>正确计算总产量</li>
+            <li>能解释 input() 返回的数据类型</li>
+            <li>留下一个报错及其解决记录</li>
+          </ul>
+          <label class="field">今日学习时长（小时）<input id="hours-input" type="number" min="0" max="12" step="0.5" placeholder="例如 5"></label>
+          <button class="primary" id="save-hours">保存时长</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="roadmap">
+      <div id="roadmap-list" class="roadmap"></div>
+    </section>
+
+    <section class="view" id="week1">
+      <div class="week-grid" id="week-days"></div>
+    </section>
+
+    <section class="view" id="practice">
+      <div class="panel intro"><h2>实操优先</h2><p>每个训练都必须经历：先独立写流程、运行、制造错误、测试，再请Codex评审。不要让Codex直接替你完成整题。</p></div>
+      <div id="practice-list" class="practice-list"></div>
+    </section>
+
+    <section class="view" id="resources">
+      <div id="resource-list" class="resource-list"></div>
+    </section>
+
+    <section class="view" id="review">
+      <div class="two-col">
+        <section class="panel form-panel">
+          <h2>每日复盘</h2>
+          <label class="field">今天学了什么？<textarea id="learned"></textarea></label>
+          <label class="field">独立完成了什么？<textarea id="built"></textarea></label>
+          <label class="field">遇到的报错及根因？<textarea id="errors"></textarea></label>
+          <label class="field">明天如何调整？<textarea id="adjust"></textarea></label>
+          <div class="actions"><button class="primary" id="save-review">保存复盘</button><button class="secondary" id="reset-data">重置演示数据</button></div>
+        </section>
+        <section class="panel">
+          <h2>本周状态规则</h2>
+          <div class="risk-row green"><strong>绿色</strong><span>完成80%以上，核心产出可运行且能解释</span></div>
+          <div class="risk-row yellow"><strong>黄色</strong><span>完成50%-79%，或运行但不能解释数据流</span></div>
+          <div class="risk-row red"><strong>红色</strong><span>完成不足50%，或主要时间只用于看课</span></div>
+          <p class="note">周复盘只看四件事：功能是否运行、测试是否通过、代码能否解释、有没有真实反馈。</p>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
+
