@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>杨其琛｜农业垂直 FDE × 智慧农业研究员 16 周强化计划</title>
+  <style>
+    :root {
+      --ink: #18221d;
+      --muted: #607068;
+      --field: #1f5d42;
+      --water: #2f7d6d;
+      --soil: #6b4f3b;
+      --harvest: #d6a21f;
+      --mist: #eef3ee;
+      --paper: #fbfcf8;
+      --line: #cad8cf;
+      --danger: #a84532;
+      --white: #fff;
+      --shadow: 0 18px 50px rgba(25, 58, 43, .12);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(31,93,66,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31,93,66,.035) 1px, transparent 1px),
+        #e8eee9;
+      background-size: 24px 24px;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      line-height: 1.72;
+    }
+
+    a { color: inherit; }
+    button, input { font: inherit; }
+
+    .page-shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 32px auto 72px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(31, 93, 66, .13);
+    }
+
+    .hero {
+      min-height: 620px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 48px;
+      align-items: end;
+      padding: 76px 72px 64px;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 88% 15%, rgba(214,162,31,.25), transparent 26%),
+        linear-gradient(135deg, #153a2b, #1f5d42 58%, #2f7d6d);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -38% 34%;
+      height: 72%;
+      border-radius: 50% 50% 0 0;
+      background: repeating-radial-gradient(
+        ellipse at center,
+        transparent 0 24px,
+        rgba(255,255,255,.08) 25px 27px
+      );
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .hero-copy { position: relative; z-index: 2; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      color: #dcebe3;
+      font-family: "Arial Narrow", "Microsoft YaHei", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 2px;
+      background: var(--harvest);
+    }
+    h1, h2, h3, h4 { margin: 0; line-height: 1.28; }
+    h1 {
+      max-width: 760px;
+      font-family: "STKaiti", "KaiTi", "Microsoft YaHei", serif;
+      font-size: clamp(42px, 6vw, 76px);
+      font-weight: 700;
+      letter-spacing: -.04em;
+    }
+    .hero-sub {
+      max-width: 680px;
+      margin: 26px 0 0;
+      color: #e4f0e9;
+      font-size: 18px;
+    }
+    .hero-thesis {
+      margin-top: 34px;
+      padding-left: 18px;
+      border-left: 4px solid var(--harvest);
+      color: #fff4c6;
+      font-weight: 700;
+      font-size: 17px;
+    }
+
+    .hero-card {
+      position: relative;
+      z-index: 2;
+      padding: 28px;
+      background: rgba(251,252,248,.92);
+      color: var(--ink);
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 4px 28px 4px 28px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-card .name {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 30px;
+      color: var(--field);
+      font-weight: 700;
+    }
+    .hero-card dl { margin: 22px 0 0; }
+    .hero-card .pair {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid var(--line);
+    }
+    .hero-card dt { color: var(--muted); }
+    .hero-card dd { margin: 0; font-weight: 700; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding: 12px 28px;
+      color: var(--white);
+      background: rgba(24,34,29,.96);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      font-size: 13px;
+    }
+    .progress-track {
+      flex: 1;
+      height: 7px;
+      overflow: hidden;
+      background: rgba(255,255,255,.18);
+      border-radius: 999px;
+    }
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--harvest);
+      transition: width .25s ease;
+    }
+    .toolbar button {
+      padding: 8px 14px;
+      color: var(--white);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.34);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .toolbar button:hover,
+    .toolbar button:focus-visible {
+      background: var(--white);
+      color: var(--ink);
+      outline: none;
+    }
+
+    main { padding: 64px 72px 80px; }
+    .section { margin-top: 74px; }
+    .section:first-child { margin-top: 0; }
+    .section-kicker {
+      margin-bottom: 8px;
+      color: var(--water);
+      font-family: "Arial Narrow", sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    h2 {
+      font-family: "STKaiti", "KaiTi", "Microsoft YaHei", serif;
+      font-size: clamp(30px, 4vw, 48px);
+      color: var(--field);
+    }
+    .section-lead {
+      max-width: 800px;
+      margin: 12px 0 30px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .diagnosis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .diagnosis {
+      padding: 24px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--field);
+    }
+    .diagnosis:nth-child(2) { border-top-color: var(--harvest); }
+    .diagnosis:nth-child(3) { border-top-color: var(--soil); }
+    .diagnosis .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+    .diagnosis h3 {
+      margin-top: 8px;
+      font-size: 22px;
+    }
+    .diagnosis p { margin: 10px 0 0; color: var(--muted); }
+
+    .north-star {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid var(--field);
+      background: var(--field);
+    }
+    .north-star > div { padding: 32px; }
+    .north-star .goal { color: var(--white); }
+    .north-star .proof { background: var(--white); }
+    .north-star h3 { font-size: 24px; }
+    .north-star p { margin-bottom: 0; }
+
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .rule {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      padding: 18px;
+      background: var(--mist);
+      border-left: 3px solid var(--water);
+    }
+    .rule strong {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      color: var(--white);
+      background: var(--water);
+      border-radius: 50%;
+    }
+    .rule h3 { font-size: 17px; }
+    .rule p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+    .field-map {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 28px;
+      padding: 10px;
+      background: var(--mist);
+      border: 1px solid var(--line);
+    }
+    .field-strip {
+      min-height: 180px;
+      padding: 20px;
+      color: var(--white);
+      background: var(--field);
+      position: relative;
+      overflow: hidden;
+    }
+    .field-strip:nth-child(2) { background: var(--water); }
+    .field-strip:nth-child(3) { background: var(--soil); }
+    .field-strip:nth-child(4) { background: #806114; }
+    .field-strip::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        100deg,
+        transparent 0 24px,
+        rgba(255,255,255,.08) 25px 28px
+      );
+    }
+    .field-strip > * { position: relative; z-index: 1; }
+    .field-strip .weeks {
+      font-family: "Arial Narrow", sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+    .field-strip h3 { margin-top: 34px; font-size: 19px; }
+    .field-strip p { margin-bottom: 0; font-size: 13px; opacity: .9; }
+
+    .phase {
+      margin-top: 46px;
+      padding-top: 24px;
+      border-top: 5px solid var(--field);
+    }
+    .phase.phase-2 { border-top-color: var(--water); }
+    .phase.phase-3 { border-top-color: var(--soil); }
+    .phase.phase-4 { border-top-color: var(--harvest); }
+    .phase-head {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 26px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+    .phase-marker {
+      padding: 15px 12px;
+      color: var(--white);
+      background: var(--field);
+      font-family: "Arial Narrow", sans-serif;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-align: center;
+    }
+    .phase-2 .phase-marker { background: var(--water); }
+    .phase-3 .phase-marker { background: var(--soil); }
+    .phase-4 .phase-marker { background: #806114; }
+    .phase-title h3 {
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 31px;
+    }
+    .phase-title p { margin: 7px 0 0; color: var(--muted); }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .week {
+      padding: 22px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 2px 18px 2px 18px;
+      break-inside: avoid;
+    }
+    .week-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: baseline;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .week-no {
+      color: var(--water);
+      font-family: "Arial Narrow", sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+    .week h4 { margin-top: 5px; font-size: 19px; }
+    .week-time {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .week ul { margin: 14px 0; padding: 0; list-style: none; }
+    .week li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .week input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 4px;
+      accent-color: var(--field);
+    }
+    .deliverable {
+      margin-top: 14px;
+      padding: 12px 14px;
+      color: #38473f;
+      background: var(--mist);
+      border-left: 3px solid var(--harvest);
+      font-size: 13px;
+    }
+    .deliverable strong { color: var(--field); }
+
+    .gate {
+      margin-top: 22px;
+      padding: 22px;
+      background: #f7f0dc;
+      border: 1px solid #dfc87c;
+    }
+    .gate h4 { color: #74580d; font-size: 18px; }
+    .gate ul { margin-bottom: 0; }
+
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .matrix th, .matrix td {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .matrix th {
+      color: var(--white);
+      background: var(--field);
+    }
+    .matrix tr:nth-child(even) td { background: var(--mist); }
+
+    .mvp {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 20px;
+    }
+    .mvp-card {
+      padding: 26px;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+    .mvp-card h3 { color: var(--field); font-size: 24px; }
+    .mvp-card ul { padding-left: 20px; }
+    .warning {
+      color: #67291e;
+      background: #f8e8e4;
+      border-color: #d7a295;
+    }
+    .warning h3 { color: var(--danger); }
+
+    .weekly-rhythm {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .day {
+      min-height: 130px;
+      padding: 15px 12px;
+      background: var(--mist);
+      border-bottom: 4px solid var(--field);
+    }
+    .day:nth-child(2) { border-color: var(--water); }
+    .day:nth-child(3) { border-color: var(--soil); }
+    .day:nth-child(4) { border-color: var(--harvest); }
+    .day:nth-child(5) { border-color: var(--water); }
+    .day:nth-child(6) { border-color: var(--ink); }
+    .day strong { display: block; margin-bottom: 8px; }
+    .day span { color: var(--muted); font-size: 12px; }
+
+    .scorecard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .score {
+      padding: 22px;
+      color: var(--white);
+      background: var(--field);
+    }
+    .score:nth-child(2) { background: var(--water); }
+    .score:nth-child(3) { background: var(--soil); }
+    .score h3 { font-size: 20px; }
+    .score ul { padding-left: 18px; margin-bottom: 0; font-size: 13px; }
+
+    .not-do {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .not-do div {
+      padding: 16px 18px;
+      color: #59251c;
+      background: #f8e8e4;
+      border-left: 4px solid var(--danger);
+    }
+
+    .final-check {
+      padding: 34px;
+      color: var(--white);
+      background: linear-gradient(120deg, var(--field), var(--water));
+    }
+    .final-check h2 { color: var(--white); }
+    .final-check .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 26px;
+      margin-top: 22px;
+    }
+    .final-check label {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+    }
+    .final-check input { margin-top: 5px; accent-color: var(--harvest); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 72px 32px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    @media (max-width: 820px) {
+      .page-shell { width: 100%; margin: 0; border: 0; }
+      .hero { grid-template-columns: 1fr; padding: 58px 28px 42px; }
+      .hero-card { max-width: 520px; }
+      .toolbar { position: relative; flex-direction: column; align-items: stretch; }
+      main { padding: 46px 24px 64px; }
+      .diagnosis-grid, .field-map, .week-grid, .mvp, .scorecard,
+      .north-star, .rules, .not-do, .final-check .check-grid {
+        grid-template-columns: 1fr;
+      }
+      .phase-head { grid-template-columns: 1fr; }
+      .weekly-rhythm { grid-template-columns: repeat(2, 1fr); }
+      footer { padding: 22px 24px; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+
+    @page {
+      size: A4;
+      margin: 12mm 11mm 14mm;
+    }
+
+    @media print {
+      :root { --paper: #fff; }
+      body { background: #fff; font-size: 10pt; line-height: 1.48; }
+      .page-shell { width: auto; margin: 0; border: 0; box-shadow: none; }
+      .toolbar { display: none; }
+      .hero {
+        min-height: 270mm;
+        grid-template-columns: 1fr;
+        align-content: center;
+        padding: 28mm 18mm;
+        page-break-after: always;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .hero h1 { font-size: 36pt; }
+      .hero-card { max-width: 145mm; margin-top: 14mm; }
+      main { padding: 0; }
+      .diagnosis-grid { grid-template-columns: repeat(3, 1fr); }
+      .north-star { grid-template-columns: 1fr 1fr; }
+      .rules { grid-template-columns: repeat(2, 1fr); }
+      .field-map { grid-template-columns: repeat(4, 1fr); }
+      .week-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mvp { grid-template-columns: 1.08fr .92fr; }
+      .weekly-rhythm { grid-template-columns: repeat(6, 1fr); }
+      .scorecard { grid-template-columns: repeat(3, 1fr); }
+      .not-do { grid-template-columns: repeat(2, 1fr); }
+      .final-check .check-grid { grid-template-columns: repeat(2, 1fr); }
+      .section { margin-top: 9mm; }
+      .section:first-child { margin-top: 0; }
+      .section-kicker { font-size: 8pt; }
+      h2 { font-size: 22pt; }
+      .section-lead { margin: 2mm 0 5mm; font-size: 10pt; }
+      .diagnosis-grid { gap: 3mm; }
+      .diagnosis { padding: 4mm; }
+      .diagnosis h3 { font-size: 13pt; }
+      .north-star > div { padding: 5mm; }
+      .rule { padding: 3mm; }
+      .field-map { gap: 1.5mm; margin-top: 5mm; padding: 2mm; }
+      .field-strip { min-height: 42mm; padding: 4mm; }
+      .phase { margin-top: 8mm; padding-top: 4mm; break-before: page; }
+      .phase-head { grid-template-columns: 32mm 1fr; gap: 5mm; margin-bottom: 4mm; }
+      .phase-marker { padding: 3mm 2mm; }
+      .phase-title h3 { font-size: 18pt; }
+      .week-grid { gap: 3mm; }
+      .week { padding: 4mm; border-radius: 0 5mm 0 5mm; }
+      .week h4 { font-size: 12pt; }
+      .week li { margin: 1.3mm 0; font-size: 9pt; }
+      .deliverable { padding: 2.5mm; font-size: 8.5pt; }
+      .gate { padding: 4mm; }
+      .matrix { font-size: 8.5pt; }
+      .matrix th, .matrix td { padding: 2.5mm; }
+      .mvp-card { padding: 4mm; }
+      .weekly-rhythm { gap: 1.5mm; }
+      .day { min-height: 31mm; padding: 3mm 2.5mm; }
+      .score { padding: 4mm; }
+      .final-check { margin-top: 8mm; padding: 6mm; }
+      footer { padding: 6mm 0 0; }
+      .rules, .field-map { break-inside: avoid; }
+      .roadmap-section { break-before: page; break-inside: avoid; }
+      .phase-1 { break-before: auto; }
+      .phase-2 { break-before: auto; }
+      .phase-4 { break-before: auto; }
+      .week, .diagnosis, .rule, .mvp-card, .score, .gate,
+      .north-star, .final-check, table { break-inside: avoid; }
+      input[type="checkbox"] { appearance: none; width: 3.5mm; height: 3.5mm; border: .3mm solid #52635a; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Agriculture × AI × Delivery</div>
+        <h1>从田间经验<br>到肥料决策交付</h1>
+        <p class="hero-sub">杨其琛农业垂直 FDE × 新洋丰“智慧农业研究员”16 周强化计划。目标不是开发作物模型本身，而是把第三方模型输出、土壤、气象、区域习惯、产品库与田间验证整合成区域化、可执行、可迭代的肥料决策。</p>
+        <p class="hero-thesis">主项目：区域肥料决策工作台</p>
+      </div>
+      <aside class="hero-card">
+        <div class="name">杨其琛</div>
+        <dl>
+          <div class="pair"><dt>当前优势</dt><dd>农业现场、生产运营、方案预算与多方协调</dd></div>
+          <div class="pair"><dt>核心短板</dt><dd>多源数据融合、决策系统构建、参数调优与软件交付证据</dd></div>
+          <div class="pair"><dt>投入建议</dt><dd>每周 20-25 小时；低于 12 小时则顺延周期</dd></div>
+          <div class="pair"><dt>目标岗位</dt><dd>新洋丰智慧农业研究员；农业 AI 决策与垂直 FDE</dd></div>
+          <div class="pair"><dt>制定日期</dt><dd>2026 年 7 月 25 日</dd></div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="toolbar">
+      <div class="progress-wrap" aria-live="polite">
+        <span>计划完成度</span>
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        <span id="progressText">0%</span>
+      </div>
+      <button type="button" onclick="window.print()">打印 / 导出 PDF</button>
+    </div>
+
+    <main>
+      <section class="section">
+        <div class="section-kicker">Diagnosis / 起点判断</div>
+        <h2>你缺的不是行业深度，是 Delta 交付证据</h2>
+        <p class="section-lead">你已经有 FDE 很难速成的一半：能进入农业现场、判断生产问题、组织资源并对结果负责。16 周计划只做一件事：把这份行业判断力接上可运行、可测试、可部署的 AI 系统。</p>
+        <div class="diagnosis-grid">
+          <article class="diagnosis">
+            <div class="label">ECHO / 摸真需求</div>
+            <h3>强项，继续实战化</h3>
+            <p>独立管理 2692 亩生产，编制 9320 亩方案与 443.11 万元预算，具备现场观察和业务拆解基础。</p>
+          </article>
+          <article class="diagnosis">
+            <div class="label">DELTA / 端到端构建</div>
+            <h3>本计划的主攻区</h3>
+            <p>补齐 GitHub、数据处理、界面、模型调用、数据库、测试、部署、日志和异常处理。</p>
+          </article>
+          <article class="diagnosis">
+            <div class="label">DELIVERY / 业务结果</div>
+            <h3>必须拿到真实证据</h3>
+            <p>不以“功能做完”为毕业标准；必须证明推荐有数据来源、区域适配、专家审核、田间验证和迭代记录。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">North Star / 北极星</div>
+        <h2>16 周后的合格状态</h2>
+        <div class="north-star">
+          <div class="goal">
+            <h3>你能独立完成一次肥料决策层交付</h3>
+            <p>从第三方作物模型输出开始，融合土壤、气象、种植习惯、肥料产品和田间试验数据，输出有依据、有边界、有审核的区域化施肥候选方案。</p>
+          </div>
+          <div class="proof">
+            <h3>毕业证据，而不是学习时长</h3>
+            <p>1 个区域肥料决策工作台 + 1 个区域适配案例 + 30 条决策测试 + 2 名专业用户评审 + 1 套田间验证方案 + 完整参数版本与迭代记录 + 岗位案例报告。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">Operating Rules / 执行原则</div>
+        <h2>六条不可妥协的规则</h2>
+        <div class="rules">
+          <article class="rule"><strong>1</strong><div><h3>先找问题，再学工具</h3><p>每个新工具必须服务于本周交付；没有真实用途，就暂时不学。</p></div></article>
+          <article class="rule"><strong>2</strong><div><h3>每两周接触用户</h3><p>访谈、演示或试用至少发生一次，避免闭门做出无人需要的系统。</p></div></article>
+          <article class="rule"><strong>3</strong><div><h3>确定性计算不交给模型</h3><p>面积、用量、单价、总价由代码计算；模型只负责解释、归纳和辅助检查。</p></div></article>
+          <article class="rule"><strong>4</strong><div><h3>农业建议必须人工复核</h3><p>施肥、用药、品种等高风险建议标注来源、版本、不确定性与审核人。</p></div></article>
+          <article class="rule"><strong>5</strong><div><h3>只做一个主项目</h3><p>先把一个工作流做到有人重复使用，再考虑 RAG、多 Agent 或跨品类扩展。</p></div></article>
+          <article class="rule"><strong>6</strong><div><h3>每周必须留下证据</h3><p>代码提交、Issue、测试记录、用户原话、演示截图和复盘缺一不可。</p></div></article>
+        </div>
+      </section>
+
+      <section class="section role-section">
+        <div class="section-kicker">Role Track / 新洋丰岗位强化主线</div>
+        <h2>你要补的是“模型之外的肥料决策层”</h2>
+        <p class="section-lead">公开岗位强调智慧农业平台运维、农业大数据处理、跨区域土壤/气象/作物数据融合与系统参数优化；公司业务又以测土配方、作物专用肥、区域服务和田间示范为基础。因此，这条岗位线最像一个农业决策型 FDE：承接模型和数据，输出能被农艺师、区域服务人员和种植户执行并持续校正的方案。</p>
+        <div class="north-star">
+          <div class="goal">
+            <h3>上游边界：不训练作物模型</h3>
+            <p>把第三方模型视为一个有版本、有输入输出契约、有适用区域和误差范围的上游服务。你的任务是理解并校验其产量、物候、养分需求、水分与胁迫等输出，而不是从零开发模型。</p>
+          </div>
+          <div class="proof">
+            <h3>下游责任：形成可执行肥料决策</h3>
+            <p>将模型输出与土壤检测、天气、区域种植习惯、肥料产品库、成本和试验结果结合，形成肥料品类、养分量、时期、方式、产品映射、风险与调整条件，并保留专家审核。</p>
+          </div>
+        </div>
+
+        <table class="matrix" style="margin-top:20px">
+          <thead><tr><th>决策层环节</th><th>需要掌握</th><th>系统证据</th><th>岗位价值</th></tr></thead>
+          <tbody>
+            <tr><td>数据契约</td><td>作物模型、土壤、气象、区域、产品、试验数据的字段、单位、时间和版本</td><td>数据字典、接口样例、质量报告</td><td>能接入第三方系统，不把脏数据直接送入决策</td></tr>
+            <tr><td>需求量解释</td><td>目标产量、养分吸收、土壤供肥、利用率与阶段需求的关系</td><td>计算说明、假设、边界测试</td><td>把模型输出翻译成可讨论的肥料需求</td></tr>
+            <tr><td>区域化调整</td><td>土壤质地、pH、有机质、前茬、灌溉、气候和种植制度</td><td>区域参数表、规则版本、差异说明</td><td>做到“大配方、小调整”，而非全国一张处方</td></tr>
+            <tr><td>产品映射</td><td>N-P₂O₅-K₂O、中微量元素、肥效特征、施用方式、价格与库存</td><td>产品主数据、约束规则、候选排序</td><td>把养分需求落到企业可供应、农户可执行的产品组合</td></tr>
+            <tr><td>田间验证</td><td>对照、处理、重复、随机化、指标、数据质控和基础统计</td><td>试验方案、原始记录、效果与偏差分析</td><td>用试验校正参数，而不是用一次高产故事证明模型</td></tr>
+            <tr><td>运营迭代</td><td>参数发布、区域灰度、日志、异常、回滚、专家审批与复盘</td><td>版本记录、审批链、问题台账</td><td>保障系统稳定运行并持续提高地域适配性</td></tr>
+          </tbody>
+        </table>
+
+        <div class="gate">
+          <h4>岗位作品的核心链路</h4>
+          <p><strong>作物模型输出 → 数据质量检查 → 养分需求解释 → 区域参数调整 → 肥料产品匹配 → 专家审核 → 形成建议卡 → 田间验证 → 参数迭代。</strong></p>
+          <p style="margin-bottom:0">公开依据：
+            <a href="https://www.zhaopin.com/jobdetail/CC307847110J40850525807.htm">新洋丰智慧农业研究员岗位</a> ·
+            <a href="https://yonfer.com/technology">新洋丰科技创新</a> ·
+            <a href="https://yonfer.com/product/service/55">新洋丰农化服务</a> ·
+            <a href="https://zzys.moa.gov.cn/tzgg/200803/t20080321_6310391.htm">农业农村部《测土配方施肥技术规范》</a> ·
+            <a href="https://jgs.moa.gov.cn/nybz/201904/t20190418_6186032.htm">《肥料登记田间试验通则》等标准公告</a>。所有推荐均作为决策支持，不替代当地农艺师和合规审核。
+          </p>
+        </div>
+      </section>
+
+      <section class="section roadmap-section">
+        <div class="section-kicker">Roadmap / 田垄路线</div>
+        <h2>四段田垄，四次交付闭环</h2>
+        <p class="section-lead">不是“先学完再实践”，而是每个阶段都完成问题定义、构建、验证和复盘。阶段门没有通过，就不向后赶进度。</p>
+        <div class="field-map">
+          <article class="field-strip"><div class="weeks">WEEK 01-03</div><h3>定义决策边界</h3><p>补 GitHub，建立六类数据契约，明确模型层与肥料决策层分工。</p></article>
+          <article class="field-strip"><div class="weeks">WEEK 04-07</div><h3>筑数据与规则底座</h3><p>完成数据质检、养分计算、产品库与可追溯规则原型。</p></article>
+          <article class="field-strip"><div class="weeks">WEEK 08-12</div><h3>做区域决策闭环</h3><p>接入模型样例，完成区域调整、产品映射、审核与田间验证方案。</p></article>
+          <article class="field-strip"><div class="weeks">WEEK 13-16</div><h3>形成岗位证据</h3><p>区域适配案例、参数调优复盘、作品集与新洋丰定向面试。</p></article>
+        </div>
+      </section>
+
+      <section class="phase phase-1">
+        <div class="phase-head">
+          <div class="phase-marker">PHASE A<br>W01-03</div>
+          <div class="phase-title">
+            <h3>定义边界：基础、数据契约与岗位场景</h3>
+            <p>你已经完成 Python 变量、循环、函数、JSON 与菜单程序练习。本阶段不重学一遍，而是把现有能力接入 GitHub，并建立作物模型、土壤、气象、区域习惯、产品库和田间试验六类数据契约。</p>
+          </div>
+        </div>
+        <div class="week-grid">
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 01</div><h4>接上现有代码，建立交付习惯</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>整理现有成本计算器和 JSON 配置管理器，删除重复文件。</span></li>
+              <li><input data-task type="checkbox"><span>建立 Git 仓库，完成至少 5 次有意义提交。</span></li>
+              <li><input data-task type="checkbox"><span>学习 repo、issue、commit、branch、PR、review、merge。</span></li>
+              <li><input data-task type="checkbox"><span>写 README：问题、输入、输出、运行方法、已知限制。</span></li>
+              <li><input data-task type="checkbox"><span>为成本计算补正常、0、负数、缺字段等 10 条测试。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>可运行的成本计算器仓库、README、10 条测试、第一次 PR。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 02</div><h4>六类数据审计，而不是急着建模</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>列出作物模型、土壤、气象、种植习惯、肥料产品和田间试验六类数据。</span></li>
+              <li><input data-task type="checkbox"><span>制作数据字典：字段、单位、来源、年份、缺失率、责任人。</span></li>
+              <li><input data-task type="checkbox"><span>识别隐私与商业敏感信息，制作脱敏样例。</span></li>
+              <li><input data-task type="checkbox"><span>用 pandas 完成读取、清洗、单位统一和异常值报告。</span></li>
+              <li><input data-task type="checkbox"><span>写清每类数据能回答什么、不能回答什么、超出何种范围必须转人工。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>六类数据资产清单、数据字典、脱敏样例、质量与适用性报告。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 03</div><h4>访谈角色，冻结决策链路</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>访谈或模拟访谈作物模型方、土肥专家、产品经理和区域农化服务人员。</span></li>
+              <li><input data-task type="checkbox"><span>明确谁提供数据、谁调整参数、谁审核、谁执行、谁反馈试验结果。</span></li>
+              <li><input data-task type="checkbox"><span>画出“模型输出到肥料建议卡再到田间验证”的工作流。</span></li>
+              <li><input data-task type="checkbox"><span>定义 MVP：一个作物、一个区域、一套产品库、一个模型样例。</span></li>
+              <li><input data-task type="checkbox"><span>确定 3 个验收指标和 3 个明确不做的功能。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>角色责任图、决策流程、问题定义书、MVP 边界与验收表。</div>
+          </article>
+        </div>
+        <div class="gate">
+          <h4>阶段门 A｜满足后才能进入开发</h4>
+          <ul>
+            <li>能解释现有程序至少 70% 的关键数据流。</li>
+            <li>能清楚说出作物模型层与肥料决策层各自负责什么。</li>
+            <li>拥有六类数据的最小样例；缺少真实数据时使用明确标注的模拟数据。</li>
+            <li>MVP 限定一个作物和一个区域，不包含无人审核的自动施肥处方。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="phase phase-2">
+        <div class="phase-head">
+          <div class="phase-marker">PHASE B<br>W04-07</div>
+          <div class="phase-title">
+            <h3>底座交付：肥料决策数据与规则工作台</h3>
+            <p>先做一个能检查多源数据、计算养分量、管理产品库和追踪规则版本的底座。模型不是主角，数据质量、确定性计算和可解释规则才是。</p>
+          </div>
+        </div>
+        <div class="week-grid">
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 04</div><h4>多源数据质检与单位统一</h4></div><span class="week-time">22h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>建立地块、作物、模型输出、土壤、气象、产品和试验主键。</span></li>
+              <li><input data-task type="checkbox"><span>统一面积、产量、养分、肥料和土壤指标的单位与时间尺度。</span></li>
+              <li><input data-task type="checkbox"><span>实现缺失、越界、时间错位、区域错配和重复数据检查。</span></li>
+              <li><input data-task type="checkbox"><span>为每个数据源记录来源、版本、更新时间和适用范围。</span></li>
+              <li><input data-task type="checkbox"><span>累计 20 条确定性数据质量测试。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>六类数据 schema、单位换算器、质量报告、20 条测试。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 05</div><h4>养分计算与肥料产品库</h4></div><span class="week-time">22h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>梳理目标产量、作物需求、土壤供肥、利用率和有机源的计算边界。</span></li>
+              <li><input data-task type="checkbox"><span>建立肥料产品主数据：养分标识、剂型、肥效、适用作物、区域、价格和库存。</span></li>
+              <li><input data-task type="checkbox"><span>实现 N-P₂O₅-K₂O 需求与产品组合的确定性换算。</span></li>
+              <li><input data-task type="checkbox"><span>加入养分过量、产品不适配、施用方式冲突等硬约束。</span></li>
+              <li><input data-task type="checkbox"><span>对照人工 Excel 完成至少 10 组复算。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>养分计算说明、产品主数据、产品匹配器、复算报告。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 06</div><h4>区域规则与可解释建议卡</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>把土壤质地、pH、有机质、前茬、灌溉和区域习惯写成参数化规则。</span></li>
+              <li><input data-task type="checkbox"><span>让模型只解释规则和生成建议卡文本，不重算养分数字。</span></li>
+              <li><input data-task type="checkbox"><span>建议卡展示输入、假设、计算、产品候选、风险、来源和审核状态。</span></li>
+              <li><input data-task type="checkbox"><span>数据不足或超出适用区时自动转人工，不强行给结论。</span></li>
+              <li><input data-task type="checkbox"><span>建立区域参数版本与修改理由。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>区域规则表、建议卡模板、人工审核与拒答机制。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 07</div><h4>工作台界面、测试与内部版</h4></div><span class="week-time">24h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>实现数据上传、质量报告、养分计算、产品匹配和建议卡页面。</span></li>
+              <li><input data-task type="checkbox"><span>扩展到至少 30 条测试，覆盖区域错配、极端值和产品缺货。</span></li>
+              <li><input data-task type="checkbox"><span>配置参数日志、错误追踪、审批记录和数据删除方式。</span></li>
+              <li><input data-task type="checkbox"><span>部署内部测试版；完成敏感数据与密钥检查。</span></li>
+              <li><input data-task type="checkbox"><span>请 1 名农艺或肥料技术人员完成一次评审。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>区域肥料决策工作台 v0.1、30 条测试、专家评审记录。</div>
+          </article>
+        </div>
+        <div class="gate">
+          <h4>阶段门 B｜“能打开”不等于“能交付”</h4>
+          <ul>
+            <li>养分与产品换算由代码计算，关键计算测试通过率 100%。</li>
+            <li>AI 不可用时，数据质检、规则计算和产品匹配仍然可用。</li>
+            <li>每条建议可回溯到输入数据、规则版本、产品记录和审核人。</li>
+            <li>所有施肥候选方案必须经过专业人员确认，不出现自动下发。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="phase phase-3">
+        <div class="phase-head">
+          <div class="phase-marker">PHASE C<br>W08-12</div>
+          <div class="phase-title">
+            <h3>区域闭环：模型接入、肥料推荐与田间验证</h3>
+            <p>这五周决定你能否胜任岗位。重点是把第三方模型输出转化为区域化候选方案，完成产品映射、专家审核、试验设计和参数迭代，而不是继续堆功能。</p>
+          </div>
+        </div>
+        <div class="week-grid">
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 08</div><h4>第三方作物模型输入输出契约</h4></div><span class="week-time">18h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>选择水稻或小麦作为唯一示范作物和一个具体区域。</span></li>
+              <li><input data-task type="checkbox"><span>定义模型输入、输出、时间步长、版本、适用区和不确定性字段。</span></li>
+              <li><input data-task type="checkbox"><span>用 mock API 或样例 JSON 模拟第三方模型，不开发模型本体。</span></li>
+              <li><input data-task type="checkbox"><span>设计模型异常、缺值、延迟和版本变化的降级处理。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>模型接口说明、样例输出、适用边界、异常处理测试。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 09</div><h4>从模型输出到养分需求候选</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>把产量目标、物候、养分吸收与胁迫输出转换为决策层特征。</span></li>
+              <li><input data-task type="checkbox"><span>叠加土壤供肥、前茬、有机投入和肥料利用率假设。</span></li>
+              <li><input data-task type="checkbox"><span>输出氮磷钾及必要中微量元素的区间，不制造虚假精确值。</span></li>
+              <li><input data-task type="checkbox"><span>做参数敏感性测试：关键参数变化时推荐如何变化。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>养分需求候选模块、假设说明、敏感性分析、v0.2。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 10</div><h4>区域化调整与产品组合</h4></div><span class="week-time">22h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>依据区域土壤、气候、种植制度和农户操作习惯调整基追比例与时期。</span></li>
+              <li><input data-task type="checkbox"><span>把养分需求映射到 2-3 个产品候选及用量、时期和方式。</span></li>
+              <li><input data-task type="checkbox"><span>同时展示成本、约束、不可满足项和替代方案。</span></li>
+              <li><input data-task type="checkbox"><span>确保每个调整可追溯到参数、数据、规则或专家意见。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>区域参数包、产品候选、建议卡、完整追溯链。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 11</div><h4>田间试验与校正方案</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>设计对照、推荐方案、农户习惯方案及必要减量/增效处理。</span></li>
+              <li><input data-task type="checkbox"><span>明确随机化、重复、小区、操作一致性和数据质控要求。</span></li>
+              <li><input data-task type="checkbox"><span>定义产量、品质、养分效率、经济收益和土壤指标。</span></li>
+              <li><input data-task type="checkbox"><span>预先写明如何用试验结果校正区域参数，而非事后挑结果。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>田间验证方案、调查表、统计分析模板、参数校正规则。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 12</div><h4>专家评审、参数发布与回滚</h4></div><span class="week-time">18h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>邀请 2 名农艺、土肥或肥料技术人员评审同一案例。</span></li>
+              <li><input data-task type="checkbox"><span>记录意见分歧、采用理由、适用区域和剩余风险。</span></li>
+              <li><input data-task type="checkbox"><span>实现参数审批、版本发布、灰度应用和一键回滚说明。</span></li>
+              <li><input data-task type="checkbox"><span>发布 v1.0 或诚实判定推荐链路尚未通过。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>专家评审、参数版本、发布/回滚记录、区域方案 v1.0。</div>
+          </article>
+        </div>
+        <div class="gate">
+          <h4>阶段门 C｜只有可审计、可验证才算岗位证据</h4>
+          <ul>
+            <li>能接收第三方模型样例，并在模型异常时安全降级。</li>
+            <li>每条推荐都有输入、参数、规则、产品、审核与版本链路。</li>
+            <li>完成一套符合基本试验原则的田间验证与参数校正方案。</li>
+            <li>至少 2 名专业人员评审；意见不一致时系统不自动下发。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="phase phase-4">
+        <div class="phase-head">
+          <div class="phase-marker">PHASE D<br>W13-16</div>
+          <div class="phase-title">
+            <h3>形成岗位证据：区域适配案例与求职验证</h3>
+            <p>最后四周不是继续堆技术，而是把“模型输出到肥料建议卡”的完整链路翻译成新洋丰和同类农业 AI 岗位看得懂的证据。</p>
+          </div>
+        </div>
+        <div class="week-grid">
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 13</div><h4>第二区域适配案例</h4></div><span class="week-time">16h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>保持同一作物，切换另一区域的土壤、气候、习惯和产品约束。</span></li>
+              <li><input data-task type="checkbox"><span>比较“大配方”不变和“小调整”发生在哪里、为什么。</span></li>
+              <li><input data-task type="checkbox"><span>用测试证明区域参数不会污染原区域结果。</span></li>
+              <li><input data-task type="checkbox"><span>形成区域复制清单，不追求第二个大型系统。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>双区域对比、参数差异、产品替换与适配案例。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 14</div><h4>FDE 案例与演示资产</h4></div><span class="week-time">20h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>按“模型输出-数据融合-区域调整-产品映射-审核-验证”写案例。</span></li>
+              <li><input data-task type="checkbox"><span>录制 3 分钟演示，展示推荐依据、边界与迭代，不做功能巡礼。</span></li>
+              <li><input data-task type="checkbox"><span>整理仓库 README、架构图、测试、Issue 和版本记录。</span></li>
+              <li><input data-task type="checkbox"><span>准备“为什么不开发模型本体”“如何调区域参数”等岗位问答。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>完整案例、演示视频、作品集页面、项目讲稿。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 15</div><h4>岗位地图与定向简历</h4></div><span class="week-time">18h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>把新洋丰职位逐条映射为平台运维、数据处理、参数调优和地域适配证据。</span></li>
+              <li><input data-task type="checkbox"><span>补充 10 个同类农业决策、智慧农业运营或行业 FDE 岗位。</span></li>
+              <li><input data-task type="checkbox"><span>重写简历：每段经历用业务问题、行动、结果和系统证据表达。</span></li>
+              <li><input data-task type="checkbox"><span>准备作物营养、数据质量、产品映射、田间试验和系统异常面试题。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>岗位地图、FDE 定向简历、面试题库。</div>
+          </article>
+          <article class="week">
+            <div class="week-head"><div><div class="week-no">WEEK 16</div><h4>投递、模拟面试与下一轮计划</h4></div><span class="week-time">18h</span></div>
+            <ul>
+              <li><input data-task type="checkbox"><span>完成新洋丰定向材料与 5-10 份同类岗位投递。</span></li>
+              <li><input data-task type="checkbox"><span>完成 3 次模拟面试和 1 次肥料决策工作台现场演示。</span></li>
+              <li><input data-task type="checkbox"><span>根据反馈判断短板属于技术、表达、行业还是岗位错配。</span></li>
+              <li><input data-task type="checkbox"><span>制定下一轮 6 周强化计划，只选一个主短板。</span></li>
+            </ul>
+            <div class="deliverable"><strong>交付：</strong>投递记录、面试复盘、能力差距表、下一轮计划。</div>
+          </article>
+        </div>
+        <div class="gate">
+          <h4>阶段门 D｜职业转型的真实出口</h4>
+          <ul>
+            <li>能用 5 分钟讲清模型层、肥料决策层、人工审核和田间验证的边界。</li>
+            <li>仓库、工作台、区域案例和简历四者说的是同一条推荐链路。</li>
+            <li>能逐条回应新洋丰岗位的农业数据处理、参数调优、平台运维和地域适配要求。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">MVP Contract / 主项目契约</div>
+        <h2>主项目做什么，不做什么</h2>
+        <div class="mvp">
+          <article class="mvp-card">
+            <h3>必须做到</h3>
+            <ul>
+              <li>接收一份第三方作物模型的版本化样例输出。</li>
+              <li>融合土壤、气象、区域习惯、产品库和试验数据。</li>
+              <li>通过确定性计算生成养分需求区间和产品候选。</li>
+              <li>输出肥料品类、用量、时期、方式、风险和调整条件。</li>
+              <li>每条推荐可追溯到数据、参数、规则、产品和审核人。</li>
+              <li>支持区域参数发布、回滚和田间验证结果回写。</li>
+            </ul>
+          </article>
+          <article class="mvp-card warning">
+            <h3>第一版明确不做</h3>
+            <ul>
+              <li>不承诺产量，不根据三年数据直接下因果结论。</li>
+              <li>不训练作物模型，不把第三方模型当绝对真值。</li>
+              <li>不自动下发未经专业人员审核的施肥处方。</li>
+              <li>不做全链路智慧农业平台。</li>
+              <li>不因为“高级”而强行使用多 Agent、微调或复杂优化算法。</li>
+              <li>不把用户敏感数据上传到未获许可的服务。</li>
+              <li>不使用一次示范田结果替代多点、多季验证。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">Skills Matrix / 能力矩阵</div>
+        <h2>只学足够完成交付的技术</h2>
+        <table class="matrix">
+          <thead><tr><th>能力</th><th>需要掌握</th><th>暂不深入</th><th>证明方式</th></tr></thead>
+          <tbody>
+            <tr><td>GitHub 协作</td><td>Issue、提交、分支、PR、Review、Release</td><td>复杂分支策略、底层 Git 原理</td><td>可追踪的需求与迭代历史</td></tr>
+            <tr><td>Python 与数据</td><td>函数、异常、CSV/Excel/JSON、pandas、测试</td><td>算法竞赛、复杂设计模式</td><td>30 条测试与可解释的数据流</td></tr>
+            <tr><td>作物营养决策</td><td>测土配方、养分平衡、区域调整、产品映射、建议卡</td><td>从零研发作物模型、未经验证的自动处方</td><td>计算说明、参数表、双区域案例</td></tr>
+            <tr><td>田间验证</td><td>对照、重复、随机化、指标、数据质控、基础统计</td><td>用单点高产结果外推全国</td><td>试验方案、分析模板、校正规则</td></tr>
+            <tr><td>AI 应用</td><td>第三方 API、结构化输出、来源、评测、失败降级</td><td>模型训练、微调、炫技型多 Agent</td><td>上游模型异常时系统安全降级</td></tr>
+            <tr><td>产品与交付</td><td>角色访谈、流程图、审核、参数发布、试点、交接</td><td>厚重 PRD 与空泛战略汇报</td><td>评审、版本、发布与回滚记录</td></tr>
+            <tr><td>部署与安全</td><td>环境变量、数据库基础、部署、备份、脱敏</td><td>大型分布式架构、复杂云原生</td><td>线上可用、密钥不入库、可恢复</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">Weekly Rhythm / 每周节奏</div>
+        <h2>建议每周 20-25 小时</h2>
+        <p class="section-lead">如果当周只能投入 12 小时，保留“构建、用户、测试、复盘”，删减课程观看，不要为了赶日历牺牲交付质量。</p>
+        <div class="weekly-rhythm">
+          <div class="day"><strong>第 1 天<br>学习</strong><span>只学本周马上要用的概念，控制在总时间 25% 内。</span></div>
+          <div class="day"><strong>第 2 天<br>构建</strong><span>独立实现核心功能，再让 Agent 检查。</span></div>
+          <div class="day"><strong>第 3 天<br>数据</strong><span>清洗样例、定义字段、检查边界与来源。</span></div>
+          <div class="day"><strong>第 4 天<br>现场</strong><span>访谈、演示、观察用户或整理用户原话。</span></div>
+          <div class="day"><strong>第 5 天<br>测试</strong><span>故意制造错误，记录失败和修复证据。</span></div>
+          <div class="day"><strong>第 6 天<br>发布复盘</strong><span>提交 PR、发布版本、写周复盘；第 7 天休息或补缺。</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">Scorecard / 毕业评分</div>
+        <h2>三条线同时过关</h2>
+        <div class="scorecard">
+          <article class="score"><h3>Echo｜业务</h3><ul><li>模型层与决策层边界</li><li>角色责任与审批链</li><li>区域差异与执行约束</li><li>明确验收与风险边界</li></ul></article>
+          <article class="score"><h3>Delta｜系统</h3><ul><li>六类数据融合</li><li>30 条决策测试</li><li>可追溯、可降级、可回滚</li><li>日志、参数、数据安全</li></ul></article>
+          <article class="score"><h3>Result｜证据</h3><ul><li>双区域适配案例</li><li>2 名专业人员评审</li><li>田间验证与校正方案</li><li>建议卡、演示与交接</li></ul></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker">Anti-plan / 防跑偏清单</div>
+        <h2>出现这些信号，立刻停下来调整</h2>
+        <div class="not-do">
+          <div>连续一周只看课程，没有可运行的新功能。</div>
+          <div>代码能跑，但无法解释数据从哪里来、到哪里去。</div>
+          <div>还没访谈用户，就开始做 RAG、多 Agent 或大平台。</div>
+          <div>用“模型说了”代替农业来源和专家审核。</div>
+          <div>同时做三个产品，每个都没有真实用户。</div>
+          <div>为了宣传写“节省 98%”，却没有人工基线和记录。</div>
+          <div>Agent 重写了整个项目，你只能复制运行。</div>
+          <div>把“做完功能”当成验收，忽略用户是否真正采用。</div>
+        </div>
+      </section>
+
+      <section class="section final-check">
+        <div class="section-kicker" style="color:#dff0e7">Final Checklist / 16 周毕业清单</div>
+        <h2>交付完成，才算阶段毕业</h2>
+        <div class="check-grid">
+          <label><input data-task type="checkbox"><span>肥料决策工作台可访问并有版本号</span></label>
+          <label><input data-task type="checkbox"><span>30 条测试与关键计算 100% 通过</span></label>
+          <label><input data-task type="checkbox"><span>模型与六类数据接口可解释</span></label>
+          <label><input data-task type="checkbox"><span>完成两个区域的参数适配</span></label>
+          <label><input data-task type="checkbox"><span>2 名专业人员完成评审</span></label>
+          <label><input data-task type="checkbox"><span>完成田间验证与参数校正方案</span></label>
+          <label><input data-task type="checkbox"><span>有完整 Issue、PR、审核与发布记录</span></label>
+          <label><input data-task type="checkbox"><span>完成新洋丰定向案例、简历和面试演示</span></label>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>杨其琛｜农业垂直 FDE × 智慧农业研究员 16 周强化计划</span>
+      <span>版本 1.1 · 2026-07-25 · 已整合新洋丰智慧农业研究员岗位与肥料决策层能力</span>
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "yang-qichen-fde-fertilizer-decision-plan-v1-1";
+    const tasks = [...document.querySelectorAll("[data-task]")];
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+    tasks.forEach((task, index) => {
+      task.checked = Boolean(saved[index]);
+      task.addEventListener("change", () => {
+        const state = {};
+        tasks.forEach((item, i) => state[i] = item.checked);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        updateProgress();
+      });
+    });
+
+    function updateProgress() {
+      const completed = tasks.filter(task => task.checked).length;
+      const percent = tasks.length ? Math.round(completed / tasks.length * 100) : 0;
+      document.getElementById("progressBar").style.width = `${percent}%`;
+      document.getElementById("progressText").textContent = `${percent}%`;
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
