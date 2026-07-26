@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>水稻当季氮磷钾投入量核算器</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f2;
+      --card: #ffffff;
+      --text: #1f2a22;
+      --muted: #637064;
+      --green: #178a55;
+      --green-dark: #0f6f44;
+      --line: #dce5dc;
+      --warn: #8a5a00;
+      --warn-bg: #fff7df;
+      --danger: #b42318;
+      --danger-bg: #fff1f0;
+      --shadow: 0 14px 34px rgba(34, 55, 38, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(23, 138, 85, 0.12), transparent 34rem),
+        linear-gradient(180deg, #f7fbf5 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .hero-card,
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 30px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .quick-note {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border-radius: 999px;
+      background: #eaf7ef;
+      color: var(--green-dark);
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .quick-note p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .card {
+      padding: 22px;
+      margin-top: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      background: #f7faf6;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #cfdacf;
+      border-radius: 12px;
+      padding: 9px 10px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    input:focus {
+      outline: 2px solid rgba(23, 138, 85, 0.22);
+      border-color: var(--green);
+    }
+
+    .with-unit {
+      display: grid;
+      grid-template-columns: minmax(72px, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit {
+      color: var(--muted);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 10px 18px rgba(23, 138, 85, 0.22);
+    }
+
+    .primary:hover {
+      background: var(--green-dark);
+    }
+
+    .secondary {
+      color: var(--green-dark);
+      background: #e9f6ee;
+    }
+
+    .ghost {
+      color: var(--muted);
+      background: #f1f4f0;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .remove {
+      color: #8a2a22;
+      background: #fff0ed;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdfb;
+      padding: 16px;
+    }
+
+    .metric-title {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green-dark);
+    }
+
+    .metric-value span {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stage-summary {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stage-line {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfdfb;
+      line-height: 1.7;
+    }
+
+    .recommend-box {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid #f0d68f;
+      background: var(--warn-bg);
+      color: #3e2d09;
+      line-height: 1.8;
+    }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid #ffccc7;
+      background: var(--danger-bg);
+      color: var(--danger);
+      line-height: 1.7;
+    }
+
+    .footnote {
+      margin-top: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .hero,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 10px;
+        margin-bottom: 12px;
+        background: #fff;
+      }
+
+      td {
+        border: 0;
+        padding: 8px 0;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <span class="tag">水稻 · N-P2O5-K2O 核算</span>
+        <h1>水稻当季氮磷钾投入量核算器</h1>
+        <p class="subtitle">
+          输入底肥、分蘖肥、穗肥中各类肥料的亩用量和养分含量，自动核算每个阶段与全季的
+          N、P2O5、K2O 投入量。用户只需要填写数值，单位已经标在输入框旁边。
+        </p>
+      </div>
+      <aside class="quick-note hero-card">
+        <span class="tag">交付边界</span>
+        <p>本工具用于养分投入量核算和粗略施氮量估算，不构成正式施肥处方、采购依据或农艺建议。</p>
+      </aside>
+    </section>
+
+    <form id="calculatorForm">
+      <section class="card" data-stage="base">
+        <div class="section-title">
+          <h2>一、底肥</h2>
+          <button class="secondary" type="button" data-add-row="base">添加一种底肥</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>肥料名称</th>
+              <th>亩用量</th>
+              <th>N 含量</th>
+              <th>P2O5 含量</th>
+              <th>K2O 含量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="baseRows"></tbody>
+        </table>
+      </section>
+
+      <section class="card" data-stage="tillering">
+        <div class="section-title">
+          <h2>二、分蘖肥</h2>
+          <button class="secondary" type="button" data-add-row="tillering">添加一种分蘖肥</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>肥料名称</th>
+              <th>亩用量</th>
+              <th>N 含量</th>
+              <th>P2O5 含量</th>
+              <th>K2O 含量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tilleringRows"></tbody>
+        </table>
+      </section>
+
+      <section class="card" data-stage="panicle">
+        <div class="section-title">
+          <h2>三、穗肥</h2>
+          <button class="secondary" type="button" data-add-row="panicle">添加一种穗肥</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>肥料名称</th>
+              <th>亩用量</th>
+              <th>N 含量</th>
+              <th>P2O5 含量</th>
+              <th>K2O 含量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="panicleRows"></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <div class="section-title">
+          <h2>四、可选：按目标产量估算适宜施氮量</h2>
+        </div>
+        <p class="subtitle">
+          如果你想知道“目标产量对应的施氮量大概是多少”，可以填写目标产量；不填也不影响上面的 NPK 核算。
+        </p>
+        <div style="max-width: 360px; margin-top: 14px;">
+          <label for="targetYield">目标产量</label>
+          <div class="with-unit" style="margin-top: 8px;">
+            <input id="targetYield" type="number" min="0" step="0.01" placeholder="例如 600">
+            <span class="unit">kg/亩</span>
+          </div>
+        </div>
+        <p class="footnote">
+          估算口径：每生产 100 kg 水稻约需 N 2 kg；土壤可提供 50%；肥料利用率按 35%；最终按估算施氮量上下浮动 10% 给出范围。
+        </p>
+      </section>
+
+      <div class="actions">
+        <button class="primary" type="submit">计算结果</button>
+        <button class="ghost" type="button" id="resetDemo">恢复示例数据</button>
+      </div>
+    </form>
+
+    <div class="error" id="errorBox"></div>
+
+    <section class="card" id="resultCard" aria-live="polite">
+      <div class="section-title">
+        <h2>核算结果</h2>
+      </div>
+      <div class="stage-summary" id="stageSummary"></div>
+      <div class="result-grid">
+        <div class="metric">
+          <div class="metric-title">全季 N 投入量</div>
+          <div class="metric-value" id="totalN">0.00 <span>kg/亩</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-title">全季 P2O5 投入量</div>
+          <div class="metric-value" id="totalP">0.00 <span>kg/亩</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-title">全季 K2O 投入量</div>
+          <div class="metric-value" id="totalK">0.00 <span>kg/亩</span></div>
+        </div>
+      </div>
+      <div class="recommend-box" id="nitrogenAdvice" style="display: none;"></div>
+      <p class="footnote">
+        注意：本工具按肥料标签常见口径 N-P2O5-K2O 计算，不等同于元素态 P、K。结果仅用于核算和沟通，不代表正式施肥建议。
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const stageMeta = {
+      base: { label: "底肥", bodyId: "baseRows" },
+      tillering: { label: "分蘖肥", bodyId: "tilleringRows" },
+      panicle: { label: "穗肥", bodyId: "panicleRows" },
+    };
+
+    const demoData = {
+      base: [
+        { name: "三个15复合肥", amount: 35, n: 15, p2o5: 15, k2o: 15 },
+      ],
+      tillering: [
+        { name: "尿素", amount: 20, n: 46, p2o5: 0, k2o: 0 },
+      ],
+      panicle: [
+        { name: "三个15复合肥", amount: 10, n: 15, p2o5: 15, k2o: 15 },
+        { name: "氯化钾", amount: 10, n: 0, p2o5: 0, k2o: 60 },
+      ],
+    };
+
+    function formatNumber(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function createInput(value, className, placeholder) {
+      const input = document.createElement("input");
+      input.className = className;
+      input.value = value ?? "";
+      input.placeholder = placeholder;
+      input.type = className === "fertilizer-name" ? "text" : "number";
+      if (input.type === "number") {
+        input.min = "0";
+        input.step = "0.01";
+      }
+      return input;
+    }
+
+    function unitCell(input, unit) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "with-unit";
+      const unitSpan = document.createElement("span");
+      unitSpan.className = "unit";
+      unitSpan.textContent = unit;
+      wrapper.append(input, unitSpan);
+      return wrapper;
+    }
+
+    function addRow(stageKey, fertilizer = {}) {
+      const tbody = document.getElementById(stageMeta[stageKey].bodyId);
+      const tr = document.createElement("tr");
+
+      const cells = [
+        ["肥料名称", createInput(fertilizer.name, "fertilizer-name", "例如 尿素")],
+        ["亩用量", unitCell(createInput(fertilizer.amount, "amount", "0"), "kg/亩")],
+        ["N 含量", unitCell(createInput(fertilizer.n, "n", "0"), "%")],
+        ["P2O5 含量", unitCell(createInput(fertilizer.p2o5, "p2o5", "0"), "%")],
+        ["K2O 含量", unitCell(createInput(fertilizer.k2o, "k2o", "0"), "%")],
+      ];
+
+      for (const [label, content] of cells) {
+        const td = document.createElement("td");
+        td.dataset.label = label;
+        td.append(content);
+        tr.append(td);
+      }
+
+      const actionTd = document.createElement("td");
+      actionTd.dataset.label = "操作";
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove";
+      removeButton.textContent = "删除";
+      removeButton.addEventListener("click", () => {
+        tr.remove();
+        calculateAndRender();
+      });
+      actionTd.append(removeButton);
+      tr.append(actionTd);
+
+      tbody.append(tr);
+    }
+
+    function resetDemoData() {
+      for (const stageKey of Object.keys(stageMeta)) {
+        document.getElementById(stageMeta[stageKey].bodyId).innerHTML = "";
+        demoData[stageKey].forEach((fertilizer) => addRow(stageKey, fertilizer));
+      }
+      document.getElementById("targetYield").value = "";
+      calculateAndRender();
+    }
+
+    function readNumber(input, fieldLabel, rowLabel) {
+      const raw = input.value.trim();
+      if (raw === "") {
+        throw new Error(`${rowLabel} 的 ${fieldLabel} 不能为空，请填写数字；如果没有该养分，请填 0。`);
+      }
+
+      const value = Number(raw);
+      if (!Number.isFinite(value)) {
+        throw new Error(`${rowLabel} 的 ${fieldLabel} 必须是数字。`);
+      }
+
+      if (value < 0) {
+        throw new Error(`${rowLabel} 的 ${fieldLabel} 不能小于 0。`);
+      }
+
+      return value;
+    }
+
+    function readPercent(input, fieldLabel, rowLabel) {
+      const value = readNumber(input, fieldLabel, rowLabel);
+      if (value > 100) {
+        throw new Error(`${rowLabel} 的 ${fieldLabel} 不能大于 100%。`);
+      }
+      return value;
+    }
+
+    function readStage(stageKey) {
+      const tbody = document.getElementById(stageMeta[stageKey].bodyId);
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const fertilizers = [];
+
+      rows.forEach((row, index) => {
+        const name = row.querySelector(".fertilizer-name").value.trim();
+        const amountInput = row.querySelector(".amount");
+        const nInput = row.querySelector(".n");
+        const p2o5Input = row.querySelector(".p2o5");
+        const k2oInput = row.querySelector(".k2o");
+        const values = [name, amountInput.value, nInput.value, p2o5Input.value, k2oInput.value];
+        const isEmptyRow = values.every((value) => String(value).trim() === "");
+
+        if (isEmptyRow) return;
+
+        const rowLabel = `${stageMeta[stageKey].label}第 ${index + 1} 行`;
+        if (!name) {
+          throw new Error(`${rowLabel} 的肥料名称不能为空。`);
+        }
+
+        const amount = readNumber(amountInput, "亩用量", rowLabel);
+        const n = readPercent(nInput, "N 含量", rowLabel);
+        const p2o5 = readPercent(p2o5Input, "P2O5 含量", rowLabel);
+        const k2o = readPercent(k2oInput, "K2O 含量", rowLabel);
+
+        fertilizers.push({
+          name,
+          amount,
+          n,
+          p2o5,
+          k2o,
+          nKg: amount * n / 100,
+          p2o5Kg: amount * p2o5 / 100,
+          k2oKg: amount * k2o / 100,
+        });
+      });
+
+      return fertilizers;
+    }
+
+    function sumStage(fertilizers) {
+      return fertilizers.reduce((acc, item) => {
+        acc.n += item.nKg;
+        acc.p2o5 += item.p2o5Kg;
+        acc.k2o += item.k2oKg;
+        return acc;
+      }, { n: 0, p2o5: 0, k2o: 0 });
+    }
+
+    function renderStageSummary(stageResults) {
+      const container = document.getElementById("stageSummary");
+      container.innerHTML = "";
+
+      stageResults.forEach((stage) => {
+        const fertilizerText = stage.fertilizers.length
+          ? stage.fertilizers.map((item) => `${item.name} ${formatNumber(item.amount)} kg/亩`).join("；")
+          : "未填写肥料";
+
+        const line = document.createElement("div");
+        line.className = "stage-line";
+        line.innerHTML = `
+          <strong>${stage.label}</strong>：${fertilizerText}<br>
+          阶段合计：N ${formatNumber(stage.total.n)} kg/亩，
+          P2O5 ${formatNumber(stage.total.p2o5)} kg/亩，
+          K2O ${formatNumber(stage.total.k2o)} kg/亩
+        `;
+        container.append(line);
+      });
+    }
+
+    function renderNitrogenAdvice(totalN) {
+      const adviceBox = document.getElementById("nitrogenAdvice");
+      const rawTargetYield = document.getElementById("targetYield").value.trim();
+
+      if (rawTargetYield === "") {
+        adviceBox.style.display = "none";
+        adviceBox.innerHTML = "";
+        return;
+      }
+
+      const targetYield = Number(rawTargetYield);
+      if (!Number.isFinite(targetYield) || targetYield <= 0) {
+        throw new Error("目标产量如果填写，必须是大于 0 的数字。");
+      }
+
+      const cropNeedN = targetYield / 100 * 2;
+      const soilSupplyN = cropNeedN * 0.5;
+      const fertilizerNeededByCrop = cropNeedN - soilSupplyN;
+      const estimatedAppliedN = fertilizerNeededByCrop / 0.35;
+      const lower = estimatedAppliedN * 0.9;
+      const upper = estimatedAppliedN * 1.1;
+
+      let comparison = "";
+      if (totalN < lower) {
+        comparison = `当前方案核算出的 N 投入量为 ${formatNumber(totalN)} kg/亩，低于这个估算范围。`;
+      } else if (totalN > upper) {
+        comparison = `当前方案核算出的 N 投入量为 ${formatNumber(totalN)} kg/亩，高于这个估算范围。`;
+      } else {
+        comparison = `当前方案核算出的 N 投入量为 ${formatNumber(totalN)} kg/亩，落在这个估算范围内。`;
+      }
+
+      adviceBox.style.display = "block";
+      adviceBox.innerHTML = `
+        <strong>目标产量施氮量估算：</strong>
+        假设目标产量是 ${formatNumber(targetYield)} kg/亩，按每生产 100 kg 水稻约需 N 2 kg 计算，
+        全季需氮量约为 ${formatNumber(cropNeedN)} kg/亩；若土壤可提供 50%，则需要由肥料补足约
+        ${formatNumber(fertilizerNeededByCrop)} kg/亩；再按肥料利用率 35% 折算，
+        适宜施氮量大概在 ${formatNumber(lower)} 至 ${formatNumber(upper)} kg N/亩水平。
+        ${comparison}
+      `;
+    }
+
+    function calculateAndRender() {
+      const errorBox = document.getElementById("errorBox");
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+
+      try {
+        const stageResults = Object.keys(stageMeta).map((stageKey) => {
+          const fertilizers = readStage(stageKey);
+          return {
+            key: stageKey,
+            label: stageMeta[stageKey].label,
+            fertilizers,
+            total: sumStage(fertilizers),
+          };
+        });
+
+        const seasonTotal = stageResults.reduce((acc, stage) => {
+          acc.n += stage.total.n;
+          acc.p2o5 += stage.total.p2o5;
+          acc.k2o += stage.total.k2o;
+          return acc;
+        }, { n: 0, p2o5: 0, k2o: 0 });
+
+        renderStageSummary(stageResults);
+        document.getElementById("totalN").innerHTML = `${formatNumber(seasonTotal.n)} <span>kg/亩</span>`;
+        document.getElementById("totalP").innerHTML = `${formatNumber(seasonTotal.p2o5)} <span>kg/亩</span>`;
+        document.getElementById("totalK").innerHTML = `${formatNumber(seasonTotal.k2o)} <span>kg/亩</span>`;
+        renderNitrogenAdvice(seasonTotal.n);
+      } catch (error) {
+        errorBox.style.display = "block";
+        errorBox.textContent = error.message;
+      }
+    }
+
+    document.querySelectorAll("[data-add-row]").forEach((button) => {
+      button.addEventListener("click", () => addRow(button.dataset.addRow));
+    });
+
+    document.getElementById("calculatorForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      calculateAndRender();
+    });
+
+    document.getElementById("resetDemo").addEventListener("click", resetDemoData);
+
+    resetDemoData();
+  </script>
+</body>
+</html>

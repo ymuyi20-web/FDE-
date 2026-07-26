@@ -1,0 +1,58 @@
+{
+  "crop": "水稻",
+  "season": "示范季",
+  "nutrient_basis": "N-P2O5-K2O",
+  "stages": [
+    {
+      "stage_name": "底肥",
+      "fertilizers": [
+        {
+          "fertilizer_name": "三个15复合肥",
+          "amount_kg_per_mu": 35.0,
+          "n_percent": 15.0,
+          "p2o5_percent": 15.0,
+          "k2o_percent": 15.0,
+          "source": "模拟数据",
+          "is_mock": true
+        }
+      ]
+    },
+    {
+      "stage_name": "分蘖肥",
+      "fertilizers": [
+        {
+          "fertilizer_name": "尿素",
+          "amount_kg_per_mu": 20.0,
+          "n_percent": 46.0,
+          "p2o5_percent": 0.0,
+          "k2o_percent": 0.0,
+          "source": "模拟数据",
+          "is_mock": true
+        }
+      ]
+    },
+    {
+      "stage_name": "穗肥",
+      "fertilizers": [
+        {
+          "fertilizer_name": "三个15复合肥",
+          "amount_kg_per_mu": 10.0,
+          "n_percent": 15.0,
+          "p2o5_percent": 15.0,
+          "k2o_percent": 15.0,
+          "source": "模拟数据",
+          "is_mock": true
+        },
+        {
+          "fertilizer_name": "氯化钾",
+          "amount_kg_per_mu": 10.0,
+          "n_percent": 0.0,
+          "p2o5_percent": 0.0,
+          "k2o_percent": 60.0,
+          "source": "模拟数据",
+          "is_mock": true
+        }
+      ]
+    }
+  ]
+}
