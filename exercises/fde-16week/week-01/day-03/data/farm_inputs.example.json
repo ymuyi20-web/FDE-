@@ -1,0 +1,34 @@
+[
+  {
+    "name": "种子",
+    "cost_per_mu": 60.0,
+    "unit": "元/亩",
+    "source": "模拟数据",
+    "effective_date": "2026-07-26",
+    "is_mock": true
+  },
+  {
+    "name": "肥料",
+    "cost_per_mu": 200.0,
+    "unit": "元/亩",
+    "source": "模拟数据",
+    "effective_date": "2026-07-26",
+    "is_mock": true
+  },
+  {
+    "name": "植保",
+    "cost_per_mu": 95.0,
+    "unit": "元/亩",
+    "source": "模拟数据",
+    "effective_date": "2026-07-26",
+    "is_mock": true
+  },
+  {
+    "name": "灌溉",
+    "cost_per_mu": 120.0,
+    "unit": "元/亩",
+    "source": "模拟数据",
+    "effective_date": "2026-07-26",
+    "is_mock": true
+  }
+]
