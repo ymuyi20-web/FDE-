@@ -678,6 +678,8 @@
   <script>
     const STORAGE_KEY = "day14_closed_loop_records";
     const DEFAULTS_KEY = "day14_closed_loop_defaults";
+    const CUSTOM_MATERIALS_KEY = "day14_closed_loop_custom_materials";
+    const BASE_MATERIALS = ["稻香A", "稻香B", "组合C"];
     const OPERATION_SUBTYPES = {
       "整地": ["翻耕", "筑埂", "上水", "耖田", "搅浆平杠", "其他"],
       "播种": ["无人机飞播", "机插秧", "人工插秧", "补秧", "其他"],
@@ -745,11 +747,41 @@
       localStorage.setItem(DEFAULTS_KEY, JSON.stringify(defaults));
     }
 
+    function loadCustomMaterials() {
+      try { return JSON.parse(localStorage.getItem(CUSTOM_MATERIALS_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function saveCustomMaterials(materials) {
+      localStorage.setItem(CUSTOM_MATERIALS_KEY, JSON.stringify(materials));
+    }
+
+    function rememberMaterial(material) {
+      const safeMaterial = material.trim();
+      if (!safeMaterial || BASE_MATERIALS.includes(safeMaterial)) return;
+      const existingMaterials = loadCustomMaterials().filter((item) => item !== safeMaterial);
+      saveCustomMaterials([safeMaterial, ...existingMaterials]);
+    }
+
+    function renderMaterialOptions(preferredMaterial = "") {
+      const customMaterials = loadCustomMaterials();
+      const materialOptions = [
+        ...customMaterials,
+        ...BASE_MATERIALS.filter((item) => !customMaterials.includes(item)),
+        "其他",
+      ];
+      fields.material.innerHTML = "";
+      materialOptions.forEach((option) => fields.material.add(new Option(option, option)));
+      fields.material.value = materialOptions.includes(preferredMaterial)
+        ? preferredMaterial
+        : materialOptions[0];
+    }
+
     function applyDefaults() {
       const defaults = loadDefaults();
       fields.date.value = defaults.date || todayString();
-      fields.material.value = defaults.material || "稻香A";
-      fields.customMaterial.value = defaults.customMaterial || "";
+      renderMaterialOptions(defaults.material || loadCustomMaterials()[0] || "稻香A");
+      fields.customMaterial.value = "";
       fields.batch.value = defaults.batch || "第一播期";
       fields.customBatch.value = defaults.customBatch || "";
       fields.operator.value = defaults.operator || "张工";
@@ -1078,10 +1110,11 @@
 
       records = [...records, ...newRecords];
       saveRecords();
+      rememberMaterial(material);
       saveDefaults({
         date: fields.date.value,
-        material: fields.material.value,
-        customMaterial: fields.customMaterial.value.trim(),
+        material,
+        customMaterial: "",
         batch: fields.batch.value,
         customBatch: fields.customBatch.value.trim(),
         type: fields.type.value,
