@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 14 育种基地闭环原型</title>
+  <style>
+    :root {
+      --green: #10643f;
+      --green-soft: #e7f3e9;
+      --soil: #895528;
+      --soil-soft: #f4eadf;
+      --dark: #17251b;
+      --muted: #667466;
+      --paper: #fffdf7;
+      --line: #dfe7db;
+      --warn: #b84a2a;
+      --warn-soft: #fff4e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--dark);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(16, 100, 63, .14), transparent 28%),
+        radial-gradient(circle at 88% 6%, rgba(137, 85, 40, .13), transparent 28%),
+        #f4f7ef;
+    }
+
+    main {
+      width: min(1240px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 24px 0 70px;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 30px;
+      color: white;
+      background: linear-gradient(135deg, #0d5c38, #7b4a1e);
+      box-shadow: 0 22px 48px rgba(35, 50, 30, .18);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .guide-button {
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: 999px;
+      padding: 11px 16px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, .18);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 1000;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .16);
+      color: #edf4e7;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 7vw, 52px);
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      max-width: 820px;
+      margin: 0;
+      color: #edf4e7;
+      line-height: 1.8;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .flow button {
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .13);
+      color: #f3f8ef;
+      font-weight: 900;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .flow button.active {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #0f4f34;
+      font-weight: 1000;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, .18);
+    }
+
+    .flow button.active::after {
+      content: "当前";
+      display: inline-flex;
+      margin-left: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--green);
+      font-size: 12px;
+      vertical-align: middle;
+    }
+
+    .layout {
+      margin-top: 18px;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: 18px;
+      box-shadow: 0 16px 36px rgba(35, 50, 30, .09);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 24px;
+    }
+
+    .field { margin-bottom: 13px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #405241;
+      font-weight: 900;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #ccd9ca;
+      border-radius: 15px;
+      color: var(--dark);
+      background: white;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea { min-height: 72px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(16, 100, 63, .12);
+    }
+
+    .hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #ccd9ca;
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: #39483a;
+      background: white;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .chip.active {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 15px;
+      padding: 12px 15px;
+      color: white;
+      background: var(--green);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 950;
+    }
+
+    button.secondary {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    button.danger { background: var(--warn); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--green);
+      font-size: 28px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty {
+      padding: 22px;
+      border: 1px dashed #bdcbbd;
+      border-radius: 20px;
+      color: var(--muted);
+      background: #fbfcf7;
+      line-height: 1.8;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      max-height: 420px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .record {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+    }
+
+    .record strong { color: var(--green); }
+
+    .record p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    details.record summary {
+      cursor: pointer;
+      list-style-position: inside;
+    }
+
+    details.record summary span {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: white;
+    }
+
+    th, td {
+      padding: 13px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    tr:last-child th, tr:last-child td { border-bottom: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+
+    thead th {
+      color: #485747;
+      background: #e8efe3;
+    }
+
+    td strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+      font-size: 19px;
+    }
+
+    td span, td em {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-style: normal;
+      line-height: 1.5;
+    }
+
+    td em { color: var(--soil); font-weight: 900; }
+
+    pre {
+      max-height: 210px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 12px 0 0;
+      padding: 13px;
+      border-radius: 18px;
+      color: #243025;
+      background: #eef4e9;
+    }
+
+    .notice {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      color: #684620;
+      background: var(--warn-soft);
+      line-height: 1.7;
+    }
+
+    .submit-status {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      color: #145235;
+      background: #e4f5e9;
+      border: 1px solid #b8dfc4;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .submit-status.show {
+      display: block;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      padding: 20px;
+      background: rgba(16, 28, 19, .58);
+      z-index: 20;
+      overflow: auto;
+    }
+
+    .modal-backdrop.show {
+      display: grid;
+      place-items: center;
+    }
+
+    .guide-modal {
+      width: min(780px, 100%);
+      max-height: min(760px, calc(100vh - 40px));
+      overflow: auto;
+      padding: 24px;
+      border-radius: 28px;
+      background: var(--paper);
+      color: var(--dark);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .32);
+    }
+
+    .guide-modal h2 {
+      margin-top: 0;
+    }
+
+    .guide-modal h3 {
+      margin: 18px 0 8px;
+    }
+
+    .guide-modal ol,
+    .guide-modal ul {
+      line-height: 1.9;
+      color: #445343;
+      padding-left: 22px;
+    }
+
+    .guide-modal .close-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 980px) {
+      .flow { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .hero-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <span class="eyebrow">Day 14 · 闭环原型</span>
+          <h1>育种基地田间记录闭环</h1>
+          <p>先录入田间操作，再自动生成操作日志。如果本条记录同步了生育期，进度看板也会跟着更新。当前仍是本地原型，数据只保存在本浏览器。</p>
+        </div>
+        <button class="guide-button" type="button" id="open-guide">使用指南</button>
+      </div>
+      <section class="flow">
+        <button class="active" type="button" data-view-target="input-view">01 录入田间操作</button>
+        <button type="button" data-view-target="log-view">02 生成操作日志</button>
+        <button type="button" data-view-target="board-view">03 更新进度看板</button>
+      </section>
+    </section>
+
+    <section class="layout">
+      <section class="view active" id="input-view">
+      <form class="card" id="field-form">
+        <h2>01 田间操作录入</h2>
+
+        <div class="field">
+          <label for="operation-date">操作日期</label>
+          <input id="operation-date" type="date" required>
+          <div class="hint">第一条默认今天；提交后，下一条默认上一条日期。</div>
+        </div>
+
+        <div class="field">
+          <label for="material-name">品种/材料</label>
+          <select id="material-name" required>
+            <option value="稻香A">稻香A</option>
+            <option value="稻香B">稻香B</option>
+            <option value="组合C">组合C</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="field" id="custom-material-field">
+          <label for="custom-material">自定义品种/材料</label>
+          <input id="custom-material" placeholder="例如：新品系-01 / 组合D">
+        </div>
+
+        <div class="field">
+          <label for="sowing-batch">播期</label>
+          <select id="sowing-batch" required>
+            <option value="第一播期">第一播期</option>
+            <option value="第二播期">第二播期</option>
+            <option value="第三播期">第三播期</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="field" id="custom-batch-field">
+          <label for="custom-batch">自定义播期</label>
+          <input id="custom-batch" placeholder="例如：第四播期 / 早播批">
+        </div>
+
+        <div class="field">
+          <label for="plot-ids">小区编号</label>
+          <textarea id="plot-ids" required placeholder="例如：A-01 或 A-01, B-01, C-01"></textarea>
+          <div class="hint">支持批量：逗号、空格、换行都可以分隔。</div>
+        </div>
+
+        <div class="field">
+          <label>一级操作类型</label>
+          <div class="chips" id="operation-type-chips">
+            <button class="chip active" type="button" data-value="整地">整地</button>
+            <button class="chip" type="button" data-value="播种">播种</button>
+            <button class="chip" type="button" data-value="施肥">施肥</button>
+            <button class="chip" type="button" data-value="除草">除草</button>
+            <button class="chip" type="button" data-value="植保">植保</button>
+            <button class="chip" type="button" data-value="晒田">晒田</button>
+            <button class="chip" type="button" data-value="灌溉">灌溉</button>
+            <button class="chip" type="button" data-value="巡田">巡田</button>
+            <button class="chip" type="button" data-value="拍照">拍照</button>
+            <button class="chip" type="button" data-value="测量">测量</button>
+            <button class="chip" type="button" data-value="其他">其他</button>
+          </div>
+          <input id="operation-type" type="hidden" value="整地">
+        </div>
+
+        <div class="field">
+          <label for="operation-subtype">二级操作内容</label>
+          <select id="operation-subtype" required></select>
+        </div>
+
+        <div class="field" id="custom-subtype-field">
+          <label for="custom-subtype">自定义二级内容</label>
+          <input id="custom-subtype" placeholder="例如：人工拔杂 / 取样">
+        </div>
+
+        <div class="field">
+          <label for="operation-detail">补充说明</label>
+          <textarea id="operation-detail" placeholder="例如：药剂名称、用量、现场情况"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="growth-stage">当前记录到的生育期</label>
+          <select id="growth-stage">
+            <option value="">不更新生育期</option>
+            <option value="播种">播种</option>
+            <option value="出苗">出苗</option>
+            <option value="分蘖">分蘖</option>
+            <option value="拔节">拔节</option>
+            <option value="孕穗">孕穗</option>
+            <option value="抽穗">抽穗</option>
+            <option value="灌浆">灌浆</option>
+            <option value="成熟">成熟</option>
+            <option value="收获">收获</option>
+          </select>
+          <div class="hint">只有选择具体生育期时，下面的进度看板才会更新。</div>
+        </div>
+
+        <div class="field">
+          <label for="operator">负责人/记录人</label>
+          <input id="operator" list="operator-options" required placeholder="例如：张工">
+          <datalist id="operator-options">
+            <option value="张工"></option>
+            <option value="李工"></option>
+            <option value="王工"></option>
+          </datalist>
+        </div>
+
+        <div class="field">
+          <label>是否需要复查</label>
+          <div class="chips" id="follow-up-chips">
+            <button class="chip" type="button" data-value="是">是</button>
+            <button class="chip active" type="button" data-value="否">否</button>
+          </div>
+          <input id="need-follow-up" type="hidden" value="否">
+        </div>
+
+        <div class="field">
+          <label for="note">备注</label>
+          <textarea id="note" placeholder="可不填"></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit">提交记录</button>
+          <button class="secondary" type="button" id="fill-demo">填入演示</button>
+          <button class="danger" type="button" id="clear-records">清空本地记录</button>
+        </div>
+        <div class="submit-status" id="submit-status"></div>
+
+        <div class="notice">边界：当前数据只保存在本浏览器。关闭后再打开通常还在；清理浏览器数据会丢失。</div>
+        <div class="page-nav">
+          <button class="secondary" type="button" data-view-target="log-view">查看农事操作日志汇总</button>
+          <button class="secondary" type="button" data-view-target="board-view">查看品种/材料进度看板</button>
+        </div>
+      </form>
+      </section>
+
+      <section class="view" id="log-view">
+        <section class="card">
+          <h2>02 农事操作日志汇总</h2>
+          <div class="stats">
+            <div class="stat"><strong id="record-count">0</strong><span>记录数</span></div>
+            <div class="stat"><strong id="plot-count">0</strong><span>小区数</span></div>
+            <div class="stat"><strong id="stage-count">0</strong><span>生育期记录</span></div>
+            <div class="stat"><strong id="follow-count">0</strong><span>需复查</span></div>
+          </div>
+          <div id="log-output"></div>
+          <div class="actions">
+            <button class="danger" type="button" id="delete-selected">删除选中记录</button>
+            <button class="secondary" type="button" id="copy-csv">复制 CSV</button>
+          </div>
+          <pre id="csv-output">operation_id,operation_date,material_name,sowing_batch,plot_id,operation_type,operation_detail,growth_stage,operator,need_follow_up,note</pre>
+          <div class="page-nav">
+            <button class="secondary" type="button" data-view-target="input-view">返回录入表单</button>
+            <button class="secondary" type="button" data-view-target="board-view">查看进度看板</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="board-view">
+        <section class="card">
+          <h2>03 品种/材料 × 播期 × 小区进度看板</h2>
+          <div id="stage-board"></div>
+          <div class="page-nav">
+            <button class="secondary" type="button" data-view-target="input-view">返回录入表单</button>
+            <button class="secondary" type="button" data-view-target="log-view">查看日志汇总</button>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <section class="modal-backdrop" id="guide-modal" aria-hidden="true">
+    <article class="guide-modal">
+      <h2>使用指南</h2>
+      <p>这个页面是一个本地闭环原型：先录入田间操作，再查看日志汇总和进度看板。数据暂时只保存在当前浏览器。</p>
+
+      <h3>一、录入田间操作</h3>
+      <ol>
+        <li>先填写操作日期、品种/材料、播期和小区编号。</li>
+        <li>小区编号支持批量填写，例如：<code>A-01, A-02, A-03</code>。</li>
+        <li>选择一级操作类型，例如整地、播种、施肥、植保、晒田、灌溉。</li>
+        <li>再选择二级操作内容，例如破口药、齐穗药、复水、上水等。</li>
+        <li>如果这条记录代表生育期变化，就选择“当前记录到的生育期”；如果只是施肥、打药、上水等操作，可以保持不更新。</li>
+        <li>点击“提交记录”。提交成功后，表单下方会显示已提交提示。</li>
+      </ol>
+
+      <h3>二、查看农事操作日志</h3>
+      <ul>
+        <li>点击顶部“02 生成操作日志”，或表单底部“查看农事操作日志汇总”。</li>
+        <li>这里会按时间显示已经录入的操作。</li>
+        <li>如果录错了，可以勾选记录，再点击“删除选中记录”。删除后日志和进度看板都会重新计算。</li>
+        <li>可以点击“复制 CSV”，把本地记录复制出去。</li>
+      </ul>
+
+      <h3>三、查看进度看板</h3>
+      <ul>
+        <li>点击顶部“03 更新进度看板”。</li>
+        <li>看板按“品种/材料 + 播期 + 小区”展示当前生育期，不会把多个小区压成一个结果。</li>
+        <li>下方“单小区操作履历”可以查看某个小区从开始到现在做过哪些操作。</li>
+      </ul>
+
+      <h3>四、当前原型边界</h3>
+      <ul>
+        <li>数据只存在当前浏览器本地，不会自动上传到服务器。</li>
+        <li>换电脑、换浏览器或清理浏览器数据后，记录可能看不到。</li>
+        <li>如果以后要多人共同使用，需要增加后台服务器和数据库。</li>
+      </ul>
+
+      <div class="close-row">
+        <button type="button" id="close-guide">关闭指南</button>
+      </div>
+    </article>
+  </section>
+
+  <script>
+    const STORAGE_KEY = "day14_closed_loop_records";
+    const DEFAULTS_KEY = "day14_closed_loop_defaults";
+    const OPERATION_SUBTYPES = {
+      "整地": ["翻耕", "筑埂", "上水", "耖田", "搅浆平杠", "其他"],
+      "播种": ["无人机飞播", "机插秧", "人工插秧", "补秧", "其他"],
+      "施肥": ["底肥", "分蘖肥", "穗肥", "追肥", "叶面肥", "其他"],
+      "除草": ["封闭除草", "茎叶除草", "补打除草", "人工除草", "其他"],
+      "植保": ["分蘖药", "封行药", "破口药", "齐穗药", "其他"],
+      "晒田": ["晒田", "复水", "其他"],
+      "灌溉": ["上水", "排水", "其他"],
+      "巡田": ["苗情观察", "分蘖观察", "拔节观察", "孕穗观察", "抽穗观察", "成熟观察", "其他"],
+      "拍照": ["生育期照片", "病虫害照片", "株型照片", "异常照片", "其他"],
+      "测量": ["株高", "分蘖数", "剑叶角度", "穗长", "其他"],
+      "其他": ["其他"],
+    };
+
+    const BATCH_ORDER = {"第一播期": 1, "第二播期": 2, "第三播期": 3};
+    const form = document.querySelector("#field-form");
+    const logOutput = document.querySelector("#log-output");
+    const stageBoard = document.querySelector("#stage-board");
+    const csvOutput = document.querySelector("#csv-output");
+    const submitStatus = document.querySelector("#submit-status");
+    const guideModal = document.querySelector("#guide-modal");
+
+    const fields = {
+      date: document.querySelector("#operation-date"),
+      material: document.querySelector("#material-name"),
+      customMaterial: document.querySelector("#custom-material"),
+      customMaterialField: document.querySelector("#custom-material-field"),
+      batch: document.querySelector("#sowing-batch"),
+      customBatch: document.querySelector("#custom-batch"),
+      customBatchField: document.querySelector("#custom-batch-field"),
+      plots: document.querySelector("#plot-ids"),
+      type: document.querySelector("#operation-type"),
+      subtype: document.querySelector("#operation-subtype"),
+      customSubtype: document.querySelector("#custom-subtype"),
+      customSubtypeField: document.querySelector("#custom-subtype-field"),
+      detail: document.querySelector("#operation-detail"),
+      stage: document.querySelector("#growth-stage"),
+      operator: document.querySelector("#operator"),
+      followUp: document.querySelector("#need-follow-up"),
+      note: document.querySelector("#note"),
+    };
+
+    let records = loadRecords();
+
+    function todayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    }
+
+    function loadRecords() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function saveRecords() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function loadDefaults() {
+      try { return JSON.parse(localStorage.getItem(DEFAULTS_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveDefaults(defaults) {
+      localStorage.setItem(DEFAULTS_KEY, JSON.stringify(defaults));
+    }
+
+    function applyDefaults() {
+      const defaults = loadDefaults();
+      fields.date.value = defaults.date || todayString();
+      fields.material.value = defaults.material || "稻香A";
+      fields.customMaterial.value = defaults.customMaterial || "";
+      fields.batch.value = defaults.batch || "第一播期";
+      fields.customBatch.value = defaults.customBatch || "";
+      fields.operator.value = defaults.operator || "张工";
+      setChipValue("operation-type-chips", "operation-type", defaults.type || "整地");
+      refreshSubtypeOptions(defaults.subtype || "");
+      fields.customSubtype.value = defaults.customSubtype || "";
+      setChipValue("follow-up-chips", "need-follow-up", defaults.followUp || "否");
+      fields.stage.value = defaults.stage || "";
+      fields.plots.value = "";
+      fields.detail.value = "";
+      fields.note.value = "";
+      updateCustomFields();
+    }
+
+    function setChipValue(groupId, inputId, value) {
+      const group = document.querySelector(`#${groupId}`);
+      const input = document.querySelector(`#${inputId}`);
+      input.value = value;
+      group.querySelectorAll(".chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.value === value);
+      });
+    }
+
+    function refreshSubtypeOptions(preferredValue = "") {
+      const options = OPERATION_SUBTYPES[fields.type.value] || ["其他"];
+      fields.subtype.innerHTML = options.map((option) => `<option value="${option}">${option}</option>`).join("");
+      fields.subtype.value = options.includes(preferredValue) ? preferredValue : options[0];
+      updateCustomFields();
+    }
+
+    function updateCustomFields() {
+      fields.customMaterialField.style.display = fields.material.value === "其他" ? "block" : "none";
+      fields.customBatchField.style.display = fields.batch.value === "其他" ? "block" : "none";
+      fields.customSubtypeField.style.display = fields.subtype.value === "其他" ? "block" : "none";
+    }
+
+    function splitPlots(value) {
+      return value.split(/[\s,，、;；]+/).map((item) => item.trim()).filter(Boolean);
+    }
+
+    function resolvedMaterialName() {
+      return fields.material.value === "其他" ? fields.customMaterial.value.trim() : fields.material.value;
+    }
+
+    function resolvedSowingBatch() {
+      return fields.batch.value === "其他" ? fields.customBatch.value.trim() : fields.batch.value;
+    }
+
+    function resolvedOperationDetail() {
+      const subtype = fields.subtype.value === "其他"
+        ? fields.customSubtype.value.trim()
+        : fields.subtype.value;
+      const safeSubtype = subtype || "其他";
+      const extra = fields.detail.value.trim();
+      return extra ? `${safeSubtype}；${extra}` : safeSubtype;
+    }
+
+    function makeOperationId(date, index) {
+      const stamp = date.replaceAll("-", "");
+      const serial = String(records.length + index + 1).padStart(3, "0");
+      return `LOOP${stamp}${serial}`;
+    }
+
+    function duplicateKey(record) {
+      return [
+        record.operation_date,
+        record.material_name,
+        record.sowing_batch,
+        record.plot_id,
+        record.operation_type,
+        record.operation_detail,
+        record.operator,
+      ].join("||");
+    }
+
+    function findDuplicates(newRecords) {
+      const existingKeys = new Set(records.map(duplicateKey));
+      return newRecords.filter((record) => existingKeys.has(duplicateKey(record)));
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? "");
+      if (/[",\n]/.test(text)) return `"${text.replaceAll('"', '""')}"`;
+      return text;
+    }
+
+    function toCsv() {
+      const header = ["operation_id", "operation_date", "material_name", "sowing_batch", "plot_id", "operation_type", "operation_detail", "growth_stage", "operator", "need_follow_up", "note"];
+      const rows = records.map((record) => header.map((key) => csvEscape(record[key])).join(","));
+      return [header.join(","), ...rows].join("\n");
+    }
+
+    function sortedRecords() {
+      return records.slice().sort((a, b) => {
+        return a.operation_date.localeCompare(b.operation_date)
+          || a.material_name.localeCompare(b.material_name)
+          || a.sowing_batch.localeCompare(b.sowing_batch)
+          || a.plot_id.localeCompare(b.plot_id);
+      });
+    }
+
+    function latestStageRecords() {
+      const latest = new Map();
+      for (const record of records) {
+        if (!record.growth_stage) continue;
+        const key = `${record.material_name}||${record.sowing_batch}||${record.plot_id}`;
+        const existing = latest.get(key);
+        if (!existing || record.operation_date >= existing.operation_date) {
+          latest.set(key, record);
+        }
+      }
+      return Array.from(latest.values());
+    }
+
+    function groupedPlotHistories() {
+      const groups = new Map();
+      for (const record of sortedRecords()) {
+        const key = `${record.material_name}||${record.sowing_batch}||${record.plot_id}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(record);
+      }
+      return Array.from(groups.entries()).map(([key, group]) => {
+        const [material, batch, plot] = key.split("||");
+        return {material, batch, plot, group};
+      });
+    }
+
+    function renderStats() {
+      document.querySelector("#record-count").textContent = records.length;
+      document.querySelector("#plot-count").textContent = new Set(records.map((record) => record.plot_id)).size;
+      document.querySelector("#stage-count").textContent = records.filter((record) => record.growth_stage).length;
+      document.querySelector("#follow-count").textContent = records.filter((record) => record.need_follow_up === "是").length;
+    }
+
+    function renderLog() {
+      if (records.length === 0) {
+        logOutput.innerHTML = `<div class="empty">暂无操作日志。先在左侧提交一条田间操作记录，这里会自动生成按时间排序的记录。</div>`;
+        return;
+      }
+      logOutput.innerHTML = `<div class="timeline">${
+        sortedRecords().slice().reverse().map((record) => `
+          <article class="record">
+            <label style="display:flex;gap:10px;align-items:flex-start;margin:0;">
+              <input type="checkbox" class="delete-record-checkbox" value="${record.operation_id}" style="width:auto;margin-top:4px;">
+              <span>
+                <strong>${record.operation_date}｜${record.material_name}｜${record.sowing_batch}｜${record.plot_id}</strong>
+              </span>
+            </label>
+            <p>${record.operation_type}：${record.operation_detail}</p>
+            <p>生育期：${record.growth_stage || "未更新"}｜负责人：${record.operator}｜复查：${record.need_follow_up}｜备注：${record.note || "无"}</p>
+          </article>
+        `).join("")
+      }</div>`;
+    }
+
+    function renderStageBoard() {
+      const stageRecords = latestStageRecords();
+      if (records.length === 0) {
+        stageBoard.innerHTML = `<div class="empty">暂无进度看板。先录入田间操作记录；如果记录里选择了“当前记录到的生育期”，这里会生成进度表和单小区操作履历。</div>`;
+        return;
+      }
+
+      const stageRows = stageRecords.length === 0
+        ? `<div class="empty">已有操作日志，但还没有任何记录同步生育期。比如录入“巡田 → 抽穗观察”并选择生育期“抽穗”后，这里才会出现进度。</div>`
+        : `<table>
+          <thead>
+            <tr>
+              <th>品种/材料</th>
+              <th>播期</th>
+              <th>小区</th>
+              <th>当前生育期</th>
+              <th>最近更新</th>
+              <th>来源操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stageRecords
+              .sort((a, b) => a.material_name.localeCompare(b.material_name)
+                || (BATCH_ORDER[a.sowing_batch] || 99) - (BATCH_ORDER[b.sowing_batch] || 99)
+                || a.sowing_batch.localeCompare(b.sowing_batch)
+                || a.plot_id.localeCompare(b.plot_id))
+              .map((record) => `<tr>
+                <td>${record.material_name}</td>
+                <td>${record.sowing_batch}</td>
+                <td>${record.plot_id}</td>
+                <td><strong>${record.growth_stage}</strong></td>
+                <td>${record.operation_date}</td>
+                <td>${record.operation_type}：${record.operation_detail}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>`;
+
+      const histories = groupedPlotHistories().map(({material, batch, plot, group}) => `
+        <details class="record">
+          <summary><strong>${material}｜${batch}｜${plot}</strong> <span>共 ${group.length} 条操作</span></summary>
+          ${group.map((record) => `
+            <p>${record.operation_date}｜${record.operation_type}：${record.operation_detail}｜生育期：${record.growth_stage || "未更新"}｜负责人：${record.operator}</p>
+          `).join("")}
+        </details>
+      `).join("");
+
+      stageBoard.innerHTML = `
+        <h3>当前生育期进度（按小区）</h3>
+        ${stageRows}
+        <h3 style="margin-top:18px;">单小区操作履历</h3>
+        <div class="timeline">${histories}</div>
+      `;
+    }
+
+    function render() {
+      renderStats();
+      renderLog();
+      renderStageBoard();
+      csvOutput.textContent = toCsv();
+    }
+
+    function showSubmitStatus(newRecords) {
+      const stageText = newRecords.some((record) => record.growth_stage)
+        ? "已同步更新进度看板。"
+        : "本次未更新生育期，进度看板不变。";
+      submitStatus.textContent = `已提交 ${newRecords.length} 条记录。${stageText}`;
+      submitStatus.classList.add("show");
+    }
+
+    function deleteSelectedRecords() {
+      const selectedIds = Array.from(document.querySelectorAll(".delete-record-checkbox:checked"))
+        .map((checkbox) => checkbox.value);
+      if (selectedIds.length === 0) {
+        alert("请先勾选要删除的记录。");
+        return;
+      }
+      if (!confirm(`确定删除选中的 ${selectedIds.length} 条记录吗？删除后日志和进度看板都会重新计算。`)) {
+        return;
+      }
+      const selectedSet = new Set(selectedIds);
+      records = records.filter((record) => !selectedSet.has(record.operation_id));
+      saveRecords();
+      render();
+      alert(`已删除 ${selectedIds.length} 条记录。`);
+    }
+
+    function showView(viewId) {
+      document.querySelectorAll(".view").forEach((view) => {
+        view.classList.toggle("active", view.id === viewId);
+      });
+      document.querySelectorAll("[data-view-target]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.viewTarget === viewId);
+      });
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    document.querySelectorAll(".chips").forEach((group) => {
+      group.addEventListener("click", (event) => {
+        const chip = event.target.closest(".chip");
+        if (!chip) return;
+        const inputId = group.id === "operation-type-chips" ? "operation-type" : "need-follow-up";
+        setChipValue(group.id, inputId, chip.dataset.value);
+        if (group.id === "operation-type-chips") refreshSubtypeOptions();
+      });
+    });
+
+    fields.material.addEventListener("change", updateCustomFields);
+    fields.batch.addEventListener("change", updateCustomFields);
+    fields.subtype.addEventListener("change", updateCustomFields);
+
+    document.querySelectorAll("[data-view-target]").forEach((button) => {
+      button.addEventListener("click", () => showView(button.dataset.viewTarget));
+    });
+
+    document.querySelector("#delete-selected").addEventListener("click", deleteSelectedRecords);
+
+    document.querySelector("#open-guide").addEventListener("click", () => {
+      guideModal.classList.add("show");
+      guideModal.setAttribute("aria-hidden", "false");
+    });
+
+    document.querySelector("#close-guide").addEventListener("click", () => {
+      guideModal.classList.remove("show");
+      guideModal.setAttribute("aria-hidden", "true");
+    });
+
+    guideModal.addEventListener("click", (event) => {
+      if (event.target === guideModal) {
+        guideModal.classList.remove("show");
+        guideModal.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const material = resolvedMaterialName();
+      const batch = resolvedSowingBatch();
+      if (!material) {
+        alert("请填写品种/材料。");
+        return;
+      }
+      if (!batch) {
+        alert("请填写播期。");
+        return;
+      }
+      const plots = splitPlots(fields.plots.value);
+      if (plots.length === 0) {
+        alert("请至少填写一个小区编号。");
+        return;
+      }
+
+      const newRecords = plots.map((plotId, index) => ({
+        operation_id: makeOperationId(fields.date.value, index),
+        operation_date: fields.date.value,
+        material_name: material,
+        sowing_batch: batch,
+        plot_id: plotId,
+        operation_type: fields.type.value,
+        operation_detail: resolvedOperationDetail(),
+        growth_stage: fields.stage.value,
+        operator: fields.operator.value.trim(),
+        need_follow_up: fields.followUp.value,
+        note: fields.note.value.trim(),
+      }));
+
+      const duplicates = findDuplicates(newRecords);
+      if (duplicates.length > 0) {
+        const preview = duplicates.slice(0, 5).map((record) => `${record.operation_date}｜${record.material_name}｜${record.sowing_batch}｜${record.plot_id}｜${record.operation_type}｜${record.operation_detail}`).join("\n");
+        if (!confirm(`发现 ${duplicates.length} 条疑似重复记录：\n\n${preview}\n\n是否仍然保存？`)) return;
+      }
+
+      records = [...records, ...newRecords];
+      saveRecords();
+      saveDefaults({
+        date: fields.date.value,
+        material: fields.material.value,
+        customMaterial: fields.customMaterial.value.trim(),
+        batch: fields.batch.value,
+        customBatch: fields.customBatch.value.trim(),
+        type: fields.type.value,
+        subtype: fields.subtype.value,
+        customSubtype: fields.customSubtype.value.trim(),
+        stage: fields.stage.value,
+        operator: fields.operator.value.trim(),
+        followUp: fields.followUp.value,
+      });
+      applyDefaults();
+      render();
+      showSubmitStatus(newRecords);
+    });
+
+    document.querySelector("#fill-demo").addEventListener("click", () => {
+      fields.date.value = fields.date.value || todayString();
+      fields.material.value = "稻香A";
+      fields.batch.value = "第一播期";
+      fields.plots.value = "A-01, B-01";
+      setChipValue("operation-type-chips", "operation-type", "巡田");
+      refreshSubtypeOptions("抽穗观察");
+      fields.detail.value = "记录抽穗整齐度";
+      fields.stage.value = "抽穗";
+      fields.operator.value = fields.operator.value || "张工";
+      setChipValue("follow-up-chips", "need-follow-up", "是");
+      fields.note.value = "三天后复查";
+      updateCustomFields();
+      render();
+    });
+
+    document.querySelector("#clear-records").addEventListener("click", () => {
+      if (!confirm("确定清空本地记录吗？")) return;
+      records = [];
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    });
+
+    document.querySelector("#copy-csv").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(toCsv());
+        alert("CSV 已复制。");
+      } catch {
+        alert("浏览器不允许自动复制，请手动选中下方 CSV 内容复制。");
+      }
+    });
+
+    applyDefaults();
+    render();
+  </script>
+</body>
+</html>
