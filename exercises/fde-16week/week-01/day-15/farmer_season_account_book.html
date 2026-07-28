@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 15 普通农户小麦季农事成本收益记录</title>
+  <style>
+    :root {
+      --green: #188f5b;
+      --green-dark: #0c5f3b;
+      --green-soft: #e9f7ef;
+      --yellow-soft: #fff7df;
+      --red-soft: #fff0ef;
+      --text: #1f2a24;
+      --muted: #66736d;
+      --border: #d9e4df;
+      --card: #ffffff;
+      --bg: #f5f7f2;
+      --shadow: 0 14px 34px rgba(22, 72, 48, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(24, 143, 91, 0.12), transparent 30%),
+        linear-gradient(180deg, #f9fbf4 0%, var(--bg) 100%);
+    }
+
+    header {
+      padding: 22px;
+      color: white;
+    }
+
+    .hero {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #0f613d, #1f9f69);
+      box-shadow: 0 24px 70px rgba(15, 97, 61, 0.22);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 780px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.86);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 22px 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h2, h3 {
+      margin: 0 0 14px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 { font-size: 22px; }
+    h3 { font-size: 17px; }
+
+    .hint {
+      margin: -6px 0 16px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--text);
+      background: #fbfdfb;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(24, 143, 91, 0.12);
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--green);
+      color: white;
+      box-shadow: 0 8px 18px rgba(24, 143, 91, 0.22);
+    }
+
+    button.secondary {
+      background: #edf5ef;
+      color: var(--green-dark);
+      box-shadow: none;
+      border: 1px solid #cfe2d6;
+    }
+
+    button.danger {
+      background: #fff0ef;
+      color: #b42318;
+      box-shadow: none;
+      border: 1px solid #ffd2cc;
+    }
+
+    .notice {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      line-height: 1.6;
+      font-weight: 700;
+    }
+
+    .notice.show { display: block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff, #f7fbf8);
+    }
+
+    .metric small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .metric strong {
+      font-size: 23px;
+      color: var(--green-dark);
+    }
+
+    .profit.negative strong { color: #b42318; }
+    .profit.positive strong { color: #0f7a4d; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: white;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: #edf6f0;
+      color: var(--green-dark);
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .record {
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .record strong { color: var(--green-dark); }
+    .record p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--yellow-soft);
+      color: #8a5a00;
+      font-size: 12px;
+      font-weight: 800;
+      margin-left: 6px;
+    }
+
+    .empty {
+      border: 1px dashed #b8c9c0;
+      background: #fbfdfb;
+      color: var(--muted);
+      border-radius: 18px;
+      padding: 18px;
+      line-height: 1.7;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-tabs button {
+      background: rgba(255,255,255,0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.24);
+      box-shadow: none;
+    }
+
+    .nav-tabs button.active {
+      background: #ffffff;
+      color: var(--green-dark);
+      border-color: #ffffff;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-tabs button.active::after {
+      content: " 当前";
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .guide-button {
+      background: rgba(255,255,255,0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.30);
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .guide-button:hover,
+    .nav-tabs button:hover {
+      background: rgba(255,255,255,0.24);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .single-column {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    .guide-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(13, 48, 32, 0.42);
+      padding: 22px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guide-modal.show {
+      display: flex;
+    }
+
+    .guide-panel {
+      width: min(720px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 22px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+    }
+
+    .guide-panel ol {
+      padding-left: 22px;
+      line-height: 1.85;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .hero-top { flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .topbar > button { width: 100%; }
+      .nav-tabs button { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>普通农户小麦季成本收益记录</h1>
+          <p>每天录一条农事操作：整地、播种、施肥、打药、收获、销售。系统自动汇总一季总成本、销售收入、总利润和每亩利润。</p>
+        </div>
+        <button class="guide-button" type="button" id="open-guide">使用说明</button>
+      </div>
+
+      <div class="topbar">
+        <div class="nav-tabs" aria-label="页面导航">
+          <button class="active" type="button" data-view-target="input-view">01 录入农事操作</button>
+          <button type="button" data-view-target="dashboard-view">02 本季收益看板</button>
+          <button type="button" data-view-target="timeline-view">03 农事时间轴</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active single-column" id="input-view">
+      <div class="card">
+        <h2>01｜录入一条农事/收支记录</h2>
+        <p class="hint">默认小麦、河南；下一条记录会自动沿用上一条作物、地区、地块面积和负责人。新增作物或地区会自动加入下拉框顶部。</p>
+
+        <form id="record-form">
+          <div class="form-grid">
+            <div class="field">
+              <label for="record-date">日期</label>
+              <input id="record-date" type="date" required>
+            </div>
+
+            <div class="field">
+              <label for="area-mu">地块面积（亩）</label>
+              <input id="area-mu" type="number" min="0" step="0.01" value="10" required>
+            </div>
+
+            <div class="field">
+              <label for="crop-name">作物</label>
+              <select id="crop-name" required></select>
+            </div>
+
+            <div class="field" id="custom-crop-field">
+              <label for="custom-crop">自定义作物</label>
+              <input id="custom-crop" placeholder="例如：花生 / 水稻">
+            </div>
+
+            <div class="field">
+              <label for="province-name">地区/省份</label>
+              <select id="province-name" required></select>
+            </div>
+
+            <div class="field" id="custom-province-field">
+              <label for="custom-province">自定义地区</label>
+              <input id="custom-province" placeholder="例如：河南南阳 / 湖北荆州">
+            </div>
+
+            <div class="field">
+              <label for="plot-name">地块名称</label>
+              <input id="plot-name" placeholder="例如：东地 / 1号田" value="1号田">
+            </div>
+
+            <div class="field">
+              <label for="operator">记录人</label>
+              <input id="operator" placeholder="例如：老张" value="老张">
+            </div>
+
+            <div class="field">
+              <label for="operation-type">农事操作</label>
+              <select id="operation-type"></select>
+            </div>
+
+            <div class="field">
+              <label for="operation-detail">细分操作</label>
+              <select id="operation-detail"></select>
+            </div>
+
+            <div class="field full">
+              <label for="item-name">投入品/收入项目</label>
+              <input id="item-name" placeholder="例如：旋耕、郑麦某品种种子、复合肥、尿素、除草剂、小麦销售">
+            </div>
+
+            <div class="field">
+              <label for="quantity">数量</label>
+              <input id="quantity" type="number" min="0" step="0.01" placeholder="例如：10">
+            </div>
+
+            <div class="field">
+              <label for="unit-name">单位</label>
+              <select id="unit-name">
+                <option value="亩">亩</option>
+                <option value="kg">kg</option>
+                <option value="袋">袋</option>
+                <option value="瓶">瓶</option>
+                <option value="次">次</option>
+                <option value="工">工</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="unit-price">单价（元/单位）</label>
+              <input id="unit-price" type="number" min="0" step="0.01" placeholder="例如：100">
+            </div>
+
+            <div class="field">
+              <label for="amount">金额（元，可自动计算）</label>
+              <input id="amount" type="number" min="0" step="0.01" placeholder="数量 × 单价">
+            </div>
+
+            <div class="field full">
+              <label for="note">备注</label>
+              <textarea id="note" placeholder="例如：底肥随播种一次施入；销售给本地粮点；价格为当日结算价。"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit">提交记录</button>
+            <button class="secondary" type="button" id="fill-demo">填入演示</button>
+            <button class="danger" type="button" id="clear-records">清空本地记录</button>
+          </div>
+          <div class="notice" id="submit-notice"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="dashboard-view">
+      <div class="card">
+        <h2>02｜本季收益看板</h2>
+        <p class="hint">收入只统计“销售”类记录；其他操作默认统计为成本。利润 = 销售收入 - 总成本。</p>
+        <div class="summary-grid">
+          <div class="metric">
+            <small>总成本</small>
+            <strong id="total-cost">0 元</strong>
+          </div>
+          <div class="metric">
+            <small>销售收入</small>
+            <strong id="total-income">0 元</strong>
+          </div>
+          <div class="metric profit" id="profit-card">
+            <small>本季利润</small>
+            <strong id="total-profit">0 元</strong>
+          </div>
+          <div class="metric profit" id="profit-mu-card">
+            <small>每亩利润</small>
+            <strong id="profit-per-mu">0 元/亩</strong>
+          </div>
+        </div>
+        <div id="category-output"></div>
+      </div>
+    </section>
+
+    <section class="view" id="timeline-view">
+      <div class="card">
+        <h2>03｜农事时间轴</h2>
+        <p class="hint">按日期倒序查看这一季做过什么、花过什么钱、卖过什么钱。</p>
+        <div id="timeline-output"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="guide-modal" id="guide-modal" aria-hidden="true">
+    <div class="guide-panel">
+      <h2>使用说明</h2>
+      <p class="hint">这个工具是给普通农户记录一季作物收支用的，当前数据只保存在本机浏览器里。</p>
+      <ol>
+        <li>先在“01 录入农事操作”里填写日期、面积、作物、地区和地块。第一次填好后，后面会自动沿用上一条。</li>
+        <li>选择农事操作后，系统会自动带出细分操作、投入品和单位。例如“施肥”默认一体打包价，也可以改成底肥、返青肥等。</li>
+        <li>填写数量和单价后，金额会自动计算；如果你直接知道总金额，也可以手动改金额。</li>
+        <li>除“销售”之外，其他记录都会算成本；选择“销售”后会算收入。</li>
+        <li>点“02 本季收益看板”，查看总成本、销售收入、总利润和每亩利润。</li>
+        <li>点“03 农事时间轴”，查看这一季从整地到销售的完整记录。</li>
+      </ol>
+      <div class="actions">
+        <button type="button" id="close-guide">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RECORDS_KEY = "day15_farmer_season_records";
+    const DEFAULTS_KEY = "day15_farmer_season_defaults";
+    const CUSTOM_CROPS_KEY = "day15_custom_crops";
+    const CUSTOM_PROVINCES_KEY = "day15_custom_provinces";
+
+    const BASE_CROPS = ["小麦", "玉米", "水稻", "大豆", "油菜"];
+    const BASE_PROVINCES = [
+      "河南", "山东", "河北", "安徽", "江苏", "湖北", "湖南", "四川", "陕西", "山西",
+      "甘肃", "新疆", "内蒙古", "黑龙江", "吉林", "辽宁", "江西", "浙江", "广东", "广西",
+      "云南", "贵州", "福建", "重庆", "天津", "北京", "上海", "宁夏", "青海", "西藏", "海南"
+    ];
+
+    const OPERATION_DETAILS = {
+      "整地": ["一体打包价", "旋耕", "深翻", "镇压", "开沟排水", "其他"],
+      "播种": ["一体打包价", "购买种子", "种子处理", "机械播种", "人工补种", "其他"],
+      "施肥": ["一体打包价", "底肥", "返青肥", "拔节肥", "叶面肥", "其他"],
+      "除草": ["一体打包价", "封闭除草", "茎叶除草", "人工除草", "补打除草", "其他"],
+      "植保": ["一体打包价", "病害防治", "虫害防治", "一喷三防", "拌种包衣", "其他"],
+      "灌溉排水": ["一体打包价", "冬灌", "返青水", "拔节水", "灌浆水", "排水降渍", "其他"],
+      "田间管理": ["查苗补苗", "防冻管理", "防倒伏", "巡田", "其他"],
+      "收获": ["机械收割", "人工收割", "烘干", "晾晒", "其他"],
+      "运输": ["田间转运", "粮点运输", "装卸", "其他"],
+      "销售": ["小麦销售", "玉米销售", "大豆销售", "秸秆销售", "其他"],
+      "其他": ["其他"],
+    };
+
+    const SMART_ENTRY_DEFAULTS = {
+      "整地": {
+        "一体打包价": {item: "整地一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "旋耕": {item: "机械旋耕", unit: "亩", useAreaAsQuantity: true},
+        "深翻": {item: "机械深翻", unit: "亩", useAreaAsQuantity: true},
+        "镇压": {item: "机械镇压", unit: "亩", useAreaAsQuantity: true},
+        "开沟排水": {item: "开沟排水作业", unit: "亩", useAreaAsQuantity: true},
+        "其他": {item: "整地作业", unit: "亩", useAreaAsQuantity: true},
+      },
+      "播种": {
+        "一体打包价": {item: "播种一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "购买种子": {item: "作物种子", unit: "kg"},
+        "种子处理": {item: "拌种剂/包衣剂", unit: "袋"},
+        "机械播种": {item: "机械播种作业", unit: "亩", useAreaAsQuantity: true},
+        "人工补种": {item: "人工补种", unit: "工"},
+        "其他": {item: "播种相关费用", unit: "亩", useAreaAsQuantity: true},
+      },
+      "施肥": {
+        "一体打包价": {item: "施肥一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "底肥": {item: "复合肥", unit: "袋"},
+        "返青肥": {item: "尿素", unit: "袋"},
+        "拔节肥": {item: "复合肥/钾肥", unit: "袋"},
+        "叶面肥": {item: "叶面肥", unit: "瓶"},
+        "其他": {item: "肥料", unit: "袋"},
+      },
+      "除草": {
+        "一体打包价": {item: "除草一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "封闭除草": {item: "封闭除草剂", unit: "亩", useAreaAsQuantity: true},
+        "茎叶除草": {item: "茎叶除草剂", unit: "亩", useAreaAsQuantity: true},
+        "人工除草": {item: "人工除草", unit: "工"},
+        "补打除草": {item: "补打除草剂", unit: "亩", useAreaAsQuantity: true},
+        "其他": {item: "除草费用", unit: "亩", useAreaAsQuantity: true},
+      },
+      "植保": {
+        "一体打包价": {item: "植保一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "病害防治": {item: "农药", unit: "次", quantity: 1},
+        "虫害防治": {item: "农药", unit: "次", quantity: 1},
+        "一喷三防": {item: "一喷三防药剂", unit: "次", quantity: 1},
+        "拌种包衣": {item: "包衣剂", unit: "袋"},
+        "其他": {item: "农药", unit: "次", quantity: 1},
+      },
+      "灌溉排水": {
+        "一体打包价": {item: "灌溉排水一体打包价", unit: "亩", useAreaAsQuantity: true},
+        "冬灌": {item: "灌溉水费/电费", unit: "亩", useAreaAsQuantity: true},
+        "返青水": {item: "灌溉水费/电费", unit: "亩", useAreaAsQuantity: true},
+        "拔节水": {item: "灌溉水费/电费", unit: "亩", useAreaAsQuantity: true},
+        "灌浆水": {item: "灌溉水费/电费", unit: "亩", useAreaAsQuantity: true},
+        "排水降渍": {item: "排水作业", unit: "次", quantity: 1},
+        "其他": {item: "灌溉排水费用", unit: "次", quantity: 1},
+      },
+      "田间管理": {
+        "查苗补苗": {item: "人工管理", unit: "工"},
+        "防冻管理": {item: "防冻管理", unit: "次", quantity: 1},
+        "防倒伏": {item: "防倒伏药剂/作业", unit: "次", quantity: 1},
+        "巡田": {item: "巡田记录", unit: "次", quantity: 1},
+        "其他": {item: "田间管理", unit: "次", quantity: 1},
+      },
+      "收获": {
+        "机械收割": {item: "机械收割", unit: "亩", useAreaAsQuantity: true},
+        "人工收割": {item: "人工收割", unit: "工"},
+        "烘干": {item: "烘干费", unit: "kg"},
+        "晾晒": {item: "晾晒人工/场地", unit: "次", quantity: 1},
+        "其他": {item: "收获费用", unit: "亩", useAreaAsQuantity: true},
+      },
+      "运输": {
+        "田间转运": {item: "田间转运费", unit: "次", quantity: 1},
+        "粮点运输": {item: "粮点运输费", unit: "次", quantity: 1},
+        "装卸": {item: "装卸费", unit: "次", quantity: 1},
+        "其他": {item: "运输费", unit: "次", quantity: 1},
+      },
+      "销售": {
+        "小麦销售": {item: "作物销售", unit: "kg"},
+        "玉米销售": {item: "作物销售", unit: "kg"},
+        "大豆销售": {item: "作物销售", unit: "kg"},
+        "秸秆销售": {item: "秸秆销售", unit: "亩", useAreaAsQuantity: true},
+        "其他": {item: "销售收入", unit: "kg"},
+      },
+      "其他": {
+        "其他": {item: "其他费用", unit: "次", quantity: 1},
+      },
+    };
+
+    const fields = {
+      date: document.querySelector("#record-date"),
+      area: document.querySelector("#area-mu"),
+      crop: document.querySelector("#crop-name"),
+      customCrop: document.querySelector("#custom-crop"),
+      customCropField: document.querySelector("#custom-crop-field"),
+      province: document.querySelector("#province-name"),
+      customProvince: document.querySelector("#custom-province"),
+      customProvinceField: document.querySelector("#custom-province-field"),
+      plot: document.querySelector("#plot-name"),
+      operator: document.querySelector("#operator"),
+      type: document.querySelector("#operation-type"),
+      detail: document.querySelector("#operation-detail"),
+      item: document.querySelector("#item-name"),
+      quantity: document.querySelector("#quantity"),
+      unit: document.querySelector("#unit-name"),
+      unitPrice: document.querySelector("#unit-price"),
+      amount: document.querySelector("#amount"),
+      note: document.querySelector("#note"),
+    };
+
+    let records = loadJson(RECORDS_KEY, []);
+
+    function loadJson(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch { return fallback; }
+    }
+
+    function saveJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function todayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    }
+
+    function money(value) {
+      return `${Number(value || 0).toFixed(2)} 元`;
+    }
+
+    function rememberCustom(key, baseItems, value) {
+      const clean = value.trim();
+      if (!clean || baseItems.includes(clean)) return;
+      const existing = loadJson(key, []).filter((item) => item !== clean);
+      saveJson(key, [clean, ...existing]);
+    }
+
+    function renderOptions(select, baseItems, customKey, preferred, defaultValue) {
+      const customItems = loadJson(customKey, []);
+      const options = [
+        ...customItems,
+        ...baseItems.filter((item) => !customItems.includes(item)),
+        "其他",
+      ];
+      select.innerHTML = "";
+      options.forEach((option) => select.add(new Option(option, option)));
+      select.value = options.includes(preferred) ? preferred : defaultValue;
+    }
+
+    function renderCropAndProvinceOptions() {
+      const defaults = loadJson(DEFAULTS_KEY, {});
+      renderOptions(fields.crop, BASE_CROPS, CUSTOM_CROPS_KEY, defaults.crop || "小麦", "小麦");
+      renderOptions(fields.province, BASE_PROVINCES, CUSTOM_PROVINCES_KEY, defaults.province || "河南", "河南");
+    }
+
+    function refreshDetailOptions(preferred = "") {
+      const options = OPERATION_DETAILS[fields.type.value] || ["其他"];
+      fields.detail.innerHTML = "";
+      options.forEach((option) => fields.detail.add(new Option(option, option)));
+      fields.detail.value = options.includes(preferred) ? preferred : options[0];
+    }
+
+    function smartDefaultForCurrentSelection() {
+      const typeDefaults = SMART_ENTRY_DEFAULTS[fields.type.value] || SMART_ENTRY_DEFAULTS["其他"];
+      const baseDefault = typeDefaults[fields.detail.value] || typeDefaults["其他"] || {item: "", unit: "次"};
+      const crop = resolvedCrop() || "作物";
+      const item = baseDefault.item
+        .replace("作物种子", `${crop}种子`)
+        .replace("作物销售", `${crop}销售`);
+      return {...baseDefault, item};
+    }
+
+    function applySmartEntryDefaults({force = true} = {}) {
+      const smartDefault = smartDefaultForCurrentSelection();
+      const shouldWrite = force || !fields.item.value.trim();
+      if (!shouldWrite) return;
+
+      fields.item.value = smartDefault.item || "";
+      fields.unit.value = smartDefault.unit || "次";
+      if (smartDefault.useAreaAsQuantity) {
+        fields.quantity.value = fields.area.value || "";
+      } else if (smartDefault.quantity !== undefined) {
+        fields.quantity.value = smartDefault.quantity;
+      } else {
+        fields.quantity.value = "";
+      }
+      fields.unitPrice.value = "";
+      fields.amount.value = "";
+    }
+
+    function updateCustomFields() {
+      fields.customCropField.style.display = fields.crop.value === "其他" ? "block" : "none";
+      fields.customProvinceField.style.display = fields.province.value === "其他" ? "block" : "none";
+    }
+
+    function applyDefaults() {
+      const defaults = loadJson(DEFAULTS_KEY, {});
+      renderCropAndProvinceOptions();
+      fields.date.value = defaults.date || todayString();
+      fields.area.value = defaults.area || 10;
+      fields.plot.value = defaults.plot || "1号田";
+      fields.operator.value = defaults.operator || "老张";
+      fields.type.value = defaults.type || "整地";
+      refreshDetailOptions(defaults.detail || "");
+      fields.customCrop.value = "";
+      fields.customProvince.value = "";
+      applySmartEntryDefaults({force: true});
+      fields.unitPrice.value = "";
+      fields.amount.value = "";
+      fields.note.value = "";
+      updateCustomFields();
+    }
+
+    function resolvedCrop() {
+      return fields.crop.value === "其他" ? fields.customCrop.value.trim() : fields.crop.value;
+    }
+
+    function resolvedProvince() {
+      return fields.province.value === "其他" ? fields.customProvince.value.trim() : fields.province.value;
+    }
+
+    function entryKind(type) {
+      return type === "销售" ? "收入" : "成本";
+    }
+
+    function calculateAmount() {
+      const quantity = Number(fields.quantity.value);
+      const unitPrice = Number(fields.unitPrice.value);
+      if (quantity > 0 && unitPrice >= 0) {
+        fields.amount.value = (quantity * unitPrice).toFixed(2);
+      }
+    }
+
+    function makeRecordId() {
+      return `DAY15-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    function sortedRecords() {
+      return records.slice().sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    function getSummary() {
+      const totalCost = records
+        .filter((record) => record.kind === "成本")
+        .reduce((sum, record) => sum + record.amount, 0);
+      const totalIncome = records
+        .filter((record) => record.kind === "收入")
+        .reduce((sum, record) => sum + record.amount, 0);
+      const latestArea = Number(loadJson(DEFAULTS_KEY, {}).area || 0);
+      const profit = totalIncome - totalCost;
+      return {
+        totalCost,
+        totalIncome,
+        profit,
+        profitPerMu: latestArea > 0 ? profit / latestArea : 0,
+      };
+    }
+
+    function renderSummary() {
+      const summary = getSummary();
+      document.querySelector("#total-cost").textContent = money(summary.totalCost);
+      document.querySelector("#total-income").textContent = money(summary.totalIncome);
+      document.querySelector("#total-profit").textContent = money(summary.profit);
+      document.querySelector("#profit-per-mu").textContent = `${summary.profitPerMu.toFixed(2)} 元/亩`;
+      document.querySelector("#profit-card").className = `metric profit ${summary.profit >= 0 ? "positive" : "negative"}`;
+      document.querySelector("#profit-mu-card").className = `metric profit ${summary.profitPerMu >= 0 ? "positive" : "negative"}`;
+    }
+
+    function renderCategoryTable() {
+      if (records.length === 0) {
+        document.querySelector("#category-output").innerHTML = `<div class="empty">暂无数据。先录入一条整地、播种、施肥或销售记录。</div>`;
+        return;
+      }
+      const categoryMap = new Map();
+      records.forEach((record) => {
+        const key = record.kind === "收入" ? "销售收入" : record.type;
+        categoryMap.set(key, (categoryMap.get(key) || 0) + record.amount);
+      });
+      const rows = Array.from(categoryMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, amount]) => `<tr><td>${name}</td><td>${money(amount)}</td></tr>`)
+        .join("");
+      document.querySelector("#category-output").innerHTML = `
+        <h3>分类汇总</h3>
+        <table>
+          <thead><tr><th>类别</th><th>金额</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderTimeline() {
+      const output = document.querySelector("#timeline-output");
+      if (records.length === 0) {
+        output.innerHTML = `<div class="empty">暂无农事时间轴。这里会按日期显示“哪天做了什么、花了多少钱、卖了多少钱”。</div>`;
+        return;
+      }
+      output.innerHTML = `<div class="timeline">${
+        sortedRecords().slice().reverse().map((record) => `
+          <article class="record">
+            <strong>${record.date}｜${record.crop}｜${record.province}｜${record.plot}</strong>
+            <span class="pill">${record.kind}</span>
+            <p>${record.type}：${record.detail}｜${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}</p>
+            <p>面积：${record.area} 亩｜记录人：${record.operator}｜备注：${record.note || "无"}</p>
+          </article>
+        `).join("")
+      }</div>`;
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderCategoryTable();
+      renderTimeline();
+    }
+
+    function showView(viewId) {
+      document.querySelectorAll(".view").forEach((view) => {
+        view.classList.toggle("active", view.id === viewId);
+      });
+      document.querySelectorAll("[data-view-target]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.viewTarget === viewId);
+      });
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    const guideModal = document.querySelector("#guide-modal");
+
+    document.querySelectorAll("[data-view-target]").forEach((button) => {
+      button.addEventListener("click", () => showView(button.dataset.viewTarget));
+    });
+
+    document.querySelector("#open-guide").addEventListener("click", () => {
+      guideModal.classList.add("show");
+      guideModal.setAttribute("aria-hidden", "false");
+    });
+
+    document.querySelector("#close-guide").addEventListener("click", () => {
+      guideModal.classList.remove("show");
+      guideModal.setAttribute("aria-hidden", "true");
+    });
+
+    guideModal.addEventListener("click", (event) => {
+      if (event.target === guideModal) {
+        guideModal.classList.remove("show");
+        guideModal.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    fields.crop.addEventListener("change", () => {
+      updateCustomFields();
+      if (["播种", "销售"].includes(fields.type.value)) applySmartEntryDefaults({force: true});
+    });
+    fields.province.addEventListener("change", updateCustomFields);
+    fields.customCrop.addEventListener("input", () => {
+      if (["播种", "销售"].includes(fields.type.value)) applySmartEntryDefaults({force: true});
+    });
+    fields.type.addEventListener("change", () => {
+      refreshDetailOptions();
+      applySmartEntryDefaults({force: true});
+    });
+    fields.detail.addEventListener("change", () => applySmartEntryDefaults({force: true}));
+    fields.area.addEventListener("change", () => {
+      const smartDefault = smartDefaultForCurrentSelection();
+      if (smartDefault.useAreaAsQuantity) fields.quantity.value = fields.area.value || "";
+      calculateAmount();
+    });
+    fields.quantity.addEventListener("input", calculateAmount);
+    fields.unitPrice.addEventListener("input", calculateAmount);
+
+    document.querySelector("#record-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const crop = resolvedCrop();
+      const province = resolvedProvince();
+      const amount = Number(fields.amount.value);
+      const area = Number(fields.area.value);
+      if (!crop) return alert("请填写作物。");
+      if (!province) return alert("请填写地区。");
+      if (!(area > 0)) return alert("地块面积必须大于 0。");
+      if (!(amount >= 0)) return alert("金额必须填写为大于等于 0 的数字。");
+
+      rememberCustom(CUSTOM_CROPS_KEY, BASE_CROPS, crop);
+      rememberCustom(CUSTOM_PROVINCES_KEY, BASE_PROVINCES, province);
+
+      const record = {
+        id: makeRecordId(),
+        date: fields.date.value,
+        crop,
+        province,
+        area,
+        plot: fields.plot.value.trim() || "未命名地块",
+        operator: fields.operator.value.trim() || "未填写",
+        type: fields.type.value,
+        detail: fields.detail.value,
+        kind: entryKind(fields.type.value),
+        item: fields.item.value.trim(),
+        quantity: Number(fields.quantity.value || 0),
+        unit: fields.unit.value,
+        unitPrice: Number(fields.unitPrice.value || 0),
+        amount,
+        note: fields.note.value.trim(),
+      };
+
+      records = [...records, record];
+      saveJson(RECORDS_KEY, records);
+      saveJson(DEFAULTS_KEY, {
+        date: fields.date.value,
+        crop,
+        province,
+        area,
+        plot: record.plot,
+        operator: record.operator,
+        type: fields.type.value,
+        detail: fields.detail.value,
+        unit: fields.unit.value,
+      });
+
+      applyDefaults();
+      renderAll();
+      const notice = document.querySelector("#submit-notice");
+      notice.textContent = `已提交 1 条${record.kind}记录：${record.type}｜${money(record.amount)}。看板已自动更新。`;
+      notice.classList.add("show");
+    });
+
+    document.querySelector("#fill-demo").addEventListener("click", () => {
+      fields.date.value = fields.date.value || todayString();
+      fields.crop.value = "小麦";
+      fields.province.value = "河南";
+      fields.area.value = 10;
+      fields.plot.value = "1号田";
+      fields.operator.value = fields.operator.value || "老张";
+      fields.type.value = "施肥";
+      refreshDetailOptions("底肥");
+      fields.item.value = "复合肥";
+      fields.quantity.value = 10;
+      fields.unit.value = "亩";
+      fields.unitPrice.value = 180;
+      calculateAmount();
+      fields.note.value = "示例：每亩底肥成本 180 元。";
+      updateCustomFields();
+    });
+
+    document.querySelector("#clear-records").addEventListener("click", () => {
+      if (!confirm("确定清空本地记录吗？作物和地区下拉记忆不会清空。")) return;
+      records = [];
+      localStorage.removeItem(RECORDS_KEY);
+      renderAll();
+    });
+
+    fields.type.innerHTML = Object.keys(OPERATION_DETAILS).map((type) => `<option value="${type}">${type}</option>`).join("");
+    applyDefaults();
+    renderAll();
+  </script>
+</body>
+</html>
