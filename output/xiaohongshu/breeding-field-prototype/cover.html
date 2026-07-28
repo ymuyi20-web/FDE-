@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>育种基地田间记录闭环封面</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 1080px;
+      height: 1440px;
+      overflow: hidden;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(74, 222, 128, .28), transparent 26%),
+        radial-gradient(circle at 90% 12%, rgba(245, 158, 11, .20), transparent 28%),
+        linear-gradient(180deg, #082719 0%, #0f5134 44%, #efe7d2 100%);
+      color: white;
+    }
+    .poster {
+      position: relative;
+      width: 1080px;
+      height: 1440px;
+      padding: 86px 76px;
+    }
+    .grid {
+      position: absolute;
+      inset: 0;
+      opacity: .16;
+      background-image:
+        linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 72%);
+    }
+    .badge {
+      position: relative;
+      display: inline-flex;
+      padding: 14px 22px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #dcfce7;
+    }
+    h1 {
+      position: relative;
+      margin: 46px 0 22px;
+      font-size: 86px;
+      line-height: 1.12;
+      letter-spacing: -3px;
+      text-shadow: 0 18px 45px rgba(0,0,0,.24);
+    }
+    .subtitle {
+      position: relative;
+      display: inline-flex;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 26px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.14);
+      color: #fef9c3;
+      font-size: 38px;
+      font-weight: 900;
+      box-shadow: 0 22px 60px rgba(0,0,0,.18);
+    }
+    .visual {
+      position: absolute;
+      left: 76px;
+      right: 76px;
+      top: 545px;
+      height: 560px;
+    }
+    .phone {
+      position: absolute;
+      left: 58px;
+      top: 10px;
+      width: 370px;
+      height: 600px;
+      border-radius: 54px;
+      background: #0b1f16;
+      border: 12px solid rgba(255,255,255,.88);
+      box-shadow: 0 42px 95px rgba(0,0,0,.36);
+      padding: 36px 26px;
+      transform: rotate(-4deg);
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      width: 116px;
+      height: 22px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: #06140e;
+    }
+    .screen-title {
+      margin-top: 24px;
+      color: #dcfce7;
+      font-size: 28px;
+      font-weight: 900;
+    }
+    .field-card {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 24px;
+      background: #f8fff2;
+      color: #17351f;
+    }
+    .field-card strong {
+      display: block;
+      margin-bottom: 12px;
+      color: #166534;
+      font-size: 24px;
+    }
+    .line {
+      height: 16px;
+      margin: 12px 0;
+      border-radius: 999px;
+      background: #dbead5;
+    }
+    .line.short { width: 62%; }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .dashboards {
+      position: absolute;
+      right: 0;
+      top: 54px;
+      width: 560px;
+      display: grid;
+      gap: 24px;
+    }
+    .panel {
+      padding: 26px;
+      border: 1px solid rgba(255,255,255,.36);
+      border-radius: 32px;
+      background: rgba(255,255,255,.86);
+      color: #16351f;
+      box-shadow: 0 28px 72px rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+    }
+    .panel h2 {
+      margin: 0 0 16px;
+      color: #14532d;
+      font-size: 30px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .stat {
+      padding: 16px;
+      border-radius: 20px;
+      background: #edf7e8;
+      text-align: center;
+    }
+    .stat b {
+      display: block;
+      color: #166534;
+      font-size: 36px;
+    }
+    .stat span {
+      color: #64745f;
+      font-size: 18px;
+    }
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .cell {
+      padding: 13px;
+      border-radius: 16px;
+      background: #f2f7ed;
+      color: #36513a;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .field {
+      position: absolute;
+      left: -110px;
+      right: -110px;
+      bottom: -100px;
+      height: 365px;
+      transform: perspective(900px) rotateX(58deg);
+      transform-origin: bottom;
+      opacity: .95;
+    }
+    .plot {
+      position: absolute;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #8fbc62, #4d7f35);
+      border: 5px solid rgba(255,255,255,.38);
+      box-shadow: inset 0 0 32px rgba(255,255,255,.16);
+    }
+    .plot:nth-child(1) { left: 0; top: 20px; width: 270px; height: 130px; }
+    .plot:nth-child(2) { left: 300px; top: 10px; width: 260px; height: 145px; }
+    .plot:nth-child(3) { left: 590px; top: 26px; width: 300px; height: 120px; }
+    .plot:nth-child(4) { left: 920px; top: 6px; width: 250px; height: 148px; }
+    .plot:nth-child(5) { left: 120px; top: 180px; width: 310px; height: 138px; }
+    .plot:nth-child(6) { left: 465px; top: 175px; width: 330px; height: 142px; }
+    .plot:nth-child(7) { left: 830px; top: 178px; width: 320px; height: 138px; }
+    .footer {
+      position: absolute;
+      left: 76px;
+      right: 76px;
+      bottom: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #17351f;
+      font-weight: 900;
+    }
+    .footer .tag {
+      padding: 14px 20px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: #14532d;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <section class="poster">
+    <div class="grid"></div>
+    <div class="badge">FDE 农业小原型</div>
+    <h1>育种基地<br>田间记录闭环</h1>
+    <div class="subtitle">录入 → 日志 → 看板</div>
+
+    <section class="visual">
+      <div class="phone">
+        <div class="screen-title">田间操作录入</div>
+        <div class="field-card">
+          <strong>品种 / 播期 / 小区</strong>
+          <div class="line"></div>
+          <div class="line short"></div>
+          <div class="chip-row">
+            <span class="chip">植保</span>
+            <span class="chip">晒田</span>
+            <span class="chip">灌溉</span>
+          </div>
+        </div>
+        <div class="field-card">
+          <strong>当前生育期</strong>
+          <div class="chip-row">
+            <span class="chip">播种</span>
+            <span class="chip">分蘖</span>
+            <span class="chip">抽穗</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboards">
+        <div class="panel">
+          <h2>农事操作日志</h2>
+          <div class="stats">
+            <div class="stat"><b>12</b><span>记录</span></div>
+            <div class="stat"><b>4</b><span>小区</span></div>
+            <div class="stat"><b>3</b><span>生育期</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>材料 × 播期 × 小区看板</h2>
+          <div class="table-row">
+            <div class="cell">稻花香A</div>
+            <div class="cell">第一播期</div>
+            <div class="cell">A-01</div>
+          </div>
+          <div class="table-row">
+            <div class="cell">新品系01</div>
+            <div class="cell">第二播期</div>
+            <div class="cell">B-03</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="field">
+      <div class="plot"></div>
+      <div class="plot"></div>
+      <div class="plot"></div>
+      <div class="plot"></div>
+      <div class="plot"></div>
+      <div class="plot"></div>
+      <div class="plot"></div>
+    </div>
+
+    <footer class="footer">
+      <div class="tag">田间数据 · 本地闭环 · 试用原型</div>
+      <div class="tag">Smart Breeding Notes</div>
+    </footer>
+  </section>
+</body>
+</html>
