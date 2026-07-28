@@ -203,13 +203,35 @@
 
     .operation-row {
       display: grid;
-      grid-template-columns: 1.1fr 1.1fr 1.3fr 0.75fr 0.75fr 0.9fr 0.9fr auto;
+      grid-template-columns: 1fr 1fr 1.1fr 1.2fr 0.7fr 0.7fr 0.85fr 0.85fr auto;
       gap: 10px;
       align-items: end;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: 18px;
       background: #fbfdfb;
+    }
+
+    .operation-row-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 4px;
+      color: var(--green-dark);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .operation-row-title span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--mint);
+      border: 1px solid #cfe2d6;
     }
 
     .actions {
@@ -259,6 +281,28 @@
 
     .negative strong { color: var(--red); }
 
+    .category-tools {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 4px 0 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfdfb;
+    }
+
+    .category-tools label {
+      margin: 0;
+      color: var(--green-dark);
+    }
+
+    .category-tools select {
+      max-width: 220px;
+      background: #fff;
+    }
+
     .timeline {
       display: grid;
       gap: 14px;
@@ -285,11 +329,31 @@
     }
 
     .op-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
       padding: 10px 12px;
       border-radius: 13px;
       background: #f7faf6;
       color: var(--muted);
       line-height: 1.55;
+    }
+
+    .op-line-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .delete-record {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--red);
+      background: #fff0ef;
+      border: 1px solid #ffd2cc;
+      box-shadow: none;
     }
 
     .pill {
@@ -372,6 +436,8 @@
       .form-grid { grid-template-columns: 1fr; }
       .operation-row { grid-template-columns: 1fr; }
       .summary-grid { grid-template-columns: 1fr 1fr; }
+      .category-tools { align-items: stretch; flex-direction: column; }
+      .category-tools select { max-width: none; }
     }
   </style>
 </head>
@@ -380,8 +446,8 @@
     <section class="hero">
       <div class="hero-top">
         <div>
-          <h1>经济作物每日多操作记录</h1>
-          <p>适合番茄、辣椒、黄瓜、草莓等经济作物：同一天打药、冲施肥、除草、浇水、采收、销售，可以一次批量提交。</p>
+          <h1>经济作物全程多操作记录</h1>
+          <p>适合番茄、辣椒、黄瓜、草莓、葱姜蒜等经济作物：从整地、播种/定植到打药、冲施肥、采收、销售都能记录；同一天多项操作可以一次批量提交。</p>
         </div>
         <button class="guide-button" type="button" id="open-guide">使用说明</button>
       </div>
@@ -399,7 +465,7 @@
     <section class="view active" id="input-view">
       <div class="card">
         <h2>01｜批量录入当天多项操作</h2>
-        <p class="hint">先填当天基础信息，再在下面添加多条操作。提交一次，就会把当天全部操作一起写入账本。</p>
+        <p class="hint">先填当天基础信息，再在下面添加多条操作。既能记录整地、播种/定植这类前期投入，也能记录打药、冲施肥、采收、销售这类高频操作。</p>
 
         <form id="batch-form">
           <div class="form-grid">
@@ -468,6 +534,13 @@
           <div class="metric" id="profit-card"><small>本季利润</small><strong id="total-profit">0 元</strong></div>
           <div class="metric" id="profit-mu-card"><small>每亩利润</small><strong id="profit-per-mu">0 元/亩</strong></div>
         </div>
+        <div class="category-tools">
+          <label for="category-sort">分类汇总排序方式</label>
+          <select id="category-sort">
+            <option value="process">按生产过程排序</option>
+            <option value="amount">按金额从高到低排序</option>
+          </select>
+        </div>
         <div id="category-output"></div>
       </div>
     </section>
@@ -479,7 +552,7 @@
       <p class="hint">这个工具是 Day16 独立版本，适合一天多项操作的经济作物管理场景。</p>
       <ol>
         <li>先填写日期、作物、地区、面积、地块和记录人。</li>
-        <li>在“当天操作明细”里添加多条操作，例如打药、冲施肥、除草、浇水。</li>
+        <li>在“当天操作明细”里添加多条操作，例如整地、播种/定植、打药、冲施肥、除草、浇水、采收、销售。</li>
         <li>每条操作可以填写数量、单位、单价，金额会自动计算；也可以直接改总金额。</li>
         <li>点击“提交当天全部操作”，系统会一次保存当天所有操作。</li>
         <li>点“02 每日农事时间轴”查看每天做了哪些事；点“03 本季收益看板”查看成本、收入和利润。</li>
@@ -498,20 +571,95 @@
     const CUSTOM_PROVINCES_KEY = "day16_custom_provinces";
     const DEMO_ID_PREFIX = "DEMO-DAY16-ECONOMIC-";
 
-    const BASE_CROPS = ["番茄", "辣椒", "黄瓜", "草莓", "西瓜", "葡萄", "水稻", "小麦", "玉米"];
+    const BASE_CROPS = ["番茄", "辣椒", "黄瓜", "草莓", "西瓜", "葡萄", "葱", "姜", "蒜", "水稻", "小麦", "玉米"];
     const BASE_PROVINCES = ["河南", "山东", "河北", "安徽", "江苏", "湖北", "湖南", "四川", "陕西", "山西", "云南", "贵州", "广东", "广西", "浙江", "福建", "新疆", "内蒙古"];
-    const OPERATIONS = ["打药", "冲施肥", "除草", "浇水", "整枝打叉", "人工管理", "采收", "运输", "销售", "其他"];
-    const OPERATION_DEFAULTS = {
-      "打药": {item: "农药", unit: "次", quantity: 1},
-      "冲施肥": {item: "水溶肥", unit: "袋"},
-      "除草": {item: "除草人工/除草剂", unit: "次", quantity: 1},
-      "浇水": {item: "灌溉水电费", unit: "次", quantity: 1},
-      "整枝打叉": {item: "整枝打叉人工", unit: "工"},
-      "人工管理": {item: "人工管理", unit: "工"},
-      "采收": {item: "采收人工", unit: "工"},
-      "运输": {item: "运输费", unit: "次", quantity: 1},
-      "销售": {item: "作物销售", unit: "kg"},
-      "其他": {item: "其他费用", unit: "次", quantity: 1},
+    const OPERATION_DETAILS = {
+      "整地": ["一体打包价", "翻耕", "起垄", "做畦", "覆膜", "滴灌带铺设", "其他"],
+      "播种/定植": ["一体打包价", "买苗", "育苗", "直播", "移栽", "补苗", "其他"],
+      "施肥": ["一体打包价", "底肥", "冲施肥", "滴灌施肥", "叶面肥", "追肥", "其他"],
+      "打药": ["一体打包价", "杀菌剂", "杀虫剂", "调节剂", "防病套餐", "其他"],
+      "除草": ["一体打包价", "人工除草", "药剂除草", "覆膜控草", "其他"],
+      "灌溉": ["一体打包价", "浇水", "滴灌", "排水", "其他"],
+      "植株管理": ["整枝打叉", "吊蔓", "疏花疏果", "授粉", "打老叶", "其他"],
+      "人工管理": ["一体打包价", "巡田", "绑蔓", "清沟", "补工", "其他"],
+      "采收": ["一体打包价", "人工采收", "分级包装", "装筐", "其他"],
+      "运输": ["一体打包价", "田间转运", "市场运输", "冷链运输", "装卸", "其他"],
+      "销售": ["批发销售", "零售销售", "电商销售", "合作社代销", "其他"],
+      "其他": ["建设大棚", "搭架", "租地", "临时用工", "其他"],
+    };
+    const OPERATIONS = Object.keys(OPERATION_DETAILS);
+    const CATEGORY_PROCESS_ORDER = [...OPERATIONS.filter((item) => item !== "销售"), "销售收入"];
+    const DETAIL_DEFAULTS = {
+      "整地|一体打包价": {item: "整地一体打包价", unit: "亩", quantityFromArea: true},
+      "整地|翻耕": {item: "翻耕机械", unit: "亩", quantityFromArea: true},
+      "整地|起垄": {item: "起垄机械", unit: "亩", quantityFromArea: true},
+      "整地|做畦": {item: "做畦人工/机械", unit: "亩", quantityFromArea: true},
+      "整地|覆膜": {item: "地膜+覆膜人工", unit: "亩", quantityFromArea: true},
+      "整地|滴灌带铺设": {item: "滴灌带材料和铺设", unit: "亩", quantityFromArea: true},
+      "整地|其他": {item: "整地其他费用", unit: "次", quantity: 1},
+      "播种/定植|一体打包价": {item: "播种/定植一体打包价", unit: "亩", quantityFromArea: true},
+      "播种/定植|买苗": {item: "种苗", unit: "株"},
+      "播种/定植|育苗": {item: "育苗费用", unit: "株"},
+      "播种/定植|直播": {item: "种子", unit: "袋"},
+      "播种/定植|移栽": {item: "移栽人工", unit: "工"},
+      "播种/定植|补苗": {item: "补苗人工和种苗", unit: "株"},
+      "播种/定植|其他": {item: "播种/定植其他费用", unit: "次", quantity: 1},
+      "施肥|一体打包价": {item: "施肥一体打包价", unit: "亩", quantityFromArea: true},
+      "施肥|底肥": {item: "复合肥/有机肥", unit: "袋"},
+      "施肥|冲施肥": {item: "水溶肥", unit: "袋"},
+      "施肥|滴灌施肥": {item: "滴灌水溶肥", unit: "袋"},
+      "施肥|叶面肥": {item: "叶面肥", unit: "瓶"},
+      "施肥|追肥": {item: "追肥", unit: "袋"},
+      "施肥|其他": {item: "施肥其他费用", unit: "次", quantity: 1},
+      "打药|一体打包价": {item: "打药一体打包价", unit: "亩", quantityFromArea: true},
+      "打药|杀菌剂": {item: "杀菌剂", unit: "次", quantity: 1},
+      "打药|杀虫剂": {item: "杀虫剂", unit: "次", quantity: 1},
+      "打药|调节剂": {item: "调节剂", unit: "次", quantity: 1},
+      "打药|防病套餐": {item: "防病套餐", unit: "次", quantity: 1},
+      "打药|其他": {item: "打药其他费用", unit: "次", quantity: 1},
+      "除草|一体打包价": {item: "除草一体打包价", unit: "亩", quantityFromArea: true},
+      "除草|人工除草": {item: "除草人工", unit: "工"},
+      "除草|药剂除草": {item: "除草剂", unit: "次", quantity: 1},
+      "除草|覆膜控草": {item: "覆膜控草", unit: "亩", quantityFromArea: true},
+      "除草|其他": {item: "除草其他费用", unit: "次", quantity: 1},
+      "灌溉|一体打包价": {item: "灌溉一体打包价", unit: "亩", quantityFromArea: true},
+      "灌溉|浇水": {item: "浇水水电费", unit: "次", quantity: 1},
+      "灌溉|滴灌": {item: "滴灌水电费", unit: "次", quantity: 1},
+      "灌溉|排水": {item: "排水人工/机械", unit: "次", quantity: 1},
+      "灌溉|其他": {item: "灌溉其他费用", unit: "次", quantity: 1},
+      "植株管理|整枝打叉": {item: "整枝打叉人工", unit: "工"},
+      "植株管理|吊蔓": {item: "吊蔓人工", unit: "工"},
+      "植株管理|疏花疏果": {item: "疏花疏果人工", unit: "工"},
+      "植株管理|授粉": {item: "授粉人工/熊蜂", unit: "次", quantity: 1},
+      "植株管理|打老叶": {item: "打老叶人工", unit: "工"},
+      "植株管理|其他": {item: "植株管理其他费用", unit: "次", quantity: 1},
+      "人工管理|一体打包价": {item: "人工管理一体打包价", unit: "亩", quantityFromArea: true},
+      "人工管理|巡田": {item: "巡田人工", unit: "工"},
+      "人工管理|绑蔓": {item: "绑蔓人工", unit: "工"},
+      "人工管理|清沟": {item: "清沟人工", unit: "工"},
+      "人工管理|补工": {item: "临时补工", unit: "工"},
+      "人工管理|其他": {item: "人工管理其他费用", unit: "次", quantity: 1},
+      "采收|一体打包价": {item: "采收一体打包价", unit: "亩", quantityFromArea: true},
+      "采收|人工采收": {item: "采收人工", unit: "工"},
+      "采收|分级包装": {item: "分级包装人工和耗材", unit: "箱"},
+      "采收|装筐": {item: "装筐人工", unit: "箱"},
+      "采收|其他": {item: "采收其他费用", unit: "次", quantity: 1},
+      "运输|一体打包价": {item: "运输一体打包价", unit: "次", quantity: 1},
+      "运输|田间转运": {item: "田间转运费", unit: "次", quantity: 1},
+      "运输|市场运输": {item: "市场运输费", unit: "次", quantity: 1},
+      "运输|冷链运输": {item: "冷链运输费", unit: "次", quantity: 1},
+      "运输|装卸": {item: "装卸人工", unit: "工"},
+      "运输|其他": {item: "运输其他费用", unit: "次", quantity: 1},
+      "销售|批发销售": {item: "作物批发销售", unit: "kg"},
+      "销售|零售销售": {item: "作物零售销售", unit: "kg"},
+      "销售|电商销售": {item: "作物电商销售", unit: "kg"},
+      "销售|合作社代销": {item: "作物合作社代销", unit: "kg"},
+      "销售|其他": {item: "作物销售", unit: "kg"},
+      "其他|建设大棚": {item: "建设大棚费用", unit: "亩", quantityFromArea: true},
+      "其他|搭架": {item: "搭架材料和人工", unit: "亩", quantityFromArea: true},
+      "其他|租地": {item: "土地租金", unit: "亩", quantityFromArea: true},
+      "其他|临时用工": {item: "临时用工", unit: "工"},
+      "其他|其他": {item: "其他费用", unit: "次", quantity: 1},
     };
 
     const fields = {
@@ -596,22 +744,44 @@
       return OPERATIONS.map((item) => `<option value="${item}" ${item === selected ? "selected" : ""}>${item}</option>`).join("");
     }
 
+    function detailOptionsHtml(type, selected) {
+      const details = OPERATION_DETAILS[type] || OPERATION_DETAILS["其他"];
+      const safeSelected = details.includes(selected) ? selected : details[0];
+      return details.map((item) => `<option value="${item}" ${item === safeSelected ? "selected" : ""}>${item}</option>`).join("");
+    }
+
+    function operationDefault(type, detail) {
+      const details = OPERATION_DETAILS[type] || OPERATION_DETAILS["其他"];
+      const safeDetail = details.includes(detail) ? detail : details[0];
+      return {
+        detail: safeDetail,
+        ...(DETAIL_DEFAULTS[`${type}|${safeDetail}`] || DETAIL_DEFAULTS[`${type}|其他`] || DETAIL_DEFAULTS["其他|其他"]),
+      };
+    }
+
     function unitOptionsHtml(selected = "次") {
       return ["亩", "kg", "袋", "瓶", "次", "工", "箱", "斤", "其他"].map((item) => `<option value="${item}" ${item === selected ? "selected" : ""}>${item}</option>`).join("");
     }
 
-    function addOperationRow(type = "打药") {
-      const defaults = OPERATION_DEFAULTS[type] || OPERATION_DEFAULTS["其他"];
+    function addOperationRow(type = "打药", detail = null) {
+      const defaults = operationDefault(type, detail);
+      const crop = resolvedCrop() || "作物";
+      const item = defaults.item.replace("作物销售", `${crop}销售`);
       const row = document.createElement("div");
       row.className = "operation-row";
       row.innerHTML = `
+        <div class="operation-row-title"><span class="operation-row-index">当天操作明细</span></div>
         <div class="field">
-          <label>操作类型</label>
+          <label>一级操作</label>
           <select class="op-type">${operationOptionsHtml(type)}</select>
         </div>
         <div class="field">
+          <label>二级操作</label>
+          <select class="op-detail">${detailOptionsHtml(type, defaults.detail)}</select>
+        </div>
+        <div class="field">
           <label>投入/收入项目</label>
-          <input class="op-item" value="${defaults.item}">
+          <input class="op-item" value="${item}">
         </div>
         <div class="field">
           <label>说明</label>
@@ -637,15 +807,24 @@
       `;
       document.querySelector("#batch-list").appendChild(row);
       wireOperationRow(row);
+      refreshOperationRowIndexes();
     }
 
-    function applyOperationDefaults(row, type) {
-      const defaults = OPERATION_DEFAULTS[type] || OPERATION_DEFAULTS["其他"];
+    function refreshOperationRowIndexes() {
+      document.querySelectorAll(".operation-row").forEach((row, index) => {
+        row.querySelector(".operation-row-index").textContent = `当天操作明细 ${index + 1}`;
+      });
+    }
+
+    function applyOperationDefaults(row, type, detail = null, refreshDetails = false) {
+      const detailSelect = row.querySelector(".op-detail");
+      if (refreshDetails) detailSelect.innerHTML = detailOptionsHtml(type, detail);
+      const defaults = operationDefault(type, detailSelect.value || detail);
       const crop = resolvedCrop() || "作物";
       const item = defaults.item.replace("作物销售", `${crop}销售`);
       row.querySelector(".op-item").value = item;
       row.querySelector(".op-unit").value = defaults.unit;
-      row.querySelector(".op-quantity").value = defaults.quantity ?? "";
+      row.querySelector(".op-quantity").value = defaults.quantityFromArea ? (Number(fields.area.value) || "") : (defaults.quantity ?? "");
       row.querySelector(".op-price").value = "";
       row.querySelector(".op-amount").value = "";
     }
@@ -657,18 +836,21 @@
     }
 
     function wireOperationRow(row) {
-      row.querySelector(".op-type").addEventListener("change", (event) => applyOperationDefaults(row, event.target.value));
+      row.querySelector(".op-type").addEventListener("change", (event) => applyOperationDefaults(row, event.target.value, null, true));
+      row.querySelector(".op-detail").addEventListener("change", () => applyOperationDefaults(row, row.querySelector(".op-type").value));
       row.querySelector(".op-quantity").addEventListener("input", () => calculateRowAmount(row));
       row.querySelector(".op-price").addEventListener("input", () => calculateRowAmount(row));
       row.querySelector(".remove-row").addEventListener("click", () => {
         if (document.querySelectorAll(".operation-row").length === 1) return alert("至少保留一条操作。");
         row.remove();
+        refreshOperationRowIndexes();
       });
     }
 
     function collectOperationRows() {
       return Array.from(document.querySelectorAll(".operation-row")).map((row) => ({
         type: row.querySelector(".op-type").value,
+        detail: row.querySelector(".op-detail").value,
         item: row.querySelector(".op-item").value.trim(),
         note: row.querySelector(".op-note").value.trim(),
         quantity: Number(row.querySelector(".op-quantity").value || 0),
@@ -692,6 +874,7 @@
         plot: base.plot,
         operator: base.operator,
         type: operation.type,
+        detail: operation.detail,
         kind: operationKind(operation.type),
         item: operation.item,
         quantity: operation.quantity,
@@ -739,9 +922,12 @@
               <div class="op-list">
                 ${group.map((record) => `
                   <div class="op-line">
-                    <strong>${record.type}</strong><span class="pill">${record.kind}</span>
-                    ${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}
-                    ${record.note ? `｜${record.note}` : ""}
+                    <div class="op-line-content">
+                      <strong>${record.type}${record.detail ? `｜${record.detail}` : ""}</strong><span class="pill">${record.kind}</span>
+                      ${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}
+                      ${record.note ? `｜${record.note}` : ""}
+                    </div>
+                    <button class="delete-record" type="button" data-record-id="${record.id}">删除</button>
                   </div>
                 `).join("")}
               </div>
@@ -770,11 +956,18 @@
         const key = record.kind === "收入" ? "销售收入" : record.type;
         categoryMap.set(key, (categoryMap.get(key) || 0) + record.amount);
       });
+      const sortMode = document.querySelector("#category-sort")?.value || "process";
+      const sortedCategories = Array.from(categoryMap.entries()).sort((a, b) => {
+        if (sortMode === "amount") return b[1] - a[1];
+        const indexA = CATEGORY_PROCESS_ORDER.includes(a[0]) ? CATEGORY_PROCESS_ORDER.indexOf(a[0]) : CATEGORY_PROCESS_ORDER.length;
+        const indexB = CATEGORY_PROCESS_ORDER.includes(b[0]) ? CATEGORY_PROCESS_ORDER.indexOf(b[0]) : CATEGORY_PROCESS_ORDER.length;
+        return indexA - indexB || b[1] - a[1];
+      });
       document.querySelector("#category-output").innerHTML = `
         <h3>分类汇总</h3>
         <table>
           <thead><tr><th>类别</th><th>金额</th></tr></thead>
-          <tbody>${Array.from(categoryMap.entries()).sort((a, b) => b[1] - a[1]).map(([key, amount]) => `<tr><td>${key}</td><td>${money(amount)}</td></tr>`).join("")}</tbody>
+          <tbody>${sortedCategories.map(([key, amount]) => `<tr><td>${key}</td><td>${money(amount)}</td></tr>`).join("")}</tbody>
         </table>
       `;
     }
@@ -784,20 +977,30 @@
       renderDashboard();
     }
 
+    function deleteRecord(recordId) {
+      const record = records.find((item) => item.id === recordId);
+      if (!record) return;
+      const label = `${record.date}｜${record.type}${record.detail ? `｜${record.detail}` : ""}｜${record.item || "未填写项目"}`;
+      if (!confirm(`确定删除这条记录吗？\n${label}`)) return;
+      records = records.filter((item) => item.id !== recordId);
+      saveJson(RECORDS_KEY, records);
+      renderAll();
+    }
+
     function showView(viewId) {
       document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
       document.querySelectorAll("[data-view-target]").forEach((button) => button.classList.toggle("active", button.dataset.viewTarget === viewId));
       window.scrollTo({top: 0, behavior: "smooth"});
     }
 
-    function setRows(types) {
+    function setRows(rows) {
       document.querySelector("#batch-list").innerHTML = "";
-      types.forEach((type) => addOperationRow(type));
+      rows.forEach((row) => typeof row === "string" ? addOperationRow(row) : addOperationRow(row.type, row.detail));
     }
 
     function demoRecords() {
       const base = {crop: "番茄", province: "河南", area: 5, plot: "1号棚", operator: "老张"};
-      const makeDemo = (index, date, type, item, quantity, unit, unitPrice, note) => ({
+      const makeDemo = (index, date, type, detail, item, quantity, unit, unitPrice, note) => ({
         id: `${DEMO_ID_PREFIX}${String(index).padStart(2, "0")}`,
         date,
         crop: base.crop,
@@ -806,6 +1009,7 @@
         plot: base.plot,
         operator: base.operator,
         type,
+        detail,
         kind: operationKind(type),
         item,
         quantity,
@@ -815,16 +1019,20 @@
         note,
       });
       return [
-        makeDemo(1, "2026-04-02", "人工管理", "定植人工", 8, "工", 120, "番茄定植和整理苗床。"),
-        makeDemo(2, "2026-04-08", "浇水", "灌溉水电费", 1, "次", 80, "缓苗水。"),
-        makeDemo(3, "2026-04-08", "冲施肥", "水溶肥", 2, "袋", 180, "同一天冲施肥。"),
-        makeDemo(4, "2026-04-16", "打药", "农药", 1, "次", 160, "病虫害预防。"),
-        makeDemo(5, "2026-04-16", "除草", "除草人工", 2, "工", 120, "棚边和行间除草。"),
-        makeDemo(6, "2026-04-16", "浇水", "灌溉水电费", 1, "次", 80, "同一天浇水。"),
-        makeDemo(7, "2026-05-03", "整枝打叉", "整枝打叉人工", 4, "工", 120, "第一次整枝打叉。"),
-        makeDemo(8, "2026-05-20", "采收", "采收人工", 5, "工", 130, "第一批采收。"),
-        makeDemo(9, "2026-05-20", "运输", "运输费", 1, "次", 180, "送到批发市场。"),
-        makeDemo(10, "2026-05-20", "销售", "番茄销售", 1800, "kg", 3.2, "第一批销售。"),
+        makeDemo(1, "2026-03-18", "整地", "一体打包价", "整地一体打包价", 5, "亩", 180, "旋耕、起垄、做畦按棚室一体处理。"),
+        makeDemo(2, "2026-03-19", "整地", "滴灌带铺设", "滴灌带材料和铺设", 5, "亩", 120, "铺滴灌带，后续冲施肥和浇水共用。"),
+        makeDemo(3, "2026-03-25", "播种/定植", "买苗", "番茄种苗", 4000, "株", 0.45, "采购商品苗，按 5 亩棚室估算。"),
+        makeDemo(4, "2026-03-26", "播种/定植", "移栽", "移栽人工", 7, "工", 130, "定植、补土、整理垄面。"),
+        makeDemo(5, "2026-03-26", "施肥", "底肥", "复合肥/有机肥", 10, "袋", 155, "定植前后底肥投入。"),
+        makeDemo(6, "2026-04-03", "灌溉", "浇水", "浇水水电费", 1, "次", 100, "缓苗水。"),
+        makeDemo(7, "2026-04-03", "施肥", "冲施肥", "水溶肥", 2, "袋", 180, "同一天随水冲施。"),
+        makeDemo(8, "2026-04-15", "打药", "防病套餐", "防病套餐", 1, "次", 180, "灰霉、叶霉等预防性用药。"),
+        makeDemo(9, "2026-04-15", "除草", "人工除草", "除草人工", 2, "工", 120, "棚边、行间杂草清理。"),
+        makeDemo(10, "2026-04-25", "植株管理", "整枝打叉", "整枝打叉人工", 4, "工", 130, "第一次整枝打叉、绑蔓整理。"),
+        makeDemo(11, "2026-05-10", "施肥", "滴灌施肥", "滴灌水溶肥", 3, "袋", 180, "坐果后补肥。"),
+        makeDemo(12, "2026-05-20", "采收", "人工采收", "采收人工", 6, "工", 140, "第一批采收。"),
+        makeDemo(13, "2026-05-20", "运输", "市场运输", "市场运输费", 1, "次", 220, "送到本地批发市场。"),
+        makeDemo(14, "2026-05-20", "销售", "批发销售", "番茄批发销售", 2000, "kg", 3.2, "第一批番茄销售。"),
       ];
     }
 
@@ -843,6 +1051,11 @@
         event.target.setAttribute("aria-hidden", "true");
       }
     });
+    document.querySelector("#timeline-output").addEventListener("click", (event) => {
+      const button = event.target.closest(".delete-record");
+      if (!button) return;
+      deleteRecord(button.dataset.recordId);
+    });
 
     fields.crop.addEventListener("change", () => {
       updateCustomFields();
@@ -856,7 +1069,8 @@
       });
     });
     fields.province.addEventListener("change", updateCustomFields);
-    document.querySelector("#add-operation").addEventListener("click", () => addOperationRow("打药"));
+    document.querySelector("#add-operation").addEventListener("click", () => addOperationRow("打药", "防病套餐"));
+    document.querySelector("#category-sort").addEventListener("change", renderDashboard);
 
     document.querySelector("#batch-form").addEventListener("submit", (event) => {
       event.preventDefault();
@@ -886,7 +1100,7 @@
       saveJson(RECORDS_KEY, records);
       saveJson(DEFAULTS_KEY, {...base});
       applyDefaults();
-      setRows(["打药", "冲施肥", "浇水"]);
+      setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
       renderAll();
       const notice = document.querySelector("#submit-notice");
       notice.textContent = `已提交 ${newRecords.length} 条当天操作。可到每日农事时间轴查看。`;
@@ -905,10 +1119,10 @@
       saveJson(RECORDS_KEY, records);
       saveJson(DEFAULTS_KEY, {date: "2026-05-20", crop: "番茄", province: "河南", area: 5, plot: "1号棚", operator: "老张"});
       applyDefaults();
-      setRows(["打药", "冲施肥", "浇水"]);
+      setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
       renderAll();
       const notice = document.querySelector("#submit-notice");
-      notice.textContent = "已生成河南 5 亩番茄经济作物演示账本，包含同一天多项操作。";
+      notice.textContent = "已生成河南 5 亩番茄经济作物全程演示账本，包含整地、定植、施肥、打药、采收、运输、销售，以及同一天多项操作。";
       notice.classList.add("show");
       showView("timeline-view");
     });
@@ -921,7 +1135,7 @@
     });
 
     applyDefaults();
-    setRows(["打药", "冲施肥", "浇水"]);
+    setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
     renderAll();
   </script>
 </body>
