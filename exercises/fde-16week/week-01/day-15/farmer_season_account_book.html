@@ -240,10 +240,31 @@
     }
 
     .record {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
       border: 1px solid var(--border);
       border-radius: 17px;
       padding: 14px;
       background: #fff;
+    }
+
+    .record-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .delete-record {
+      flex: 0 0 auto;
+      border: 1px solid #ffd2cc;
+      border-radius: 11px;
+      padding: 8px 11px;
+      background: #fff0ef;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: none;
     }
 
     .record strong { color: var(--green-dark); }
@@ -923,10 +944,13 @@
       output.innerHTML = `<div class="timeline">${
         sortedRecords().map((record) => `
           <article class="record">
-            <strong>${record.date}｜${record.crop}｜${record.province}｜${record.plot}</strong>
-            <span class="pill">${record.kind}</span>
-            <p>${record.type}：${record.detail}｜${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}</p>
-            <p>面积：${record.area} 亩｜记录人：${record.operator}｜备注：${record.note || "无"}</p>
+            <div class="record-content">
+              <strong>${record.date}｜${record.crop}｜${record.province}｜${record.plot}</strong>
+              <span class="pill">${record.kind}</span>
+              <p>${record.type}：${record.detail}｜${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}</p>
+              <p>面积：${record.area} 亩｜记录人：${record.operator}｜备注：${record.note || "无"}</p>
+            </div>
+            <button class="delete-record" type="button" data-record-id="${record.id}">删除</button>
           </article>
         `).join("")
       }</div>`;
@@ -936,6 +960,16 @@
       renderSummary();
       renderCategoryTable();
       renderTimeline();
+    }
+
+    function deleteRecord(recordId) {
+      const record = records.find((item) => item.id === recordId);
+      if (!record) return;
+      const label = `${record.date}｜${record.type}：${record.detail}｜${record.item || "未填写项目"}`;
+      if (!confirm(`确定删除这条记录吗？\n${label}`)) return;
+      records = records.filter((item) => item.id !== recordId);
+      saveJson(RECORDS_KEY, records);
+      renderAll();
     }
 
     function showView(viewId) {
@@ -969,6 +1003,12 @@
         guideModal.classList.remove("show");
         guideModal.setAttribute("aria-hidden", "true");
       }
+    });
+
+    document.querySelector("#timeline-output").addEventListener("click", (event) => {
+      const button = event.target.closest(".delete-record");
+      if (!button) return;
+      deleteRecord(button.dataset.recordId);
     });
 
     fields.crop.addEventListener("change", () => {
