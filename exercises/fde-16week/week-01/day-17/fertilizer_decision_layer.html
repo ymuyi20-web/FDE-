@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 17 区域施肥方案解释与产品匹配原型</title>
+  <style>
+    :root{
+      --green:#157347;--dark:#0d4f32;--mint:#eaf7ef;--yellow:#f59e0b;--yellow-soft:#fff7e6;
+      --blue-soft:#f0f7ff;--blue-line:#cfe2ff;--bg:#f6faf4;--card:#fff;--line:#dbe8dd;
+      --text:#1f2a24;--muted:#66736d;--danger:#b42318;--shadow:0 18px 45px rgba(16,82,51,.12)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 8% 4%,rgba(245,158,11,.13),transparent 28%),radial-gradient(circle at 92% 8%,rgba(21,115,71,.15),transparent 32%),linear-gradient(180deg,#fbfdf6 0%,var(--bg) 100%)}
+    header,main{max-width:1180px;margin:0 auto;padding:22px}
+    .hero{padding:30px;border-radius:30px;background:linear-gradient(135deg,#0d4f32,#1e9a66 72%,#d88712);color:#fff;box-shadow:var(--shadow)}
+    .hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+    h1{margin:0 0 10px;font-size:clamp(28px,4vw,44px);letter-spacing:-.05em}
+    h2,h3{margin:0 0 14px;letter-spacing:-.03em}
+    .hero p,.hint{line-height:1.75;color:rgba(255,255,255,.88);margin:0;max-width:920px}
+    .hint{color:var(--muted);margin:-4px 0 16px;font-size:14px}
+    .topbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .nav-tabs{display:flex;flex-wrap:wrap;gap:10px}
+    button{border:0;border-radius:14px;padding:11px 16px;font:inherit;font-weight:900;cursor:pointer;background:var(--green);color:#fff;box-shadow:0 8px 18px rgba(21,115,71,.22)}
+    button.secondary{background:#eef7f0;color:var(--dark);border:1px solid #cfe2d6;box-shadow:none}
+    button.danger{background:#fff0ef;color:var(--danger);border:1px solid #ffd2cc;box-shadow:none}
+    button.small{padding:8px 11px;border-radius:11px;font-size:13px}
+    .nav-tabs button,.guide-button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);box-shadow:none}
+    .nav-tabs button.active{background:#fff;color:var(--dark);border-color:#fff;box-shadow:0 12px 26px rgba(0,0,0,.15);transform:translateY(-1px)}
+    .nav-tabs button.active:after{content:" 当前";font-size:12px;opacity:.9}
+    .view{display:none}.view.active{display:block}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+    .card.narrow{max-width:980px;margin:0 auto}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:14px}
+    .field.full{grid-column:1/-1}
+    label{display:block;margin-bottom:7px;font-size:14px;font-weight:800}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px 12px;font:inherit;background:#fbfdfb;color:var(--text);outline:none}
+    textarea{min-height:78px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(21,115,71,.12)}
+    .stage-list,.record-list{display:grid;gap:12px}
+    .stage-card,.record-card{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fbfdfb}
+    .stage-card h3,.record-card h3{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:17px}
+    .product-row{display:grid;grid-template-columns:1.25fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:10px;padding:10px;border:1px solid #e7efe9;border-radius:15px;background:#fff}
+    .custom-product{display:none;grid-column:1/-1}
+    .custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+    .metric{padding:15px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fff,#f7fbf8)}
+    .metric small{display:block;color:var(--muted);margin-bottom:8px}.metric strong{color:var(--dark);font-size:22px}
+    .section{border:1px solid var(--line);border-radius:18px;padding:15px;background:#fbfdfb;margin-top:12px}
+    .section h3{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:17px}
+    .badge{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900;background:var(--yellow-soft);color:#8a5a00;white-space:nowrap}
+    .formula{margin:10px 0 14px;padding:11px 13px;border-radius:14px;background:var(--blue-soft);border:1px solid var(--blue-line);color:#36516f;font-size:13px;line-height:1.7}
+    .formula code{color:#1d4ed8;font-weight:800;white-space:normal}
+    table{width:100%;border-collapse:collapse;border-radius:15px;overflow:hidden;font-size:14px}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{background:var(--mint);color:var(--dark)}
+    ul{margin:8px 0 0;padding-left:20px;line-height:1.75;color:var(--muted)}
+    .empty{border:1px dashed #b8c9c0;background:#fbfdfb;color:var(--muted);padding:18px;border-radius:16px}
+    .warning{border-left:5px solid var(--yellow);background:var(--yellow-soft)}
+    .guide-modal{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;padding:20px;background:rgba(9,35,23,.48)}
+    .guide-modal.show{display:flex}.guide-panel{width:min(760px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:24px;padding:24px;box-shadow:0 22px 70px rgba(0,0,0,.24)}
+    .guide-panel ol{padding-left:22px;line-height:1.85;color:var(--muted)}
+    @media(max-width:980px){.hero-top{flex-direction:column}.form-grid,.metrics,.product-row,.custom-grid{grid-template-columns:1fr}.nav-tabs button{flex:1 1 100%}}
+  </style>
+</head>
+<body>
+  <header>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>Day 17｜区域施肥方案解释与产品匹配原型</h1>
+          <p>先依据区域、作物和目标产量取得公开指导范围，再结合土壤丰缺等级选择范围内的参考值，最后核对肥料产品方案是否偏高或偏低。</p>
+        </div>
+        <button class="guide-button" type="button" id="open-guide">使用说明</button>
+      </div>
+      <div class="topbar">
+        <div class="nav-tabs">
+          <button class="active" type="button" data-view-target="input-view">01 输入当前数据</button>
+          <button type="button" data-view-target="history-view">02 存储数据</button>
+          <button type="button" data-view-target="output-view">03 输出推荐方案</button>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="view active" id="input-view">
+      <div class="card narrow">
+        <h2>01｜输入当前数据</h2>
+        <p class="hint">水稻默认第一项。提交后会保存为一条本地历史记录，可以在第二页删除、载入修改或生成方案。</p>
+        <form id="decision-form">
+          <div class="form-grid">
+            <div class="field"><label for="crop">作物</label><select id="crop"></select></div>
+            <div class="field" id="custom-crop-field" style="display:none;"><label for="customCrop">自定义作物</label><input id="customCrop" placeholder="例如：油菜 / 大豆 / 花生"></div>
+            <div class="field"><label for="region">区域</label><select id="region"></select></div>
+            <div class="field"><label for="previousCrop">前茬</label><select id="previousCrop"></select></div>
+            <div class="field"><label for="area">面积（亩）</label><input id="area" type="number" min="0.01" step="0.01" value="10"></div>
+            <div class="field"><label for="targetYield">目标产量（kg/亩）</label><input id="targetYield" type="number" min="50" step="10" value="600"></div>
+            <div class="field"><label for="soilNLevel">土壤氮素丰缺等级</label><select id="soilNLevel"><option value="中等">中等</option><option value="偏低">偏低</option><option value="偏高">偏高</option></select></div>
+            <div class="field"><label for="soilPLevel">土壤磷素丰缺等级</label><select id="soilPLevel"><option value="中等">中等</option><option value="偏低">偏低</option><option value="偏高">偏高</option></select></div>
+            <div class="field"><label for="soilKLevel">土壤钾素丰缺等级</label><select id="soilKLevel"><option value="中等">中等</option><option value="偏低">偏低</option><option value="偏高">偏高</option></select></div>
+            <div class="field"><label for="plantingMode">栽培/施肥方式</label><select id="plantingMode"></select></div>
+            <div class="field" id="custom-planting-mode-field" style="display:none;"><label for="customPlantingMode">自定义栽培/施肥方式</label><input id="customPlantingMode" placeholder="例如：无人机撒肥 / 水肥一体化"></div>
+            <div class="field"><label for="strawReturn">秸秆还田</label><select id="strawReturn"><option value="否">否</option><option value="是">是</option><option value="不确定">不确定</option></select></div>
+            <div class="field full">
+              <label>分阶段肥料产品</label>
+              <div class="stage-list" id="stage-products"></div>
+            </div>
+            <div class="field full"><label for="modelOutput">作物模型/农技员输入摘要（可选）</label><textarea id="modelOutput" placeholder="例如：目标产量 600 kg/亩，苗情中等，穗肥需看苗情和天气再确认。"></textarea></div>
+          </div>
+          <div class="actions">
+            <button type="submit">保存当前数据</button>
+            <button class="secondary" type="button" id="fill-demo">填入水稻演示</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="history-view">
+      <div class="card">
+        <h2>02｜存储数据</h2>
+        <p class="hint">这里是本地浏览器保存的历史记录。录错了可以删除；想修改，可“载入修改”回到第一页重新保存。</p>
+        <div id="history-output"></div>
+      </div>
+    </section>
+
+    <section class="view" id="output-view">
+      <div class="card">
+        <h2>03｜输出推荐方案</h2>
+        <p class="hint">从第二页选择一条记录生成方案。输出会对比“区域指导范围”和“当前产品投入”，是审阅草案，不是最终农艺处方。</p>
+        <div id="result"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="guide-modal" id="guide-modal" aria-hidden="true">
+    <div class="guide-panel">
+      <h2>使用说明</h2>
+      <p class="hint">这个工具用于练习“作物模型之外的肥料决策层”：把作物目标产量、土壤数据、肥料产品和分阶段施肥方式连接起来。</p>
+      <ol>
+        <li>第一页输入作物、区域、前茬、目标产量、土壤等级、栽培方式和当前考虑使用的肥料产品。</li>
+        <li>每个施肥阶段可以添加多种肥料产品。例如水稻穗肥可采用“复合肥 + 氯化钾”组合，而不是只能选一种肥料。</li>
+        <li>选择“其他”作物或肥料后，输入的内容会保存到本地，下次自动出现在下拉框前面。</li>
+        <li>第二页保存历史数据，可删除、载入修改或生成方案。</li>
+        <li>第三页先显示区域公开指导范围，再显示土壤等级选值、阶段分配和当前产品投入差异。真实生产中必须结合当地农技员、区域经理、田间试验和产品库确认。</li>
+      </ol>
+      <div class="actions"><button type="button" id="close-guide">知道了</button></div>
+    </div>
+  </div>
+
+  <script>
+    const RECORDS_KEY = "day17_fertilizer_decision_records_v2";
+    const CUSTOM_CROPS_KEY = "day17_custom_crops";
+    const CUSTOM_PRODUCTS_KEY = "day17_custom_fertilizer_products";
+    const CUSTOM_PLANTING_MODES_KEY = "day17_custom_planting_modes";
+
+    const cropRules = {
+      "水稻": {
+        baseYield: 600,
+        uptakePer100: { n: 2.0, p: 1.1, k: 2.5 },
+        regions: ["长江中下游水稻区", "东北水稻区", "华南双季稻区", "西南水稻区", "其他水稻区"],
+        plantingModes: ["常规施肥", "机插侧深施肥", "缓释配方肥"],
+        recommendations: {
+          "长江中下游水稻区": [
+            { maxYield: 500, n: [9, 11], p: [4.5, 6], k: [9, 12], label: "500kg/亩以下" },
+            { maxYield: 600, n: [10, 13], p: [5, 7], k: [11, 15], label: "500—600kg/亩" },
+            { maxYield: 700, n: [12, 15], p: [5.5, 7.5], k: [13, 17], label: "600—700kg/亩" },
+            { maxYield: Infinity, n: [13, 16], p: [6, 8], k: [14, 18], label: "700kg/亩以上" }
+          ],
+          "东北水稻区": [
+            { maxYield: 500, n: [8, 10], p: [4, 6], k: [8, 11], label: "500kg/亩以下" },
+            { maxYield: 600, n: [9, 12], p: [5, 7], k: [10, 14], label: "500—600kg/亩" },
+            { maxYield: Infinity, n: [11, 14], p: [5.5, 8], k: [12, 16], label: "600kg/亩以上" }
+          ],
+          "华南双季稻区": [
+            { maxYield: 500, n: [8, 11], p: [4, 6], k: [8, 12], label: "500kg/亩以下" },
+            { maxYield: 600, n: [10, 13], p: [5, 7], k: [11, 15], label: "500—600kg/亩" },
+            { maxYield: Infinity, n: [12, 15], p: [5.5, 8], k: [13, 17], label: "600kg/亩以上" }
+          ],
+          "西南水稻区": [
+            { maxYield: 500, n: [8, 11], p: [4, 6], k: [8, 12], label: "500kg/亩以下" },
+            { maxYield: 600, n: [10, 13], p: [5, 7], k: [10, 14], label: "500—600kg/亩" },
+            { maxYield: Infinity, n: [11, 15], p: [5.5, 8], k: [12, 16], label: "600kg/亩以上" }
+          ],
+          "其他水稻区": [
+            { maxYield: Infinity, n: [9, 14], p: [4, 8], k: [9, 16], label: "通用教学参考档" }
+          ]
+        },
+        recommendationSource: "教学原型恢复为按水稻大区和目标产量估算作物需肥量，再用土壤丰缺等级做轻度修正。正式方案仍需替换为当地测土配方施肥资料和田间验证参数。",
+        recommendationUrl: "https://zzys.moa.gov.cn/tzgg/202303/t20230314_6423039.htm",
+        previousDefault: "油菜",
+        previousOptions: ["油菜", "小麦", "蔬菜", "休耕", "未知"],
+        stages: [
+          { name: "基肥/底肥", note: "移栽或播种前后，磷全部基施，钾多前移", ratios: { n: .45, p: 1.00, k: .55 }, limit: [20, 45], products: ["compound-15-15-15", "rice-20-10-15", "yonfer-baibeibang-17-17-17", "other"], defaultProducts: ["compound-15-15-15"] },
+          { name: "苗肥/分蘖肥", note: "促进有效分蘖，主要追氮，不分配钾", ratios: { n: .25, p: 0, k: 0 }, limit: [5, 22], products: ["urea-46-0-0", "rice-top-30-0-5", "other"], defaultProducts: ["urea-46-0-0"] },
+          { name: "穗肥", note: "幼穗分化前后，钾肥后移一部分", ratios: { n: .30, p: 0, k: .45 }, limit: [5, 25], products: ["compound-15-15-15", "rice-top-30-0-5", "urea-46-0-0", "potash-0-0-60", "sop-0-0-50", "other"], defaultProducts: ["compound-15-15-15", "potash-0-0-60"] }
+        ]
+      },
+      "小麦": {
+        baseYield: 600,
+        uptakePer100: { n: 3.0, p: 1.2, k: 3.0 },
+        regions: ["黄淮海冬麦区", "长江中下游冬麦区", "西北冬春麦区", "西南麦区", "其他小麦区"],
+        plantingModes: ["基追结合施肥", "一次性施肥", "水肥一体化"],
+        recommendations: {
+          "黄淮海冬麦区": [
+            { maxYield: 400, n: [6.9, 8.5], p: [3, 4], k: [1.5, 2], label: "400kg/亩以下" },
+            { maxYield: 500, n: [8.5, 10.7], p: [4, 5], k: [2, 2.5], label: "400—500kg/亩" },
+            { maxYield: 600, n: [11.4, 14.5], p: [6, 7], k: [3, 3.5], label: "500—600kg/亩" },
+            { maxYield: Infinity, n: [14.5, 15.2], p: [7, 8], k: [3.5, 4], label: "600kg/亩以上" }
+          ],
+          "长江中下游冬麦区": [
+            { maxYield: 350, n: [5.9, 7.7], p: [3, 3.8], k: [2, 2.5], label: "350kg/亩以下" },
+            { maxYield: 450, n: [8.2, 10.9], p: [3.8, 5.3], k: [2.5, 3.5], label: "350—450kg/亩" },
+            { maxYield: 600, n: [10.9, 15], p: [5.3, 6.8], k: [3.5, 4.5], label: "450—600kg/亩" },
+            { maxYield: Infinity, n: [15, 18.2], p: [6.8, 8.3], k: [4.5, 5.5], label: "600kg/亩以上" }
+          ],
+          "西北冬春麦区": [
+            { maxYield: 450, n: [9, 12], p: [4, 6], k: [3, 5], label: "450kg/亩以下" },
+            { maxYield: 600, n: [12, 16], p: [5, 7], k: [4, 6], label: "450—600kg/亩" },
+            { maxYield: Infinity, n: [15, 19], p: [6, 8], k: [5, 7], label: "600kg/亩以上" }
+          ],
+          "西南麦区": [
+            { maxYield: 350, n: [7, 10], p: [3, 5], k: [3, 5], label: "350kg/亩以下" },
+            { maxYield: 500, n: [10, 14], p: [4, 6], k: [4, 6], label: "350—500kg/亩" },
+            { maxYield: Infinity, n: [13, 17], p: [5, 7], k: [5, 7], label: "500kg/亩以上" }
+          ],
+          "其他小麦区": [
+            { maxYield: Infinity, n: [9, 16], p: [4, 8], k: [3, 7], label: "通用教学参考档" }
+          ]
+        },
+        recommendationSource: "教学原型按小麦主要种植大区设置粗分区，并用目标产量需肥量作为主线。正式交付需替换为当地小麦测土配方施肥资料、品种和灌溉条件校正。",
+        recommendationUrl: "https://zzys.moa.gov.cn/gdxw/202009/t20200930_6353753.htm",
+        previousDefault: "玉米",
+        previousOptions: ["玉米", "大豆", "花生", "蔬菜", "未知"],
+        stages: [
+          { name: "底肥", note: "基追结合方案：磷钾前移，约40%氮由配方肥带入", ratios: { n: .40, p: 1.00, k: 1.00 }, limit: [20, 55], products: ["wheat-15-20-10", "yonfer-wheat-25-14-7", "yonfer-mailexin-15-19-6", "other"], defaultProducts: ["wheat-15-20-10"] },
+          { name: "返青肥（条件项）", note: "只对弱苗或群体不足田块启用，不作常规固定分配", ratios: { n: 0, p: 0, k: 0 }, limit: [0, 10], products: ["urea-46-0-0", "other"], defaultProducts: ["urea-46-0-0"] },
+          { name: "拔节肥", note: "约60%氮在起身至拔节期追施，需结合苗情和倒伏风险", ratios: { n: .60, p: 0, k: 0 }, limit: [5, 22], products: ["urea-46-0-0", "wheat-top-30-0-5", "other"], defaultProducts: ["urea-46-0-0"] }
+        ]
+      },
+      "玉米": {
+        baseYield: 650,
+        uptakePer100: { n: 2.8, p: 1.1, k: 2.8 },
+        regions: ["黄淮海夏玉米区", "东北春玉米区", "西北玉米区", "西南玉米区", "其他玉米区"],
+        plantingModes: ["种肥同播一次性施肥"],
+        recommendations: {
+          "黄淮海夏玉米区": [
+            { maxYield: 400, n: [8.4, 11.2], p: [1.8, 2.4], k: [2.7, 3.6], label: "400kg/亩以下" },
+            { maxYield: 600, n: [11.2, 12.6], p: [2.4, 2.7], k: [3.6, 4.1], label: "400—600kg/亩" },
+            { maxYield: 800, n: [12.6, 14], p: [2.7, 3], k: [4.1, 4.5], label: "600—800kg/亩" },
+            { maxYield: Infinity, n: [14, 16.8], p: [3, 3.6], k: [4.5, 5.4], label: "800kg/亩以上" }
+          ],
+          "东北春玉米区": [
+            { maxYield: 500, n: [10, 13], p: [4, 6], k: [8, 12], label: "500kg/亩以下" },
+            { maxYield: 700, n: [13, 17], p: [5, 7], k: [11, 15], label: "500—700kg/亩" },
+            { maxYield: Infinity, n: [16, 20], p: [6, 8], k: [14, 18], label: "700kg/亩以上" }
+          ],
+          "西北玉米区": [
+            { maxYield: 600, n: [12, 16], p: [5, 7], k: [10, 14], label: "600kg/亩以下" },
+            { maxYield: 800, n: [16, 20], p: [6, 8], k: [13, 17], label: "600—800kg/亩" },
+            { maxYield: Infinity, n: [19, 23], p: [7, 9], k: [16, 20], label: "800kg/亩以上" }
+          ],
+          "西南玉米区": [
+            { maxYield: 500, n: [10, 14], p: [4, 6], k: [8, 12], label: "500kg/亩以下" },
+            { maxYield: 700, n: [13, 18], p: [5, 7], k: [11, 15], label: "500—700kg/亩" },
+            { maxYield: Infinity, n: [16, 21], p: [6, 8], k: [13, 18], label: "700kg/亩以上" }
+          ],
+          "其他玉米区": [
+            { maxYield: Infinity, n: [10, 20], p: [4, 8], k: [8, 18], label: "通用教学参考档" }
+          ]
+        },
+        recommendationSource: "教学原型按玉米主要种植大区设置粗分区，并用目标产量需肥量作为主线。正式交付需替换为当地玉米测土配方施肥资料和一次性施肥产品包。",
+        recommendationUrl: "https://zzys.moa.gov.cn/tzgg/202303/t20230314_6423039.htm",
+        previousDefault: "小麦",
+        previousOptions: ["小麦", "油菜", "蔬菜", "大豆", "未知"],
+        stages: [
+          { name: "种肥同播一次性施肥", note: "本区域基线来自28-6-9或相近配方的一次性施肥方案", ratios: { n: 1.00, p: 1.00, k: 1.00 }, limit: [30, 60], products: ["corn-28-6-9", "corn-28-6-6", "compound-26-10-12", "other"], defaultProducts: ["corn-28-6-9"] },
+          { name: "苗肥/拔节肥（条件项）", note: "弱苗或脱肥时人工确认，不作固定分配", ratios: { n: 0, p: 0, k: 0 }, limit: [0, 12], products: ["urea-46-0-0", "other"], defaultProducts: ["urea-46-0-0"] },
+          { name: "大喇叭口补肥（条件项）", note: "仅在未采用一次性方案或中后期脱肥时人工确认", ratios: { n: 0, p: 0, k: 0 }, limit: [0, 25], products: ["urea-46-0-0", "other"], defaultProducts: ["urea-46-0-0"] }
+        ]
+      }
+    };
+
+    const BASE_CROPS = ["水稻", "小麦", "玉米"];
+    const GENERIC_RULE = {
+      unsupported: true,
+      baseYield: 300,
+      uptakePer100: { n: 3.0, p: 1.2, k: 2.5 },
+      regions: ["自定义作物区域（暂不生成）"],
+      plantingModes: ["待农技人员定义"],
+      previousDefault: "未知",
+      previousOptions: ["小麦", "玉米", "水稻", "蔬菜", "未知"],
+      stages: [
+        { name: "基肥", note: "通用占位规则", ratios: { n: .50, p: 1.00, k: .70 }, limit: [20, 40], products: ["yonfer-baibeibang-17-17-17", "compound-15-15-15", "other"], defaultProducts: ["yonfer-baibeibang-17-17-17"] },
+        { name: "追肥一", note: "通用占位规则", ratios: { n: .30, p: 0, k: .20 }, limit: [5, 20], products: ["urea-46-0-0", "other"], defaultProducts: ["urea-46-0-0"] },
+        { name: "追肥二", note: "通用占位规则", ratios: { n: .20, p: 0, k: .10 }, limit: [0, 15], products: ["urea-46-0-0", "potash-0-0-60", "other"], defaultProducts: ["urea-46-0-0"] }
+      ]
+    };
+
+    const productNpk = {
+      "yonfer-wheat-25-14-7": { name: "新洋丰小麦磷能 25-14-7（待产品库核验）", n: 25, p: 14, k: 7 },
+      "yonfer-mailexin-15-19-6": { name: "新洋丰麦乐锌 15-19-6（待产品库核验）", n: 15, p: 19, k: 6 },
+      "yonfer-baibeibang-17-17-17": { name: "新洋丰百倍邦 17-17-17（待产品库核验）", n: 17, p: 17, k: 17 },
+      "compound-15-15-15": { name: "通用复合肥 15-15-15", n: 15, p: 15, k: 15 },
+      "wheat-15-20-10": { name: "小麦配方肥 15-20-10（公开指导配方）", n: 15, p: 20, k: 10 },
+      "compound-26-10-12": { name: "玉米高氮复合肥 26-10-12（示例）", n: 26, p: 10, k: 12 },
+      "corn-28-6-6": { name: "玉米高氮型 28-6-6（示例）", n: 28, p: 6, k: 6 },
+      "corn-28-6-9": { name: "夏玉米配方肥 28-6-9（公开指导配方）", n: 28, p: 6, k: 9 },
+      "rice-20-10-15": { name: "水稻配方肥 20-10-15（示例）", n: 20, p: 10, k: 15 },
+      "urea-46-0-0": { name: "尿素 46-0-0", n: 46, p: 0, k: 0 },
+      "potash-0-0-60": { name: "氯化钾 0-0-60", n: 0, p: 0, k: 60 },
+      "sop-0-0-50": { name: "硫酸钾 0-0-50", n: 0, p: 0, k: 50 },
+      "wheat-top-30-0-5": { name: "小麦高氮追肥 30-0-5（示例）", n: 30, p: 0, k: 5 },
+      "corn-top-30-0-5": { name: "玉米高氮追肥 30-0-5（示例）", n: 30, p: 0, k: 5 },
+      "rice-top-30-0-5": { name: "水稻分蘖/穗肥 30-0-5（示例）", n: 30, p: 0, k: 5 }
+    };
+
+    const sourceNotes = {
+      riceUptake: "水稻每100kg稻谷吸收养分参考区间：N约2.0–2.4kg、P₂O₅约0.9–1.4kg、K₂O约2.5–2.9kg；本原型取偏保守值 N 2.0、P₂O₅ 1.1、K₂O 2.5。来源：农业技术资料及地方测土配方施肥规程，用于教学估算。",
+      riceStage: "水稻阶段分配依据：农业农村部2023年小麦水稻玉米马铃薯春夏季科学施肥指导意见中，长江下游单季稻区建议氮肥基肥40%–50%、蘖肥20%–30%、穗肥20%–30%；磷肥全部基施；钾肥基肥50%–60%、穗肥40%–50%。本原型取 N 45/25/30、P 100/0/0、K 55/0/45。",
+      soil: "丰缺等级用于对目标产量需肥量做轻度修正：偏低保留100%，中等按85%，偏高按70%。这是教学原型的简化规则，不是土壤供肥量换算公式。正式交付必须由当地测土指标、肥效试验或农技员给出分区修正规则。",
+      product: "肥料产品含量来源：页面内置产品按包装标识N-P₂O₅-K₂O录入；自定义产品以用户输入含量为准。真实产品库应由企业产品资料或采购台账维护。",
+      demo: "当前产品用量来源：按用户提供的湖北水稻常见经验方案录入，作为“农户常规方案”与区域指导范围对照，不等于系统推荐。"
+    };
+
+    const $ = s => document.querySelector(s);
+    const fields = {
+      crop: $("#crop"), customCrop: $("#customCrop"), customCropField: $("#custom-crop-field"),
+      region: $("#region"), previousCrop: $("#previousCrop"), area: $("#area"), targetYield: $("#targetYield"),
+      soilNLevel: $("#soilNLevel"), soilPLevel: $("#soilPLevel"), soilKLevel: $("#soilKLevel"),
+      plantingMode: $("#plantingMode"), customPlantingMode: $("#customPlantingMode"), customPlantingModeField: $("#custom-planting-mode-field"), strawReturn: $("#strawReturn"),
+      modelOutput: $("#modelOutput"), stageProducts: $("#stage-products")
+    };
+
+    const loadJson = (k, fallback) => {
+      try { return JSON.parse(localStorage.getItem(k)) || fallback; } catch { return fallback; }
+    };
+    const saveJson = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+    const records = () => loadJson(RECORDS_KEY, []);
+    let editingRecordId = "";
+    const rememberItem = (key, value) => {
+      const clean = String(value || "").trim();
+      if (clean) saveJson(key, [clean, ...loadJson(key, []).filter(x => x !== clean)]);
+    };
+    const parseNpk = text => {
+      const m = String(text || "").match(/(\d+(?:\.\d+)?)\s*[-/]\s*(\d+(?:\.\d+)?)\s*[-/]\s*(\d+(?:\.\d+)?)/);
+      return m ? { n: +m[1], p: +m[2], k: +m[3] } : null;
+    };
+    const rememberProduct = product => {
+      if (!product || product.isInvalid || !product.name) return;
+      const id = `${product.name}|${product.n}-${product.p}-${product.k}`;
+      saveJson(CUSTOM_PRODUCTS_KEY, [{ id, name: product.name, n: product.n, p: product.p, k: product.k }, ...loadJson(CUSTOM_PRODUCTS_KEY, []).filter(x => x.id !== id)]);
+    };
+    const currentCrop = () => fields.crop.value === "其他" ? fields.customCrop.value.trim() : fields.crop.value;
+    const currentRule = () => cropRules[currentCrop()] || GENERIC_RULE;
+    const currentPlantingMode = () => fields.plantingMode.value === "其他" ? fields.customPlantingMode.value.trim() : fields.plantingMode.value;
+    const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+    const kg = v => `${Number(v || 0).toFixed(1)} kg/亩`;
+    const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+    const level = (v, low, high) => v < low ? "偏低" : v > high ? "偏高" : "中等";
+    const selectWithinRange = (range, levelName) => levelName === "偏低" ? range[1] : levelName === "偏高" ? range[0] : (range[0] + range[1]) / 2;
+    const soilNeedFactor = levelName => levelName === "偏低" ? 1 : levelName === "偏高" ? .7 : .85;
+    const normalizeRegion = region => ({
+      "长江中游一季籼稻区（湖北中东部等）": "长江中下游水稻区",
+      "长江下游单季稻区（江苏、浙北）": "长江中下游水稻区",
+      "河南中北部华北平原灌溉冬麦区": "黄淮海冬麦区",
+      "河南东南部华北雨养冬麦区": "黄淮海冬麦区",
+      "河南/黄淮海夏玉米区": "黄淮海夏玉米区"
+    }[region] || region);
+
+    function productById(id) {
+      if (id === "other") return null;
+      if (id?.startsWith("custom|")) return loadJson(CUSTOM_PRODUCTS_KEY, []).find(x => x.id === id.replace("custom|", ""));
+      return productNpk[id];
+    }
+    const productLabel = id => id === "other" ? "其他肥料产品" : (productById(id)?.name || id);
+    const sourceNoteForCrop = crop => crop === "水稻"
+      ? sourceNotes.riceUptake
+      : "当前作物吸收参数为教学原型占位值，正式交付前需替换为当地作物施肥规程或测土配方参数。";
+    const stageSourceForCrop = crop => crop === "水稻"
+      ? sourceNotes.riceStage
+      : crop === "小麦"
+        ? "小麦阶段分配依据：农业农村部2020年基追结合方案中配方肥作底肥、尿素在起身至拔节期追施；按公开产品用量折算，页面近似取N 40%底施、60%追施，返青肥只保留为弱苗条件项。"
+        : crop === "玉米"
+          ? "玉米阶段依据：农业农村部2023年指导意见中，黄淮海夏玉米推荐28-6-9或相近配方种肥同播一次性施肥；苗肥和大喇叭口补肥仅保留为人工确认的条件项。"
+          : "当前作物没有经过核实的阶段规则，系统不会生成精确方案。";
+
+    function renderOptions(select, items, preferred) {
+      select.innerHTML = "";
+      items.forEach(x => select.add(new Option(x, x)));
+      select.value = items.includes(preferred) ? preferred : items[0];
+    }
+    function renderCropOptions(preferred = "水稻") {
+      const custom = loadJson(CUSTOM_CROPS_KEY, []);
+      renderOptions(fields.crop, [...custom, ...BASE_CROPS.filter(x => !custom.includes(x)), "其他"], preferred);
+      updateCustomCropField();
+    }
+    function updateCustomCropField() {
+      fields.customCropField.style.display = fields.crop.value === "其他" ? "block" : "none";
+    }
+    function renderPlantingModeOptions(rule, preferred = "") {
+      const custom = loadJson(CUSTOM_PLANTING_MODES_KEY, []);
+      const base = rule.plantingModes || ["待农技人员定义"];
+      renderOptions(fields.plantingMode, [...custom, ...base.filter(x => !custom.includes(x)), "其他"], preferred);
+      updateCustomPlantingModeField();
+    }
+    function updateCustomPlantingModeField() {
+      fields.customPlantingModeField.style.display = fields.plantingMode.value === "其他" ? "block" : "none";
+    }
+    function getProductOptions(stage, selected = "") {
+      const customIds = loadJson(CUSTOM_PRODUCTS_KEY, []).map(x => `custom|${x.id}`);
+      return [...customIds, ...stage.products]
+        .filter((id, index, arr) => arr.indexOf(id) === index)
+        .map(id => `<option value="${escapeHtml(id)}" ${selected === id ? "selected" : ""}>${escapeHtml(productLabel(id))}</option>`)
+        .join("");
+    }
+    function normalizeStageInput(stage, saved) {
+      if (saved?.products?.length) return saved;
+      if (saved?.productId) return { products: [saved] };
+      return { products: (stage.defaultProducts || [stage.products[0] || "other"]).map(productId => ({ productId, localAmount: "", customName: "", customNpk: "" })) };
+    }
+    function productRowHtml(stage, product = {}, rowIndex = 0) {
+      return `
+        <div class="product-row" data-row-index="${rowIndex}">
+          <div>
+            <label>肥料产品 ${rowIndex + 1}</label>
+            <select class="stage-product">${getProductOptions(stage, product.productId || stage.products[0])}</select>
+          </div>
+          <div>
+            <label>当地常规用量（kg/亩，可选）</label>
+            <input class="local-amount" type="number" min="0" step="0.1" value="${escapeHtml(product.localAmount || "")}" placeholder="如：35 / 20.5 / 10">
+          </div>
+          <div class="custom-product">
+            <div class="custom-grid">
+              <div><label>自定义产品名称</label><input class="custom-name" value="${escapeHtml(product.customName || "")}" placeholder="例如：当地穗肥"></div>
+              <div><label>N-P₂O₅-K₂O</label><input class="custom-npk" value="${escapeHtml(product.customNpk || "")}" placeholder="例如：15-15-15"></div>
+            </div>
+          </div>
+          <button class="danger small remove-product" type="button">删除</button>
+        </div>
+      `;
+    }
+    function renderStageProducts(stageInputs = null) {
+      const rule = currentRule();
+      fields.stageProducts.innerHTML = rule.stages.map((stage, i) => {
+        const saved = normalizeStageInput(stage, stageInputs?.[i]);
+        return `
+          <div class="stage-card" data-stage-index="${i}">
+            <h3>${i + 1}. ${escapeHtml(stage.name)}<span class="badge">${escapeHtml(stage.note)}</span></h3>
+            <div class="product-list">
+              ${saved.products.map((p, idx) => productRowHtml(stage, p, idx)).join("")}
+            </div>
+            <div class="actions">
+              <button class="secondary small add-product" type="button">添加本阶段肥料</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      updateStageCustomFields();
+    }
+    function updateProductRowNumbers(card) {
+      card.querySelectorAll(".product-row").forEach((row, idx) => {
+        row.dataset.rowIndex = idx;
+        const label = row.querySelector("label");
+        if (label) label.textContent = `肥料产品 ${idx + 1}`;
+      });
+    }
+    function updateStageCustomFields() {
+      fields.stageProducts.querySelectorAll(".product-row").forEach(row => {
+        const custom = row.querySelector(".custom-product");
+        custom.style.display = row.querySelector(".stage-product").value === "other" ? "block" : "none";
+      });
+    }
+    function syncCropOptions(stageInputs = null) {
+      const rule = currentRule();
+      renderOptions(fields.region, rule.regions, rule.regions[0]);
+      renderOptions(fields.previousCrop, rule.previousOptions, rule.previousDefault);
+      renderPlantingModeOptions(rule, fields.plantingMode.value);
+      updateCustomCropField();
+      renderStageProducts(stageInputs);
+    }
+    function getStageInput(card) {
+      const products = [...card.querySelectorAll(".product-row")].map(row => ({
+        productId: row.querySelector(".stage-product").value,
+        localAmount: row.querySelector(".local-amount")?.value.trim() || "",
+        customName: row.querySelector(".custom-name")?.value.trim() || "",
+        customNpk: row.querySelector(".custom-npk")?.value.trim() || ""
+      }));
+      return { products };
+    }
+    function getStageProduct(input) {
+      if (!input) return { name: "未选产品", n: 0, p: 0, k: 0, isInvalid: true };
+      if (input.productId !== "other") return productById(input.productId) || { name: "未选产品", n: 0, p: 0, k: 0, isInvalid: true };
+      const npk = parseNpk(input.customNpk);
+      const valid = npk && npk.n <= 100 && npk.p <= 100 && npk.k <= 100 && npk.n + npk.p + npk.k <= 100;
+      return valid ? { name: input.customName || "自定义肥料产品", ...npk } : { name: input.customName || "自定义肥料产品", n: 0, p: 0, k: 0, isInvalid: true };
+    }
+    function collectInput() {
+      const crop = currentCrop();
+      const stageInputs = [...fields.stageProducts.querySelectorAll(".stage-card")].map(getStageInput);
+      return {
+        id: editingRecordId || `D17-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        createdAt: new Date().toLocaleString("zh-CN"),
+        crop, region: fields.region.value, previousCrop: fields.previousCrop.value,
+        area: +fields.area.value, targetYield: +fields.targetYield.value,
+        soilNLevel: fields.soilNLevel.value, soilPLevel: fields.soilPLevel.value, soilKLevel: fields.soilKLevel.value,
+        plantingMode: currentPlantingMode(), strawReturn: fields.strawReturn.value,
+        modelOutput: fields.modelOutput.value.trim(), stageInputs
+      };
+    }
+    function loadInput(data) {
+      const knownCustom = loadJson(CUSTOM_CROPS_KEY, []).includes(data.crop);
+      renderCropOptions(cropRules[data.crop] || knownCustom ? data.crop : "其他");
+      if (!cropRules[data.crop] && !knownCustom) fields.customCrop.value = data.crop;
+      syncCropOptions(data.stageInputs);
+      editingRecordId = data.id;
+      fields.area.value = data.area;
+      fields.targetYield.value = data.targetYield;
+      fields.soilNLevel.value = data.soilNLevel || data.nLevel || "中等";
+      fields.soilPLevel.value = data.soilPLevel || data.pLevel || "中等";
+      fields.soilKLevel.value = data.soilKLevel || data.kLevel || "中等";
+      if ([...fields.plantingMode.options].some(o => o.value === data.plantingMode)) {
+        fields.plantingMode.value = data.plantingMode;
+      } else if (data.plantingMode) {
+        fields.plantingMode.value = "其他";
+        fields.customPlantingMode.value = data.plantingMode;
+      }
+      updateCustomPlantingModeField();
+      fields.strawReturn.value = data.strawReturn || "不确定";
+      fields.modelOutput.value = data.modelOutput || "";
+      const normalizedRegion = normalizeRegion(data.region);
+      if ([...fields.region.options].some(o => o.value === normalizedRegion)) fields.region.value = normalizedRegion;
+      if ([...fields.previousCrop.options].some(o => o.value === data.previousCrop)) fields.previousCrop.value = data.previousCrop;
+      showView("input-view");
+    }
+    const suppliedBy = (amount, product) => ({
+      n: amount * product.n / 100,
+      p: amount * product.p / 100,
+      k: amount * product.k / 100
+    });
+    const addNutrients = (a, b) => ({ n: a.n + b.n, p: a.p + b.p, k: a.k + b.k });
+    const matchLoss = (supplied, target) => ["n", "p", "k"].reduce((sum, key) => {
+      if (target[key] <= 0) return sum + supplied[key] * supplied[key] * 4;
+      const delta = (supplied[key] - target[key]) / target[key];
+      return sum + delta * delta * (delta > 0 ? 2.5 : 1);
+    }, 0);
+    function optimizeProductAmounts(rows, nutrient, maxAmount) {
+      const amounts = rows.map(() => 0);
+      let supplied = { n: 0, p: 0, k: 0 };
+      let currentLoss = matchLoss(supplied, nutrient);
+      const step = .1;
+      for (let turn = 0; turn < Math.ceil(maxAmount / step); turn++) {
+        let best = null;
+        rows.forEach((row, index) => {
+          const candidateSupply = addNutrients(supplied, suppliedBy(step, row.product));
+          const loss = matchLoss(candidateSupply, nutrient);
+          if (!best || loss < best.loss) best = { index, loss, supplied: candidateSupply };
+        });
+        if (!best || best.loss >= currentLoss - 1e-8) break;
+        amounts[best.index] += step;
+        supplied = best.supplied;
+        currentLoss = best.loss;
+      }
+      return { amounts, supplied };
+    }
+    function planStageProducts(stage, inputs, nutrient, area) {
+      const rows = (inputs.products || []).map(input => ({ input, product: getStageProduct(input), localAmount: Number(input.localAmount || 0) })).filter(x => x.product && !x.product.isInvalid);
+      if (!rows.length) return { nutrient, productPlans: [], totalAmount: 0, supplied: { n: 0, p: 0, k: 0 } };
+
+      let supplied = { n: 0, p: 0, k: 0 };
+      const plans = [];
+      const addPlan = (row, amount, reason) => {
+        const safeAmount = Math.max(amount || 0, 0);
+        supplied = addNutrients(supplied, suppliedBy(safeAmount, row.product));
+        plans.push({ ...row, amount: safeAmount, total: safeAmount * area, reason });
+      };
+
+      if (rows.some(row => row.localAmount > 0)) {
+        const manualTotal = rows.reduce((sum, row) => sum + row.localAmount, 0);
+        const limitNote = manualTotal > stage.limit[1] ? `；本阶段合计${manualTotal.toFixed(1)}kg/亩，超过页面记录的常规上限${stage.limit[1]}kg/亩，请人工复核` : "";
+        rows.forEach(row => addPlan(row, row.localAmount, `采用用户填写的当前/常规用量，用于与区域指导值比较，不视为系统自动推荐${limitNote}`));
+        return {
+          nutrient,
+          productPlans: plans,
+          totalAmount: plans.reduce((sum, x) => sum + x.amount, 0),
+          supplied
+        };
+      }
+
+      const optimized = optimizeProductAmounts(rows, nutrient, stage.limit[1]);
+      supplied = { n: 0, p: 0, k: 0 };
+      rows.forEach((row, index) => {
+        if (optimized.amounts[index] > 0) addPlan(row, optimized.amounts[index], "在本阶段总用量上限内，按养分缺口最小化匹配；超量会受到更高惩罚");
+      });
+      return {
+        nutrient,
+        productPlans: plans,
+        totalAmount: plans.reduce((sum, x) => sum + x.amount, 0),
+        supplied
+      };
+    }
+    const recommendationFor = (rule, region, targetYield) => {
+      const bands = rule.recommendations?.[region];
+      return bands?.find(item => targetYield <= item.maxYield) || null;
+    };
+    function calculatePlan(data) {
+      const rule = cropRules[data.crop] || GENERIC_RULE;
+      const nLevel = data.soilNLevel || "中等";
+      const pLevel = data.soilPLevel || "中等";
+      const kLevel = data.soilKLevel || "中等";
+      const uptakeReference = {
+        n: data.targetYield / 100 * rule.uptakePer100.n,
+        p: data.targetYield / 100 * rule.uptakePer100.p,
+        k: data.targetYield / 100 * rule.uptakePer100.k
+      };
+      data.region = normalizeRegion(data.region);
+      const recommendation = recommendationFor(rule, data.region, data.targetYield);
+      if (!recommendation) return { data, rule, unsupported: true, uptakeReference };
+      const fertNeed = {
+        n: uptakeReference.n * soilNeedFactor(nLevel),
+        p: uptakeReference.p * soilNeedFactor(pLevel),
+        k: uptakeReference.k * soilNeedFactor(kLevel)
+      };
+      const stagePlans = rule.stages.map((stage, i) => {
+        const input = normalizeStageInput(stage, data.stageInputs?.[i]);
+        const nutrient = { n: fertNeed.n * stage.ratios.n, p: fertNeed.p * stage.ratios.p, k: fertNeed.k * stage.ratios.k };
+        return { stage, ...planStageProducts(stage, input, nutrient, data.area) };
+      });
+      return { data, rule, nLevel, pLevel, kLevel, recommendation, uptakeReference, fertNeed, stagePlans };
+    }
+    function renderHistory() {
+      const list = records();
+      $("#history-output").innerHTML = list.length ? `<div class="record-list">${list.map(r => `
+        <article class="record-card">
+          <h3>${escapeHtml(r.crop)}｜${escapeHtml(r.region)}<span class="badge">${escapeHtml(r.createdAt)}</span></h3>
+          <p class="hint">面积 ${r.area} 亩｜目标产量 ${r.targetYield} kg/亩｜前茬 ${escapeHtml(r.previousCrop)}</p>
+          <div class="actions">
+            <button type="button" data-action="plan" data-id="${r.id}">生成方案</button>
+            <button class="secondary" type="button" data-action="load" data-id="${r.id}">载入修改</button>
+            <button class="danger" type="button" data-action="delete" data-id="${r.id}">删除</button>
+          </div>
+        </article>`).join("")}</div>` : `<div class="empty">暂无保存数据。请先在第一页保存当前数据。</div>`;
+    }
+    function renderPlan(plan) {
+      const d = plan.data;
+      if (plan.unsupported) {
+        $("#result").innerHTML = `
+          <div class="section warning">
+            <h3>暂不生成精确推荐<span class="badge">缺少区域规则</span></h3>
+            <p>当前“${escapeHtml(d.crop)}—${escapeHtml(d.region)}”没有经过核实的区域施肥规则。数据已经可以保存，但系统不会套用通用占位公式生成看似精确的处方。</p>
+            <p class="hint">下一步需要补充：当地公开施肥规程、目标产量档位、土壤丰缺指标、阶段分配比例和可用产品包，并由农技人员确认。</p>
+          </div>`;
+        return;
+      }
+      const stageRatioRows = plan.rule.stages.map(stage => `<tr>
+        <td>${escapeHtml(stage.name)}</td>
+        <td>${Math.round(stage.ratios.n * 100)}%</td>
+        <td>${Math.round(stage.ratios.p * 100)}%</td>
+        <td>${Math.round(stage.ratios.k * 100)}%</td>
+        <td>${escapeHtml(stage.note)}</td>
+      </tr>`).join("");
+      const productRows = plan.stagePlans.flatMap(stagePlan => {
+        if (!stagePlan.productPlans.length) {
+          return [`<tr><td>${escapeHtml(stagePlan.stage.name)}</td><td colspan="5">未选择有效肥料产品</td></tr>`];
+        }
+        return stagePlan.productPlans.map(x => `<tr>
+          <td>${escapeHtml(stagePlan.stage.name)}</td>
+          <td>${escapeHtml(x.product.name)}${x.input.localAmount ? `<br><span class="hint">常规用量：${escapeHtml(x.input.localAmount)} kg/亩</span>` : ""}</td>
+          <td>N ${kg(stagePlan.nutrient.n)} / P₂O₅ ${kg(stagePlan.nutrient.p)} / K₂O ${kg(stagePlan.nutrient.k)}</td>
+          <td>${x.amount.toFixed(1)} kg/亩</td>
+          <td>${x.total.toFixed(1)} kg</td>
+          <td>${escapeHtml(x.reason)}</td>
+        </tr>`);
+      }).join("");
+      const actualNutrients = { n: 0, p: 0, k: 0 };
+      const actualRows = plan.stagePlans.flatMap(stagePlan => {
+        if (!stagePlan.productPlans.length) {
+          return [`<tr><td>${escapeHtml(stagePlan.stage.name)}</td><td colspan="6">未选择有效肥料产品</td></tr>`];
+        }
+        return stagePlan.productPlans.map(x => {
+          const n = x.amount * x.product.n / 100;
+          const p = x.amount * x.product.p / 100;
+          const k = x.amount * x.product.k / 100;
+          actualNutrients.n += n;
+          actualNutrients.p += p;
+          actualNutrients.k += k;
+          return `<tr>
+            <td>${escapeHtml(stagePlan.stage.name)}</td>
+            <td>${escapeHtml(x.product.name)}</td>
+            <td>${x.amount.toFixed(1)} kg/亩</td>
+            <td>${kg(n)}</td>
+            <td>${kg(p)}</td>
+            <td>${kg(k)}</td>
+            <td>${escapeHtml(x.product.n)}-${escapeHtml(x.product.p)}-${escapeHtml(x.product.k)}</td>
+          </tr>`;
+        });
+      }).join("");
+      const compareStatus = (actual, range) => actual < range[0] ? "低于指导范围" : actual > range[1] ? "高于指导范围" : "处于指导范围";
+      const comparisonRows = [
+        ["N", actualNutrients.n, plan.recommendation.n],
+        ["P₂O₅", actualNutrients.p, plan.recommendation.p],
+        ["K₂O", actualNutrients.k, plan.recommendation.k]
+      ].map(([name, actual, range]) => `<tr>
+        <td>${name}</td><td>${kg(actual)}</td><td>${kg(range[0])}—${kg(range[1])}</td>
+        <td><span class="badge">${compareStatus(actual, range)}</span></td>
+        <td>${kg(actual - plan.fertNeed[name === "N" ? "n" : name === "P₂O₅" ? "p" : "k"])}</td>
+      </tr>`).join("");
+      $("#result").innerHTML = `
+        <div class="metrics">
+          <div class="metric"><small>目标需肥修正 N</small><strong>${kg(plan.fertNeed.n)}</strong></div>
+          <div class="metric"><small>目标需肥修正 P₂O₅</small><strong>${kg(plan.fertNeed.p)}</strong></div>
+          <div class="metric"><small>目标需肥修正 K₂O</small><strong>${kg(plan.fertNeed.k)}</strong></div>
+        </div>
+        <div class="section">
+          <h3>第一步：估算目标产量需肥量<span class="badge">目标产量</span></h3>
+          <div class="formula">
+            <div><code>目标作物需养分 = 目标产量 ÷ 100 × 每100kg产量需肥系数</code></div>
+            <div><strong>本作物系数：</strong>每100kg产量约需 N ${plan.rule.uptakePer100.n} kg、P₂O₅ ${plan.rule.uptakePer100.p} kg、K₂O ${plan.rule.uptakePer100.k} kg。</div>
+            <div>当前估算：N ${kg(plan.uptakeReference.n)}、P₂O₅ ${kg(plan.uptakeReference.p)}、K₂O ${kg(plan.uptakeReference.k)}。</div>
+            <div>区域参考档位：${escapeHtml(plan.recommendation.label)}；N ${kg(plan.recommendation.n[0])}—${kg(plan.recommendation.n[1])}，P₂O₅ ${kg(plan.recommendation.p[0])}—${kg(plan.recommendation.p[1])}，K₂O ${kg(plan.recommendation.k[0])}—${kg(plan.recommendation.k[1])}。</div>
+            <div><strong>来源/依据：</strong>${escapeHtml(plan.rule.recommendationSource)} <a href="${escapeHtml(plan.rule.recommendationUrl)}" target="_blank" rel="noopener">查看公开资料</a></div>
+            <div><strong>说明：</strong>本版本先恢复为“目标产量需肥量”主线，区域档位只作为大区参考和人工校验，不再把偏低的公开施用范围直接当成最终用肥目标。</div>
+          </div>
+        </div>
+        <div class="section">
+          <h3>第二步：按土壤丰缺等级修正<span class="badge">丰缺等级</span></h3>
+          <div class="formula">
+            <div><code>偏低：保留目标需肥量100%；中等：按85%估算；偏高：按70%估算。</code></div>
+            <div>N 等级 ${plan.nLevel} → ${kg(plan.fertNeed.n)}；P₂O₅ 等级 ${plan.pLevel} → ${kg(plan.fertNeed.p)}；K₂O 等级 ${plan.kLevel} → ${kg(plan.fertNeed.k)}。</div>
+            <div><strong>来源/依据：</strong>${escapeHtml(sourceNotes.soil)}</div>
+            <div><strong>等级来源说明：</strong>如果有测土报告，应先由当地测土配方标准或农技员把碱解氮、有效磷、速效钾判成偏低/中等/偏高，再录入本页面。本页面不直接处理 mg/kg 原始检测值。</div>
+            <div><strong>已记录但未自动量化：</strong>栽培/施肥方式“${escapeHtml(d.plantingMode || "未填写")}”、秸秆还田“${escapeHtml(d.strawReturn || "不确定")}”、前茬“${escapeHtml(d.previousCrop)}”。这些因素必须在取得当地校正规则后才能自动改变施肥量。</div>
+            <div><strong>模型/农技员摘要：</strong>${escapeHtml(d.modelOutput || "未填写")}。当前版本把它作为人工审阅证据保存，尚未从自由文本中自动提取参数或修改推荐值。</div>
+          </div>
+          <table>
+            <thead><tr><th>养分</th><th>目标产量需肥估算</th><th>土壤等级</th><th>修正后参考值</th></tr></thead>
+            <tbody>
+              <tr><td>N</td><td>${kg(plan.uptakeReference.n)}</td><td>${escapeHtml(plan.nLevel)}</td><td>${kg(plan.fertNeed.n)}</td></tr>
+              <tr><td>P₂O₅</td><td>${kg(plan.uptakeReference.p)}</td><td>${escapeHtml(plan.pLevel)}</td><td>${kg(plan.fertNeed.p)}</td></tr>
+              <tr><td>K₂O</td><td>${kg(plan.uptakeReference.k)}</td><td>${escapeHtml(plan.kLevel)}</td><td>${kg(plan.fertNeed.k)}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section">
+          <h3>第三步：分阶段产品匹配<span class="badge">允许产品组合</span></h3>
+          <div class="formula">
+            <div><code>阶段需养分 = 肥料需提供总养分 × 阶段分配比例。</code></div>
+            <div><code>产品组合规则：填写了当前/常规用量时，原样折算并与区域范围比较；未填写用量时，在本阶段总用量上限内搜索养分偏差较小的组合，并对养分超量给予更高惩罚。</code></div>
+            <div><strong>阶段分配来源/依据：</strong>${escapeHtml(stageSourceForCrop(d.crop))}</div>
+            <div><strong>产品含量来源/依据：</strong>${escapeHtml(sourceNotes.product)}</div>
+            <div><strong>常规用量来源/依据：</strong>${escapeHtml(sourceNotes.demo)}</div>
+            <div>自动匹配仍是教学型算法；正式交付应优先使用区域经理确认的产品包、包装施用说明和田间试验校准结果。</div>
+          </div>
+          <table>
+            <thead><tr><th>阶段</th><th>N 分配</th><th>P₂O₅ 分配</th><th>K₂O 分配</th><th>说明</th></tr></thead>
+            <tbody>${stageRatioRows}</tbody>
+          </table>
+          <br>
+          <table>
+            <thead><tr><th>阶段</th><th>产品</th><th>阶段目标养分</th><th>方案用量</th><th>合计</th><th>匹配说明</th></tr></thead>
+            <tbody>${productRows}</tbody>
+          </table>
+          <br>
+          <h3>当前施肥用量折算养分<span class="badge">实际投入折算</span></h3>
+          <div class="formula">
+            <div><code>本产品提供养分 = 该产品用量 × 产品对应养分含量 ÷ 100</code></div>
+            <div>例如：15-15-15 复合肥 10kg/亩，可折算 N 1.5kg/亩、P₂O₅ 1.5kg/亩、K₂O 1.5kg/亩。</div>
+          </div>
+          <table>
+            <thead><tr><th>阶段</th><th>产品</th><th>用量</th><th>折算 N</th><th>折算 P₂O₅</th><th>折算 K₂O</th><th>产品含量</th></tr></thead>
+            <tbody>
+              ${actualRows}
+              <tr><th colspan="3">合计</th><th>${kg(actualNutrients.n)}</th><th>${kg(actualNutrients.p)}</th><th>${kg(actualNutrients.k)}</th><th>—</th></tr>
+            </tbody>
+          </table>
+          <br>
+          <h3>当前方案与区域指导范围比较<span class="badge">闭环核对</span></h3>
+          <table>
+            <thead><tr><th>养分</th><th>当前产品实际投入</th><th>区域指导范围</th><th>判断</th><th>相对本次选值</th></tr></thead>
+            <tbody>${comparisonRows}</tbody>
+          </table>
+        </div>
+        <div class="section warning">
+          <h3>边界声明<span class="badge">交付边界</span></h3>
+          <ul>
+            <li>本结果是推荐草案，不是最终施肥处方。</li>
+            <li>粒肥、后期补肥等应根据苗情、天气、品种抗倒伏能力和田间验证决定。</li>
+            <li>所有真实生产决策必须由农技员、区域经理或田间试验确认。</li>
+          </ul>
+        </div>`;
+    }
+    function showView(id) {
+      document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+      document.querySelectorAll("[data-view-target]").forEach(b => b.classList.toggle("active", b.dataset.viewTarget === id));
+      scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    fields.stageProducts.addEventListener("click", e => {
+      const addBtn = e.target.closest(".add-product");
+      const removeBtn = e.target.closest(".remove-product");
+      if (addBtn) {
+        const card = addBtn.closest(".stage-card");
+        const stage = currentRule().stages[+card.dataset.stageIndex];
+        const list = card.querySelector(".product-list");
+        list.insertAdjacentHTML("beforeend", productRowHtml(stage, { productId: stage.products[0] }, list.children.length));
+        updateStageCustomFields();
+      }
+      if (removeBtn) {
+        const card = removeBtn.closest(".stage-card");
+        const rows = card.querySelectorAll(".product-row");
+        if (rows.length <= 1) return alert("每个阶段至少保留一种肥料产品。");
+        removeBtn.closest(".product-row").remove();
+        updateProductRowNumbers(card);
+      }
+    });
+    fields.stageProducts.addEventListener("change", e => {
+      if (e.target.classList.contains("stage-product")) updateStageCustomFields();
+    });
+
+    $("#decision-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const data = collectInput();
+      if (!data.crop) return alert("请填写作物。");
+      if (!(data.area > 0)) return alert("面积必须大于 0。");
+      if (!(data.targetYield > 0)) return alert("目标产量必须大于 0。");
+      if (fields.plantingMode.value === "其他" && !fields.customPlantingMode.value.trim()) return alert("请选择或填写栽培/施肥方式。");
+      const invalidCustom = data.stageInputs.flatMap(x => x.products).some(p => p.productId === "other" && getStageProduct(p).isInvalid);
+      if (invalidCustom) return alert("自定义肥料必须填写有效名称和N-P₂O₅-K₂O；单项及总养分均不能超过100。");
+      if (fields.crop.value === "其他") {
+        rememberItem(CUSTOM_CROPS_KEY, data.crop);
+        renderCropOptions(data.crop);
+      }
+      if (fields.plantingMode.value === "其他") {
+        rememberItem(CUSTOM_PLANTING_MODES_KEY, data.plantingMode);
+        renderPlantingModeOptions(currentRule(), data.plantingMode);
+      }
+      data.stageInputs.forEach(stage => stage.products.forEach(p => rememberProduct(getStageProduct(p))));
+      saveJson(RECORDS_KEY, [data, ...records().filter(r => r.id !== data.id)]);
+      editingRecordId = "";
+      renderHistory();
+      showView("history-view");
+    });
+    $("#history-output").addEventListener("click", e => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const list = records();
+      const record = list.find(x => x.id === btn.dataset.id);
+      if (!record) return;
+      if (btn.dataset.action === "delete") {
+        if (confirm("确定删除这条数据吗？")) {
+          saveJson(RECORDS_KEY, list.filter(x => x.id !== record.id));
+          renderHistory();
+        }
+      } else if (btn.dataset.action === "load") {
+        loadInput(record);
+      } else {
+        renderPlan(calculatePlan(record));
+        showView("output-view");
+      }
+    });
+    fields.crop.addEventListener("change", () => syncCropOptions());
+    fields.customCrop.addEventListener("input", () => syncCropOptions());
+    fields.plantingMode.addEventListener("change", updateCustomPlantingModeField);
+    document.querySelectorAll("[data-view-target]").forEach(b => b.addEventListener("click", () => showView(b.dataset.viewTarget)));
+
+    const guideModal = $("#guide-modal");
+    $("#open-guide").addEventListener("click", () => {
+      guideModal.classList.add("show");
+      guideModal.setAttribute("aria-hidden", "false");
+    });
+    $("#close-guide").addEventListener("click", () => {
+      guideModal.classList.remove("show");
+      guideModal.setAttribute("aria-hidden", "true");
+    });
+    guideModal.addEventListener("click", e => {
+      if (e.target === guideModal) {
+        guideModal.classList.remove("show");
+        guideModal.setAttribute("aria-hidden", "true");
+      }
+    });
+    $("#fill-demo").addEventListener("click", () => {
+      renderCropOptions("水稻");
+      fields.crop.value = "水稻";
+      syncCropOptions([
+        { products: [{ productId: "compound-15-15-15", localAmount: "35", customName: "", customNpk: "" }] },
+        { products: [{ productId: "urea-46-0-0", localAmount: "20.5", customName: "", customNpk: "" }] },
+        { products: [
+          { productId: "compound-15-15-15", localAmount: "10", customName: "", customNpk: "" },
+          { productId: "potash-0-0-60", localAmount: "10", customName: "", customNpk: "" }
+        ] }
+      ]);
+      fields.region.value = "长江中下游水稻区";
+      fields.area.value = 10;
+      fields.targetYield.value = 600;
+      fields.soilNLevel.value = "中等";
+      fields.soilPLevel.value = "中等";
+      fields.soilKLevel.value = "中等";
+      fields.plantingMode.value = "常规施肥";
+      fields.strawReturn.value = "否";
+      fields.previousCrop.value = "油菜";
+      fields.modelOutput.value = "目标产量 600 kg/亩。当前农户常规方案：底肥 15-15-15 复合肥 35kg/亩；苗肥/分蘖肥尿素合计 20.5kg/亩；穗肥 15-15-15 复合肥 10kg/亩 + 氯化钾 10kg/亩。本工具按长江中下游水稻区进行教学测算，并把常规方案折算为氮磷钾投入量供人工校验。";
+    });
+
+    renderCropOptions("水稻");
+    syncCropOptions();
+    renderHistory();
+  </script>
+</body>
+</html>
