@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 19 版本迭代计划器</title>
+  <style>
+    :root{
+      --green:#157347;--dark:#0d4f32;--mint:#eaf7ef;--amber:#f59e0b;--amber-soft:#fff7e6;
+      --blue:#2563eb;--blue-soft:#eef6ff;--paper:#fffef8;--line:#dbe8dd;--bg:#f5faf2;
+      --text:#1f2a24;--muted:#66736d;--danger:#b42318;--shadow:0 18px 45px rgba(16,82,51,.12)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 8% 4%,rgba(245,158,11,.14),transparent 28%),radial-gradient(circle at 92% 8%,rgba(21,115,71,.14),transparent 32%),linear-gradient(180deg,#fbfdf6 0%,var(--bg) 100%)}
+    header,main{max-width:1024px;margin:0 auto;padding:22px}
+    .hero{padding:30px;border-radius:28px;background:linear-gradient(135deg,#0d4f32,#1e9a66 72%,#d88712);color:#fff;box-shadow:var(--shadow)}
+    .hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+    h1{margin:0 0 10px;font-size:clamp(28px,4vw,44px)}
+    h2,h3{margin:0 0 14px}
+    .hero p,.hint{line-height:1.75;margin:0}.hero p{max-width:850px;color:rgba(255,255,255,.9)}
+    .hint{color:var(--muted);margin:-4px 0 16px;font-size:14px}
+    .topbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .nav-tabs{display:flex;flex-wrap:wrap;gap:10px}
+    button{border:0;border-radius:14px;padding:11px 16px;font:inherit;font-weight:900;cursor:pointer;background:var(--green);color:#fff;box-shadow:0 8px 18px rgba(21,115,71,.22)}
+    button.secondary{background:#eef7f0;color:var(--dark);border:1px solid #cfe2d6;box-shadow:none}
+    button.danger{background:#fff0ef;color:var(--danger);border:1px solid #ffd2cc;box-shadow:none}
+    button.small{padding:7px 10px;border-radius:10px;font-size:13px}
+    .nav-tabs button,.guide-button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);box-shadow:none}
+    .nav-tabs button.active{background:#fff;color:var(--dark);border-color:#fff;box-shadow:0 12px 26px rgba(0,0,0,.15)}
+    .nav-tabs button.active:after{content:" 当前";font-size:12px;opacity:.9}
+    .view{display:none}.view.active{display:block}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:14px}
+    .field.full{grid-column:1/-1}
+    label{display:block;margin-bottom:7px;font-size:14px;font-weight:800}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px 12px;font:inherit;background:#fbfdfb;color:var(--text);outline:none}
+    textarea{min-height:84px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(21,115,71,.12)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .metric{padding:15px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .metric small{display:block;color:var(--muted);margin-bottom:8px}.metric strong{font-size:24px;color:var(--dark)}
+    .section{border:1px solid var(--line);border-radius:18px;padding:15px;background:#fbfdfb;margin-top:12px}
+    .item-list{display:grid;gap:12px}
+    .item-card{border:1px solid var(--line);border-radius:18px;padding:15px;background:#fff}
+    .item-card h3{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:17px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .badge{display:inline-flex;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900;background:var(--amber-soft);color:#8a5a00;white-space:nowrap}
+    .badge.blue{background:var(--blue-soft);color:#174ea6}.badge.green{background:var(--mint);color:var(--dark)}
+    .quote{padding:12px 14px;border-left:4px solid var(--green);background:#f7fbf8;border-radius:12px;color:#435149;line-height:1.75}
+    table{width:100%;border-collapse:collapse;border-radius:14px;overflow:hidden;font-size:14px}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{background:var(--mint);color:var(--dark)}
+    .empty{border:1px dashed #b8c9c0;background:#fbfdfb;color:var(--muted);padding:18px;border-radius:16px}
+    .guide-modal{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;padding:20px;background:rgba(9,35,23,.48)}
+    .guide-modal.show{display:flex}.guide-panel{width:min(760px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 22px 70px rgba(0,0,0,.24)}
+    .guide-panel ol{padding-left:22px;line-height:1.85;color:var(--muted)}
+    @media(max-width:900px){.hero-top{flex-direction:column}.form-grid,.metrics{grid-template-columns:1fr}.nav-tabs button{flex:1 1 100%}}
+  </style>
+</head>
+<body>
+  <header>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>Day 19｜版本迭代计划器</h1>
+          <p>把反馈转化成版本计划：本版改什么、暂缓什么、为什么这样排、怎么验收。</p>
+        </div>
+        <button class="guide-button" type="button" id="open-guide">使用说明</button>
+      </div>
+      <div class="topbar">
+        <div class="nav-tabs">
+          <button class="active" type="button" data-view-target="input-view">01 添加迭代项</button>
+          <button type="button" data-view-target="plan-view">02 版本计划</button>
+          <button type="button" data-view-target="note-view">03 Release Note</button>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="view active" id="input-view">
+      <div class="card">
+        <h2>01｜添加一个迭代项</h2>
+        <p class="hint">一条迭代项必须来自反馈或自测证据，并且要写清楚验收标准。</p>
+        <form id="item-form">
+          <div class="form-grid">
+            <div class="field"><label for="version">目标版本</label><input id="version" value="v0.2"></div>
+            <div class="field"><label for="product">对应产品</label><select id="product"><option>Day17 施肥决策层</option><option>Day16 经济作物多操作账本</option><option>Day15 普通农户成本收益账本</option><option>其他</option></select></div>
+            <div class="field"><label for="type">类型</label><select id="type"><option>业务不符</option><option>Bug</option><option>体验问题</option><option>可解释性</option><option>新需求</option><option>暂缓项</option></select></div>
+            <div class="field"><label for="scope">处理范围</label><select id="scope"><option>本版处理</option><option>暂缓处理</option><option>需追问后决定</option></select></div>
+            <div class="field"><label for="priority">优先级</label><select id="priority"><option>高</option><option>中</option><option>低</option></select></div>
+            <div class="field"><label for="owner">负责人</label><input id="owner" value="我"></div>
+            <div class="field full"><label for="feedback">反馈/证据</label><textarea id="feedback" placeholder="例如：朋友反馈水稻地区分类不符合真实说法。"></textarea></div>
+            <div class="field full"><label for="change">计划改动</label><textarea id="change" placeholder="例如：恢复水稻、小麦、玉米的大区分类，并兼容旧地区名。"></textarea></div>
+            <div class="field full"><label for="reason">为什么这样排</label><textarea id="reason" placeholder="例如：地区是施肥方案入口，属于高优先级业务不符。"></textarea></div>
+            <div class="field full"><label for="acceptance">验收标准</label><textarea id="acceptance" placeholder="例如：水稻地区下拉框能看到长江中下游、东北、华南、西南、其他。"></textarea></div>
+          </div>
+          <div class="actions">
+            <button type="submit">保存迭代项</button>
+            <button class="secondary" type="button" id="fill-demo">填入 Day17 示例计划</button>
+            <button class="secondary" type="reset">清空表单</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="plan-view">
+      <div class="card">
+        <h2>02｜版本计划</h2>
+        <p class="hint">先看“本版处理”，再看“暂缓处理”。一个小版本最好只解决少数关键问题。</p>
+        <div class="metrics" id="metrics"></div>
+        <div class="section">
+          <h3>本版处理</h3>
+          <div id="included-list"></div>
+        </div>
+        <div class="section">
+          <h3>暂缓与追问</h3>
+          <div id="deferred-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="note-view">
+      <div class="card">
+        <h2>03｜Release Note</h2>
+        <p class="hint">Release note 是发给朋友或业务方看的，不是写给自己看的流水账。</p>
+        <textarea id="release-note" readonly></textarea>
+        <div class="actions">
+          <button type="button" id="refresh-note">生成 Release Note</button>
+          <button class="secondary" type="button" id="copy-note">复制 Release Note</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="guide-modal" id="guide-modal" role="dialog" aria-modal="true">
+    <div class="guide-panel">
+      <h2>使用说明</h2>
+      <ol>
+        <li>第一页把反馈转成迭代项，每条都要写计划改动和验收标准。</li>
+        <li>第二页查看哪些进入本版，哪些暂缓或需追问。</li>
+        <li>第三页生成 Release Note，可发给朋友说明这一版改了什么、不改什么。</li>
+        <li>本页面只保存在当前浏览器本地，不会自动上传。</li>
+      </ol>
+      <div class="actions"><button type="button" id="close-guide">知道了</button></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "day19_release_items";
+    const $ = s => document.querySelector(s);
+    const fields = {
+      version: $("#version"), product: $("#product"), type: $("#type"), scope: $("#scope"),
+      priority: $("#priority"), owner: $("#owner"), feedback: $("#feedback"),
+      change: $("#change"), reason: $("#reason"), acceptance: $("#acceptance")
+    };
+    const escapeHtml = text => String(text ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+    const items = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    const saveItems = list => localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    const score = item => ({ "高": 3, "中": 2, "低": 1 }[item.priority] || 0) + ({ "Bug": 4, "业务不符": 4, "可解释性": 2, "体验问题": 2, "新需求": 1, "暂缓项": 0 }[item.type] || 0);
+    const sortedItems = () => [...items()].sort((a, b) => score(b) - score(a));
+
+    function collectItem() {
+      return {
+        id: `R19-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        createdAt: new Date().toLocaleString("zh-CN"),
+        version: fields.version.value.trim() || "v0.2",
+        product: fields.product.value,
+        type: fields.type.value,
+        scope: fields.scope.value,
+        priority: fields.priority.value,
+        owner: fields.owner.value.trim() || "未填写",
+        feedback: fields.feedback.value.trim(),
+        change: fields.change.value.trim(),
+        reason: fields.reason.value.trim(),
+        acceptance: fields.acceptance.value.trim()
+      };
+    }
+
+    function renderMetrics() {
+      const list = items();
+      const included = list.filter(x => x.scope === "本版处理");
+      $("#metrics").innerHTML = [
+        ["总迭代项", list.length],
+        ["本版处理", included.length],
+        ["暂缓/追问", list.length - included.length],
+        ["高优先级", list.filter(x => x.priority === "高").length]
+      ].map(([label, value]) => `<div class="metric"><small>${label}</small><strong>${value}</strong></div>`).join("");
+    }
+
+    function card(item) {
+      return `<article class="item-card">
+        <h3>${escapeHtml(item.change || "未填写改动")}<span class="badge">${escapeHtml(item.version)}</span></h3>
+        <div class="meta">
+          <span class="badge green">${escapeHtml(item.type)}</span>
+          <span class="badge blue">${escapeHtml(item.priority)}优先级</span>
+          <span class="badge">${escapeHtml(item.scope)}</span>
+          <span class="badge">${escapeHtml(item.product)}</span>
+        </div>
+        <div class="quote">${escapeHtml(item.feedback || "未填写反馈/证据")}</div>
+        <p><strong>为什么这样排：</strong>${escapeHtml(item.reason || "未填写")}</p>
+        <p><strong>验收标准：</strong>${escapeHtml(item.acceptance || "未填写")}</p>
+        <div class="actions"><button class="danger small" type="button" data-delete="${item.id}">删除</button></div>
+      </article>`;
+    }
+
+    function renderLists() {
+      const list = sortedItems();
+      const included = list.filter(x => x.scope === "本版处理");
+      const deferred = list.filter(x => x.scope !== "本版处理");
+      $("#included-list").innerHTML = included.length ? `<div class="item-list">${included.map(card).join("")}</div>` : `<div class="empty">暂无本版处理项。</div>`;
+      $("#deferred-list").innerHTML = deferred.length ? `<div class="item-list">${deferred.map(card).join("")}</div>` : `<div class="empty">暂无暂缓或追问项。</div>`;
+    }
+
+    function releaseNote() {
+      const list = sortedItems();
+      const version = list[0]?.version || "v0.2";
+      const included = list.filter(x => x.scope === "本版处理");
+      const deferred = list.filter(x => x.scope !== "本版处理");
+      const bullet = rows => rows.map(x => `- ${x.change}\n  - 原因：${x.reason || "未填写"}\n  - 验收：${x.acceptance || "未填写"}`).join("\n");
+      return `# ${version} Release Note\n\n## 版本目标\n\n根据反馈和自测，把最影响试用理解和业务判断的问题先修掉。这个版本仍然是原型，不是最终正式系统。\n\n## 本版处理\n\n${bullet(included) || "- 暂无本版处理项"}\n\n## 本版暂缓\n\n${bullet(deferred) || "- 暂无暂缓项"}\n\n## 复测建议\n\n- 先确认核心流程是否能跑通；\n- 再确认业务字段是否贴近真实说法；\n- 最后确认页面说明和公式是否能被目标用户看懂。\n`;
+    }
+
+    function renderAll() {
+      renderMetrics();
+      renderLists();
+      $("#release-note").value = releaseNote();
+    }
+
+    $("#item-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const item = collectItem();
+      if (!item.feedback || !item.change || !item.acceptance) return alert("反馈/证据、计划改动、验收标准都要填写。");
+      saveItems([item, ...items()]);
+      e.target.reset();
+      fields.version.value = item.version;
+      fields.owner.value = "我";
+      renderAll();
+      showView("plan-view");
+    });
+
+    $("#fill-demo").addEventListener("click", () => {
+      const demo = [
+        { version: "v0.2", product: "Day17 施肥决策层", type: "业务不符", scope: "本版处理", priority: "高", owner: "我", feedback: "地区分类不符合真实农业说法。", change: "恢复水稻、小麦、玉米的大区分类，并兼容旧地区名。", reason: "地区是施肥决策入口，分类不对会影响后续判断。", acceptance: "水稻能看到长江中下游、东北、华南、西南、其他；小麦和玉米也有对应大区；旧记录能生成方案。" },
+        { version: "v0.2", product: "Day17 施肥决策层", type: "可解释性", scope: "本版处理", priority: "中", owner: "我", feedback: "目标产量需肥公式没有写清楚系数。", change: "在输出页补充每100kg产量需 N、P₂O₅、K₂O 系数。", reason: "结果要能被业务人员审阅，不能只给公式和结果。", acceptance: "输出页公式下方能看到当前作物的 N、P₂O₅、K₂O 系数。" },
+        { version: "v0.2", product: "Day17 施肥决策层", type: "体验问题", scope: "本版处理", priority: "中", owner: "我", feedback: "顶部目录比输入框宽。", change: "统一顶部和主体内容宽度。", reason: "页面专业度会影响朋友试用的第一印象。", acceptance: "桌面端顶部区域不再明显宽于输入卡片。" },
+        { version: "v0.3", product: "Day17 施肥决策层", type: "新需求", scope: "暂缓处理", priority: "低", owner: "我", feedback: "希望自动生成最终施肥处方。", change: "暂不做最终处方，只保留推荐草案和人工确认边界。", reason: "农艺风险较高，缺少区域产品库和田间验证。", acceptance: "页面继续明确提示不是最终施肥处方。" }
+      ].map((x, i) => ({ id: `R19-demo-${Date.now()}-${i}`, createdAt: new Date().toLocaleString("zh-CN"), ...x }));
+      saveItems([...demo, ...items()]);
+      renderAll();
+      showView("plan-view");
+    });
+
+    document.body.addEventListener("click", e => {
+      const button = e.target.closest("button[data-delete]");
+      if (!button) return;
+      if (confirm("确定删除这条迭代项吗？")) {
+        saveItems(items().filter(item => item.id !== button.dataset.delete));
+        renderAll();
+      }
+    });
+
+    $("#refresh-note").addEventListener("click", () => $("#release-note").value = releaseNote());
+    $("#copy-note").addEventListener("click", async () => {
+      $("#release-note").value = releaseNote();
+      await navigator.clipboard.writeText($("#release-note").value);
+      alert("Release Note 已复制。");
+    });
+
+    function showView(id) {
+      document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+      document.querySelectorAll("[data-view-target]").forEach(b => b.classList.toggle("active", b.dataset.viewTarget === id));
+      if (id === "note-view") $("#release-note").value = releaseNote();
+    }
+    document.querySelectorAll("[data-view-target]").forEach(b => b.addEventListener("click", () => showView(b.dataset.viewTarget)));
+    const guideModal = $("#guide-modal");
+    $("#open-guide").addEventListener("click", () => guideModal.classList.add("show"));
+    $("#close-guide").addEventListener("click", () => guideModal.classList.remove("show"));
+    guideModal.addEventListener("click", e => { if (e.target === guideModal) guideModal.classList.remove("show"); });
+    renderAll();
+  </script>
+</body>
+</html>

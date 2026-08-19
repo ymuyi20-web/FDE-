@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 16 经济作物一天多操作批量记录</title>
+  <style>
+    :root {
+      --green: #177a4d;
+      --green-dark: #0b5435;
+      --mint: #e8f7ee;
+      --orange: #f59e0b;
+      --orange-soft: #fff7e6;
+      --bg: #f5f8f0;
+      --card: #ffffff;
+      --line: #dce8df;
+      --text: #1f2a24;
+      --muted: #66736d;
+      --red: #b42318;
+      --shadow: 0 16px 38px rgba(18, 68, 44, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 4%, rgba(245, 158, 11, 0.16), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(23, 122, 77, 0.14), transparent 30%),
+        linear-gradient(180deg, #fbfdf4 0%, var(--bg) 100%);
+    }
+
+    header {
+      padding: 22px;
+      color: #fff;
+    }
+
+    .hero {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #0b5435, #209966 72%, #d98912);
+      box-shadow: 0 24px 70px rgba(15, 97, 61, 0.22);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 850px;
+      line-height: 1.78;
+      color: rgba(255,255,255,0.88);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 22px 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(23, 122, 77, 0.22);
+    }
+
+    button.secondary {
+      background: #eef7f0;
+      color: var(--green-dark);
+      border: 1px solid #cfe2d6;
+      box-shadow: none;
+    }
+
+    button.danger {
+      background: #fff0ef;
+      color: var(--red);
+      border: 1px solid #ffd2cc;
+      box-shadow: none;
+    }
+
+    .guide-button,
+    .nav-tabs button {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.26);
+      box-shadow: none;
+    }
+
+    .nav-tabs button.active {
+      background: #fff;
+      color: var(--green-dark);
+      border-color: #fff;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.15);
+    }
+
+    .nav-tabs button.active::after {
+      content: " 当前";
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h2, h3 {
+      margin: 0 0 14px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 { font-size: 23px; }
+    h3 { font-size: 17px; }
+
+    .hint {
+      margin: -4px 0 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 13px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 11px 12px;
+      font: inherit;
+      background: #fbfdfb;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(23, 122, 77, 0.12);
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .batch-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .operation-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.1fr 1.2fr 0.7fr 0.7fr 0.85fr 0.85fr auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdfb;
+    }
+
+    .operation-row-title {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 4px;
+      color: var(--green-dark);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .operation-row-title span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--mint);
+      border: 1px solid #cfe2d6;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .notice {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--mint);
+      color: var(--green-dark);
+      line-height: 1.65;
+      font-weight: 800;
+    }
+
+    .notice.show { display: block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f7fbf8);
+    }
+
+    .metric small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .metric strong {
+      font-size: 24px;
+      color: var(--green-dark);
+    }
+
+    .negative strong { color: var(--red); }
+
+    .category-tools {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 4px 0 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfdfb;
+    }
+
+    .category-tools label {
+      margin: 0;
+      color: var(--green-dark);
+    }
+
+    .category-tools select {
+      max-width: 220px;
+      background: #fff;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .day-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fff;
+      padding: 15px;
+    }
+
+    .day-card h3 {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--green-dark);
+    }
+
+    .op-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .op-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border-radius: 13px;
+      background: #f7faf6;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .op-line-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .delete-record {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--red);
+      background: #fff0ef;
+      border: 1px solid #ffd2cc;
+      box-shadow: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--orange-soft);
+      color: #8a5a00;
+      font-size: 12px;
+      font-weight: 900;
+      margin-left: 6px;
+    }
+
+    .empty {
+      border: 1px dashed #b8c9c0;
+      background: #fbfdfb;
+      color: var(--muted);
+      border-radius: 18px;
+      padding: 18px;
+      line-height: 1.7;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf6f0;
+      color: var(--green-dark);
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(13, 48, 32, 0.42);
+      padding: 22px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.show { display: flex; }
+
+    .guide-modal {
+      width: min(740px, 100%);
+      max-height: 86vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+    }
+
+    .guide-modal ol {
+      padding-left: 22px;
+      line-height: 1.85;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .hero-top { flex-direction: column; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .nav-tabs button { flex: 1 1 100%; }
+      .form-grid { grid-template-columns: 1fr; }
+      .operation-row { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .category-tools { align-items: stretch; flex-direction: column; }
+      .category-tools select { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>经济作物全程多操作记录</h1>
+          <p>适合番茄、辣椒、黄瓜、草莓、葱姜蒜等经济作物：从整地、播种/定植到打药、冲施肥、采收、销售都能记录；同一天多项操作可以一次批量提交。</p>
+        </div>
+        <button class="guide-button" type="button" id="open-guide">使用说明</button>
+      </div>
+      <div class="topbar">
+        <div class="nav-tabs">
+          <button class="active" type="button" data-view-target="input-view">01 批量录入当天操作</button>
+          <button type="button" data-view-target="timeline-view">02 每日农事时间轴</button>
+          <button type="button" data-view-target="dashboard-view">03 本季收益看板</button>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="view active" id="input-view">
+      <div class="card">
+        <h2>01｜批量录入当天多项操作</h2>
+        <p class="hint">先填当天基础信息，再在下面添加多条操作。既能记录整地、播种/定植这类前期投入，也能记录打药、冲施肥、采收、销售这类高频操作。</p>
+
+        <form id="batch-form">
+          <div class="form-grid">
+            <div class="field">
+              <label for="record-date">日期</label>
+              <input id="record-date" type="date" required>
+            </div>
+            <div class="field">
+              <label for="crop-name">作物</label>
+              <select id="crop-name"></select>
+            </div>
+            <div class="field" id="custom-crop-field">
+              <label for="custom-crop">自定义作物</label>
+              <input id="custom-crop" placeholder="例如：蓝莓 / 西兰花">
+            </div>
+            <div class="field">
+              <label for="province-name">地区/省份</label>
+              <select id="province-name"></select>
+            </div>
+            <div class="field" id="custom-province-field">
+              <label for="custom-province">自定义地区</label>
+              <input id="custom-province" placeholder="例如：河南扶沟">
+            </div>
+            <div class="field">
+              <label for="area-mu">面积（亩）</label>
+              <input id="area-mu" type="number" min="0" step="0.01" value="5" required>
+            </div>
+            <div class="field">
+              <label for="plot-name">地块/棚号（可选）</label>
+              <input id="plot-name" placeholder="例如：1号棚 / 东地">
+            </div>
+            <div class="field">
+              <label for="operator">记录人</label>
+              <input id="operator" value="老张">
+            </div>
+          </div>
+
+          <h3 style="margin-top:20px;">当天操作明细</h3>
+          <div class="batch-list" id="batch-list"></div>
+          <div class="actions">
+            <button class="secondary" type="button" id="add-operation">新增一条操作</button>
+            <button type="submit">提交当天全部操作</button>
+            <button class="secondary" type="button" id="fill-demo">填入演示</button>
+            <button class="danger" type="button" id="clear-records">清空本地记录</button>
+          </div>
+          <div class="notice" id="submit-notice"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="timeline-view">
+      <div class="card">
+        <h2>02｜每日农事时间轴</h2>
+        <p class="hint">按日期从前到后展示。每一天会合并显示当天多项操作，适合复盘“这一天到底做了哪些事”。</p>
+        <div id="timeline-output"></div>
+      </div>
+    </section>
+
+    <section class="view" id="dashboard-view">
+      <div class="card">
+        <h2>03｜本季收益看板</h2>
+        <p class="hint">销售类记录算收入，其他记录算成本。利润 = 销售收入 - 总成本。</p>
+        <div class="summary-grid">
+          <div class="metric"><small>总成本</small><strong id="total-cost">0 元</strong></div>
+          <div class="metric"><small>销售收入</small><strong id="total-income">0 元</strong></div>
+          <div class="metric" id="profit-card"><small>本季利润</small><strong id="total-profit">0 元</strong></div>
+          <div class="metric" id="profit-mu-card"><small>每亩利润</small><strong id="profit-per-mu">0 元/亩</strong></div>
+        </div>
+        <div class="category-tools">
+          <label for="category-sort">分类汇总排序方式</label>
+          <select id="category-sort">
+            <option value="process">按生产过程排序</option>
+            <option value="amount">按金额从高到低排序</option>
+          </select>
+        </div>
+        <div id="category-output"></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="modal-backdrop" id="guide-modal" aria-hidden="true">
+    <article class="guide-modal">
+      <h2>使用说明</h2>
+      <p class="hint">这个工具是 Day16 独立版本，适合一天多项操作的经济作物管理场景。</p>
+      <ol>
+        <li>先填写日期、作物、地区、面积、地块和记录人。</li>
+        <li>在“当天操作明细”里添加多条操作，例如整地、播种/定植、打药、冲施肥、除草、浇水、采收、销售。</li>
+        <li>每条操作可以填写数量、单位、单价，金额会自动计算；也可以直接改总金额。</li>
+        <li>点击“提交当天全部操作”，系统会一次保存当天所有操作。</li>
+        <li>点“02 每日农事时间轴”查看每天做了哪些事；点“03 本季收益看板”查看成本、收入和利润。</li>
+        <li>当前数据只保存在本地浏览器，适合原型测试；多人协作需要后续接服务器。</li>
+      </ol>
+      <div class="actions">
+        <button type="button" id="close-guide">知道了</button>
+      </div>
+    </article>
+  </section>
+
+  <script>
+    const RECORDS_KEY = "day16_economic_crop_batch_records";
+    const DEFAULTS_KEY = "day16_economic_crop_batch_defaults";
+    const CUSTOM_CROPS_KEY = "day16_custom_crops";
+    const CUSTOM_PROVINCES_KEY = "day16_custom_provinces";
+    const DEMO_ID_PREFIX = "DEMO-DAY16-ECONOMIC-";
+
+    const BASE_CROPS = ["番茄", "辣椒", "黄瓜", "草莓", "西瓜", "葡萄", "葱", "姜", "蒜", "水稻", "小麦", "玉米"];
+    const BASE_PROVINCES = ["河南", "山东", "河北", "安徽", "江苏", "湖北", "湖南", "四川", "陕西", "山西", "云南", "贵州", "广东", "广西", "浙江", "福建", "新疆", "内蒙古"];
+    const OPERATION_DETAILS = {
+      "整地": ["一体打包价", "翻耕", "起垄", "做畦", "覆膜", "滴灌带铺设", "其他"],
+      "播种/定植": ["一体打包价", "买苗", "育苗", "直播", "移栽", "补苗", "其他"],
+      "施肥": ["一体打包价", "底肥", "冲施肥", "滴灌施肥", "叶面肥", "追肥", "其他"],
+      "打药": ["一体打包价", "杀菌剂", "杀虫剂", "调节剂", "防病套餐", "其他"],
+      "除草": ["一体打包价", "人工除草", "药剂除草", "覆膜控草", "其他"],
+      "灌溉": ["一体打包价", "浇水", "滴灌", "排水", "其他"],
+      "植株管理": ["整枝打叉", "吊蔓", "疏花疏果", "授粉", "打老叶", "其他"],
+      "人工管理": ["一体打包价", "巡田", "绑蔓", "清沟", "补工", "其他"],
+      "采收": ["一体打包价", "人工采收", "分级包装", "装筐", "其他"],
+      "运输": ["一体打包价", "田间转运", "市场运输", "冷链运输", "装卸", "其他"],
+      "销售": ["批发销售", "零售销售", "电商销售", "合作社代销", "其他"],
+      "其他": ["建设大棚", "搭架", "租地", "临时用工", "其他"],
+    };
+    const OPERATIONS = Object.keys(OPERATION_DETAILS);
+    const CATEGORY_PROCESS_ORDER = [...OPERATIONS.filter((item) => item !== "销售"), "销售收入"];
+    const DETAIL_DEFAULTS = {
+      "整地|一体打包价": {item: "整地一体打包价", unit: "亩", quantityFromArea: true},
+      "整地|翻耕": {item: "翻耕机械", unit: "亩", quantityFromArea: true},
+      "整地|起垄": {item: "起垄机械", unit: "亩", quantityFromArea: true},
+      "整地|做畦": {item: "做畦人工/机械", unit: "亩", quantityFromArea: true},
+      "整地|覆膜": {item: "地膜+覆膜人工", unit: "亩", quantityFromArea: true},
+      "整地|滴灌带铺设": {item: "滴灌带材料和铺设", unit: "亩", quantityFromArea: true},
+      "整地|其他": {item: "整地其他费用", unit: "次", quantity: 1},
+      "播种/定植|一体打包价": {item: "播种/定植一体打包价", unit: "亩", quantityFromArea: true},
+      "播种/定植|买苗": {item: "种苗", unit: "株"},
+      "播种/定植|育苗": {item: "育苗费用", unit: "株"},
+      "播种/定植|直播": {item: "种子", unit: "袋"},
+      "播种/定植|移栽": {item: "移栽人工", unit: "工"},
+      "播种/定植|补苗": {item: "补苗人工和种苗", unit: "株"},
+      "播种/定植|其他": {item: "播种/定植其他费用", unit: "次", quantity: 1},
+      "施肥|一体打包价": {item: "施肥一体打包价", unit: "亩", quantityFromArea: true},
+      "施肥|底肥": {item: "复合肥/有机肥", unit: "袋"},
+      "施肥|冲施肥": {item: "水溶肥", unit: "袋"},
+      "施肥|滴灌施肥": {item: "滴灌水溶肥", unit: "袋"},
+      "施肥|叶面肥": {item: "叶面肥", unit: "瓶"},
+      "施肥|追肥": {item: "追肥", unit: "袋"},
+      "施肥|其他": {item: "施肥其他费用", unit: "次", quantity: 1},
+      "打药|一体打包价": {item: "打药一体打包价", unit: "亩", quantityFromArea: true},
+      "打药|杀菌剂": {item: "杀菌剂", unit: "次", quantity: 1},
+      "打药|杀虫剂": {item: "杀虫剂", unit: "次", quantity: 1},
+      "打药|调节剂": {item: "调节剂", unit: "次", quantity: 1},
+      "打药|防病套餐": {item: "防病套餐", unit: "次", quantity: 1},
+      "打药|其他": {item: "打药其他费用", unit: "次", quantity: 1},
+      "除草|一体打包价": {item: "除草一体打包价", unit: "亩", quantityFromArea: true},
+      "除草|人工除草": {item: "除草人工", unit: "工"},
+      "除草|药剂除草": {item: "除草剂", unit: "次", quantity: 1},
+      "除草|覆膜控草": {item: "覆膜控草", unit: "亩", quantityFromArea: true},
+      "除草|其他": {item: "除草其他费用", unit: "次", quantity: 1},
+      "灌溉|一体打包价": {item: "灌溉一体打包价", unit: "亩", quantityFromArea: true},
+      "灌溉|浇水": {item: "浇水水电费", unit: "次", quantity: 1},
+      "灌溉|滴灌": {item: "滴灌水电费", unit: "次", quantity: 1},
+      "灌溉|排水": {item: "排水人工/机械", unit: "次", quantity: 1},
+      "灌溉|其他": {item: "灌溉其他费用", unit: "次", quantity: 1},
+      "植株管理|整枝打叉": {item: "整枝打叉人工", unit: "工"},
+      "植株管理|吊蔓": {item: "吊蔓人工", unit: "工"},
+      "植株管理|疏花疏果": {item: "疏花疏果人工", unit: "工"},
+      "植株管理|授粉": {item: "授粉人工/熊蜂", unit: "次", quantity: 1},
+      "植株管理|打老叶": {item: "打老叶人工", unit: "工"},
+      "植株管理|其他": {item: "植株管理其他费用", unit: "次", quantity: 1},
+      "人工管理|一体打包价": {item: "人工管理一体打包价", unit: "亩", quantityFromArea: true},
+      "人工管理|巡田": {item: "巡田人工", unit: "工"},
+      "人工管理|绑蔓": {item: "绑蔓人工", unit: "工"},
+      "人工管理|清沟": {item: "清沟人工", unit: "工"},
+      "人工管理|补工": {item: "临时补工", unit: "工"},
+      "人工管理|其他": {item: "人工管理其他费用", unit: "次", quantity: 1},
+      "采收|一体打包价": {item: "采收一体打包价", unit: "亩", quantityFromArea: true},
+      "采收|人工采收": {item: "采收人工", unit: "工"},
+      "采收|分级包装": {item: "分级包装人工和耗材", unit: "箱"},
+      "采收|装筐": {item: "装筐人工", unit: "箱"},
+      "采收|其他": {item: "采收其他费用", unit: "次", quantity: 1},
+      "运输|一体打包价": {item: "运输一体打包价", unit: "次", quantity: 1},
+      "运输|田间转运": {item: "田间转运费", unit: "次", quantity: 1},
+      "运输|市场运输": {item: "市场运输费", unit: "次", quantity: 1},
+      "运输|冷链运输": {item: "冷链运输费", unit: "次", quantity: 1},
+      "运输|装卸": {item: "装卸人工", unit: "工"},
+      "运输|其他": {item: "运输其他费用", unit: "次", quantity: 1},
+      "销售|批发销售": {item: "作物批发销售", unit: "kg"},
+      "销售|零售销售": {item: "作物零售销售", unit: "kg"},
+      "销售|电商销售": {item: "作物电商销售", unit: "kg"},
+      "销售|合作社代销": {item: "作物合作社代销", unit: "kg"},
+      "销售|其他": {item: "作物销售", unit: "kg"},
+      "其他|建设大棚": {item: "建设大棚费用", unit: "亩", quantityFromArea: true},
+      "其他|搭架": {item: "搭架材料和人工", unit: "亩", quantityFromArea: true},
+      "其他|租地": {item: "土地租金", unit: "亩", quantityFromArea: true},
+      "其他|临时用工": {item: "临时用工", unit: "工"},
+      "其他|其他": {item: "其他费用", unit: "次", quantity: 1},
+    };
+
+    const fields = {
+      date: document.querySelector("#record-date"),
+      crop: document.querySelector("#crop-name"),
+      customCrop: document.querySelector("#custom-crop"),
+      customCropField: document.querySelector("#custom-crop-field"),
+      province: document.querySelector("#province-name"),
+      customProvince: document.querySelector("#custom-province"),
+      customProvinceField: document.querySelector("#custom-province-field"),
+      area: document.querySelector("#area-mu"),
+      plot: document.querySelector("#plot-name"),
+      operator: document.querySelector("#operator"),
+    };
+
+    let records = loadJson(RECORDS_KEY, []);
+
+    function loadJson(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+      catch { return fallback; }
+    }
+
+    function saveJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function todayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    }
+
+    function money(value) {
+      return `${Number(value || 0).toFixed(2)} 元`;
+    }
+
+    function renderOptions(select, baseItems, customKey, preferred, fallback) {
+      const customItems = loadJson(customKey, []);
+      const options = [...customItems, ...baseItems.filter((item) => !customItems.includes(item)), "其他"];
+      select.innerHTML = "";
+      options.forEach((option) => select.add(new Option(option, option)));
+      select.value = options.includes(preferred) ? preferred : fallback;
+    }
+
+    function rememberCustom(key, baseItems, value) {
+      const clean = value.trim();
+      if (!clean || baseItems.includes(clean)) return;
+      const existing = loadJson(key, []).filter((item) => item !== clean);
+      saveJson(key, [clean, ...existing]);
+    }
+
+    function resolvedCrop() {
+      return fields.crop.value === "其他" ? fields.customCrop.value.trim() : fields.crop.value;
+    }
+
+    function resolvedProvince() {
+      return fields.province.value === "其他" ? fields.customProvince.value.trim() : fields.province.value;
+    }
+
+    function updateCustomFields() {
+      fields.customCropField.style.display = fields.crop.value === "其他" ? "block" : "none";
+      fields.customProvinceField.style.display = fields.province.value === "其他" ? "block" : "none";
+    }
+
+    function applyDefaults() {
+      const defaults = loadJson(DEFAULTS_KEY, {});
+      fields.date.value = defaults.date || todayString();
+      renderOptions(fields.crop, BASE_CROPS, CUSTOM_CROPS_KEY, defaults.crop || "番茄", "番茄");
+      renderOptions(fields.province, BASE_PROVINCES, CUSTOM_PROVINCES_KEY, defaults.province || "河南", "河南");
+      fields.area.value = defaults.area || 5;
+      fields.plot.value = defaults.plot === "默认地块" ? "" : (defaults.plot || "");
+      fields.operator.value = defaults.operator || "老张";
+      fields.customCrop.value = "";
+      fields.customProvince.value = "";
+      updateCustomFields();
+    }
+
+    function operationKind(type) {
+      return type === "销售" ? "收入" : "成本";
+    }
+
+    function operationOptionsHtml(selected = "打药") {
+      return OPERATIONS.map((item) => `<option value="${item}" ${item === selected ? "selected" : ""}>${item}</option>`).join("");
+    }
+
+    function detailOptionsHtml(type, selected) {
+      const details = OPERATION_DETAILS[type] || OPERATION_DETAILS["其他"];
+      const safeSelected = details.includes(selected) ? selected : details[0];
+      return details.map((item) => `<option value="${item}" ${item === safeSelected ? "selected" : ""}>${item}</option>`).join("");
+    }
+
+    function operationDefault(type, detail) {
+      const details = OPERATION_DETAILS[type] || OPERATION_DETAILS["其他"];
+      const safeDetail = details.includes(detail) ? detail : details[0];
+      return {
+        detail: safeDetail,
+        ...(DETAIL_DEFAULTS[`${type}|${safeDetail}`] || DETAIL_DEFAULTS[`${type}|其他`] || DETAIL_DEFAULTS["其他|其他"]),
+      };
+    }
+
+    function unitOptionsHtml(selected = "次") {
+      return ["亩", "kg", "袋", "瓶", "次", "工", "箱", "斤", "其他"].map((item) => `<option value="${item}" ${item === selected ? "selected" : ""}>${item}</option>`).join("");
+    }
+
+    function addOperationRow(type = "打药", detail = null) {
+      const defaults = operationDefault(type, detail);
+      const crop = resolvedCrop() || "作物";
+      const item = defaults.item.replace("作物销售", `${crop}销售`);
+      const row = document.createElement("div");
+      row.className = "operation-row";
+      row.innerHTML = `
+        <div class="operation-row-title"><span class="operation-row-index">当天操作明细</span></div>
+        <div class="field">
+          <label>一级操作</label>
+          <select class="op-type">${operationOptionsHtml(type)}</select>
+        </div>
+        <div class="field">
+          <label>二级操作</label>
+          <select class="op-detail">${detailOptionsHtml(type, defaults.detail)}</select>
+        </div>
+        <div class="field">
+          <label>投入/收入项目</label>
+          <input class="op-item" value="${item}">
+        </div>
+        <div class="field">
+          <label>说明</label>
+          <input class="op-note" placeholder="例如：上午打药 / 下午浇水">
+        </div>
+        <div class="field">
+          <label>数量</label>
+          <input class="op-quantity" type="number" min="0" step="0.01" value="${defaults.quantity ?? ""}">
+        </div>
+        <div class="field">
+          <label>单位</label>
+          <select class="op-unit">${unitOptionsHtml(defaults.unit)}</select>
+        </div>
+        <div class="field">
+          <label>单价</label>
+          <input class="op-price" type="number" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>金额</label>
+          <input class="op-amount" type="number" min="0" step="0.01">
+        </div>
+        <button class="danger remove-row" type="button">删除</button>
+      `;
+      document.querySelector("#batch-list").appendChild(row);
+      wireOperationRow(row);
+      refreshOperationRowIndexes();
+    }
+
+    function refreshOperationRowIndexes() {
+      document.querySelectorAll(".operation-row").forEach((row, index) => {
+        row.querySelector(".operation-row-index").textContent = `当天操作明细 ${index + 1}`;
+      });
+    }
+
+    function applyOperationDefaults(row, type, detail = null, refreshDetails = false) {
+      const detailSelect = row.querySelector(".op-detail");
+      if (refreshDetails) detailSelect.innerHTML = detailOptionsHtml(type, detail);
+      const defaults = operationDefault(type, detailSelect.value || detail);
+      const crop = resolvedCrop() || "作物";
+      const item = defaults.item.replace("作物销售", `${crop}销售`);
+      row.querySelector(".op-item").value = item;
+      row.querySelector(".op-unit").value = defaults.unit;
+      row.querySelector(".op-quantity").value = defaults.quantityFromArea ? (Number(fields.area.value) || "") : (defaults.quantity ?? "");
+      row.querySelector(".op-price").value = "";
+      row.querySelector(".op-amount").value = "";
+    }
+
+    function calculateRowAmount(row) {
+      const quantity = Number(row.querySelector(".op-quantity").value);
+      const price = Number(row.querySelector(".op-price").value);
+      if (quantity > 0 && price >= 0) row.querySelector(".op-amount").value = (quantity * price).toFixed(2);
+    }
+
+    function wireOperationRow(row) {
+      row.querySelector(".op-type").addEventListener("change", (event) => applyOperationDefaults(row, event.target.value, null, true));
+      row.querySelector(".op-detail").addEventListener("change", () => applyOperationDefaults(row, row.querySelector(".op-type").value));
+      row.querySelector(".op-quantity").addEventListener("input", () => calculateRowAmount(row));
+      row.querySelector(".op-price").addEventListener("input", () => calculateRowAmount(row));
+      row.querySelector(".remove-row").addEventListener("click", () => {
+        if (document.querySelectorAll(".operation-row").length === 1) return alert("至少保留一条操作。");
+        row.remove();
+        refreshOperationRowIndexes();
+      });
+    }
+
+    function collectOperationRows() {
+      return Array.from(document.querySelectorAll(".operation-row")).map((row) => ({
+        type: row.querySelector(".op-type").value,
+        detail: row.querySelector(".op-detail").value,
+        item: row.querySelector(".op-item").value.trim(),
+        note: row.querySelector(".op-note").value.trim(),
+        quantity: Number(row.querySelector(".op-quantity").value || 0),
+        unit: row.querySelector(".op-unit").value,
+        unitPrice: Number(row.querySelector(".op-price").value || 0),
+        amount: Number(row.querySelector(".op-amount").value || 0),
+      }));
+    }
+
+    function makeRecordId(index = 0) {
+      return `DAY16-${Date.now()}-${index}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    function makeRecord(base, operation, index) {
+      return {
+        id: makeRecordId(index),
+        date: base.date,
+        crop: base.crop,
+        province: base.province,
+        area: base.area,
+        plot: base.plot,
+        operator: base.operator,
+        type: operation.type,
+        detail: operation.detail,
+        kind: operationKind(operation.type),
+        item: operation.item,
+        quantity: operation.quantity,
+        unit: operation.unit,
+        unitPrice: operation.unitPrice,
+        amount: operation.amount,
+        note: operation.note,
+      };
+    }
+
+    function sortedRecords() {
+      return records.slice().sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+    }
+
+    function groupedByDate() {
+      const groups = new Map();
+      sortedRecords().forEach((record) => {
+        if (!groups.has(record.date)) groups.set(record.date, []);
+        groups.get(record.date).push(record);
+      });
+      return Array.from(groups.entries());
+    }
+
+    function getSummary() {
+      const totalCost = records.filter((record) => record.kind === "成本").reduce((sum, record) => sum + record.amount, 0);
+      const totalIncome = records.filter((record) => record.kind === "收入").reduce((sum, record) => sum + record.amount, 0);
+      const latestArea = Number(loadJson(DEFAULTS_KEY, {}).area || 0);
+      const profit = totalIncome - totalCost;
+      return {totalCost, totalIncome, profit, profitPerMu: latestArea > 0 ? profit / latestArea : 0};
+    }
+
+    function renderTimeline() {
+      const output = document.querySelector("#timeline-output");
+      if (records.length === 0) {
+        output.innerHTML = `<div class="empty">暂无记录。先录入一天的多项操作，或点击“填入演示”。</div>`;
+        return;
+      }
+      output.innerHTML = `<div class="timeline">${
+        groupedByDate().map(([date, group]) => {
+          const cost = group.filter((record) => record.kind === "成本").reduce((sum, record) => sum + record.amount, 0);
+          const income = group.filter((record) => record.kind === "收入").reduce((sum, record) => sum + record.amount, 0);
+          return `
+            <article class="day-card">
+              <h3><span>${date}｜${group[0].crop}｜${group[0].province}｜${group[0].plot}</span><span>${group.length} 项操作</span></h3>
+              <div class="op-list">
+                ${group.map((record) => `
+                  <div class="op-line">
+                    <div class="op-line-content">
+                      <strong>${record.type}${record.detail ? `｜${record.detail}` : ""}</strong><span class="pill">${record.kind}</span>
+                      ${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}
+                      ${record.note ? `｜${record.note}` : ""}
+                    </div>
+                    <button class="delete-record" type="button" data-record-id="${record.id}">删除</button>
+                  </div>
+                `).join("")}
+              </div>
+              <p class="hint" style="margin:12px 0 0;">当天成本：${money(cost)}｜当天收入：${money(income)}｜记录人：${group[0].operator}</p>
+            </article>
+          `;
+        }).join("")
+      }</div>`;
+    }
+
+    function renderDashboard() {
+      const summary = getSummary();
+      document.querySelector("#total-cost").textContent = money(summary.totalCost);
+      document.querySelector("#total-income").textContent = money(summary.totalIncome);
+      document.querySelector("#total-profit").textContent = money(summary.profit);
+      document.querySelector("#profit-per-mu").textContent = `${summary.profitPerMu.toFixed(2)} 元/亩`;
+      document.querySelector("#profit-card").className = `metric ${summary.profit >= 0 ? "" : "negative"}`;
+      document.querySelector("#profit-mu-card").className = `metric ${summary.profitPerMu >= 0 ? "" : "negative"}`;
+
+      if (records.length === 0) {
+        document.querySelector("#category-output").innerHTML = `<div class="empty">暂无分类汇总。</div>`;
+        return;
+      }
+      const categoryMap = new Map();
+      records.forEach((record) => {
+        const key = record.kind === "收入" ? "销售收入" : record.type;
+        categoryMap.set(key, (categoryMap.get(key) || 0) + record.amount);
+      });
+      const sortMode = document.querySelector("#category-sort")?.value || "process";
+      const sortedCategories = Array.from(categoryMap.entries()).sort((a, b) => {
+        if (sortMode === "amount") return b[1] - a[1];
+        const indexA = CATEGORY_PROCESS_ORDER.includes(a[0]) ? CATEGORY_PROCESS_ORDER.indexOf(a[0]) : CATEGORY_PROCESS_ORDER.length;
+        const indexB = CATEGORY_PROCESS_ORDER.includes(b[0]) ? CATEGORY_PROCESS_ORDER.indexOf(b[0]) : CATEGORY_PROCESS_ORDER.length;
+        return indexA - indexB || b[1] - a[1];
+      });
+      document.querySelector("#category-output").innerHTML = `
+        <h3>分类汇总</h3>
+        <table>
+          <thead><tr><th>类别</th><th>金额</th></tr></thead>
+          <tbody>${sortedCategories.map(([key, amount]) => `<tr><td>${key}</td><td>${money(amount)}</td></tr>`).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderAll() {
+      renderTimeline();
+      renderDashboard();
+    }
+
+    function deleteRecord(recordId) {
+      const record = records.find((item) => item.id === recordId);
+      if (!record) return;
+      const label = `${record.date}｜${record.type}${record.detail ? `｜${record.detail}` : ""}｜${record.item || "未填写项目"}`;
+      if (!confirm(`确定删除这条记录吗？\n${label}`)) return;
+      records = records.filter((item) => item.id !== recordId);
+      saveJson(RECORDS_KEY, records);
+      renderAll();
+    }
+
+    function showView(viewId) {
+      document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
+      document.querySelectorAll("[data-view-target]").forEach((button) => button.classList.toggle("active", button.dataset.viewTarget === viewId));
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    function setRows(rows) {
+      document.querySelector("#batch-list").innerHTML = "";
+      rows.forEach((row) => typeof row === "string" ? addOperationRow(row) : addOperationRow(row.type, row.detail));
+    }
+
+    function demoRecords() {
+      const base = {crop: "番茄", province: "河南", area: 5, plot: "1号棚", operator: "老张"};
+      const makeDemo = (index, date, type, detail, item, quantity, unit, unitPrice, note) => ({
+        id: `${DEMO_ID_PREFIX}${String(index).padStart(2, "0")}`,
+        date,
+        crop: base.crop,
+        province: base.province,
+        area: base.area,
+        plot: base.plot,
+        operator: base.operator,
+        type,
+        detail,
+        kind: operationKind(type),
+        item,
+        quantity,
+        unit,
+        unitPrice,
+        amount: Number((quantity * unitPrice).toFixed(2)),
+        note,
+      });
+      return [
+        makeDemo(1, "2026-03-18", "整地", "一体打包价", "整地一体打包价", 5, "亩", 180, "旋耕、起垄、做畦按棚室一体处理。"),
+        makeDemo(2, "2026-03-19", "整地", "滴灌带铺设", "滴灌带材料和铺设", 5, "亩", 120, "铺滴灌带，后续冲施肥和浇水共用。"),
+        makeDemo(3, "2026-03-25", "播种/定植", "买苗", "番茄种苗", 4000, "株", 0.45, "采购商品苗，按 5 亩棚室估算。"),
+        makeDemo(4, "2026-03-26", "播种/定植", "移栽", "移栽人工", 7, "工", 130, "定植、补土、整理垄面。"),
+        makeDemo(5, "2026-03-26", "施肥", "底肥", "复合肥/有机肥", 10, "袋", 155, "定植前后底肥投入。"),
+        makeDemo(6, "2026-04-03", "灌溉", "浇水", "浇水水电费", 1, "次", 100, "缓苗水。"),
+        makeDemo(7, "2026-04-03", "施肥", "冲施肥", "水溶肥", 2, "袋", 180, "同一天随水冲施。"),
+        makeDemo(8, "2026-04-15", "打药", "防病套餐", "防病套餐", 1, "次", 180, "灰霉、叶霉等预防性用药。"),
+        makeDemo(9, "2026-04-15", "除草", "人工除草", "除草人工", 2, "工", 120, "棚边、行间杂草清理。"),
+        makeDemo(10, "2026-04-25", "植株管理", "整枝打叉", "整枝打叉人工", 4, "工", 130, "第一次整枝打叉、绑蔓整理。"),
+        makeDemo(11, "2026-05-10", "施肥", "滴灌施肥", "滴灌水溶肥", 3, "袋", 180, "坐果后补肥。"),
+        makeDemo(12, "2026-05-20", "采收", "人工采收", "采收人工", 6, "工", 140, "第一批采收。"),
+        makeDemo(13, "2026-05-20", "运输", "市场运输", "市场运输费", 1, "次", 220, "送到本地批发市场。"),
+        makeDemo(14, "2026-05-20", "销售", "批发销售", "番茄批发销售", 2000, "kg", 3.2, "第一批番茄销售。"),
+      ];
+    }
+
+    document.querySelectorAll("[data-view-target]").forEach((button) => button.addEventListener("click", () => showView(button.dataset.viewTarget)));
+    document.querySelector("#open-guide").addEventListener("click", () => {
+      document.querySelector("#guide-modal").classList.add("show");
+      document.querySelector("#guide-modal").setAttribute("aria-hidden", "false");
+    });
+    document.querySelector("#close-guide").addEventListener("click", () => {
+      document.querySelector("#guide-modal").classList.remove("show");
+      document.querySelector("#guide-modal").setAttribute("aria-hidden", "true");
+    });
+    document.querySelector("#guide-modal").addEventListener("click", (event) => {
+      if (event.target.id === "guide-modal") {
+        event.target.classList.remove("show");
+        event.target.setAttribute("aria-hidden", "true");
+      }
+    });
+    document.querySelector("#timeline-output").addEventListener("click", (event) => {
+      const button = event.target.closest(".delete-record");
+      if (!button) return;
+      deleteRecord(button.dataset.recordId);
+    });
+
+    fields.crop.addEventListener("change", () => {
+      updateCustomFields();
+      document.querySelectorAll(".op-type").forEach((select) => {
+        if (select.value === "销售") applyOperationDefaults(select.closest(".operation-row"), "销售");
+      });
+    });
+    fields.customCrop.addEventListener("input", () => {
+      document.querySelectorAll(".op-type").forEach((select) => {
+        if (select.value === "销售") applyOperationDefaults(select.closest(".operation-row"), "销售");
+      });
+    });
+    fields.province.addEventListener("change", updateCustomFields);
+    document.querySelector("#add-operation").addEventListener("click", () => addOperationRow("打药", "防病套餐"));
+    document.querySelector("#category-sort").addEventListener("change", renderDashboard);
+
+    document.querySelector("#batch-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const crop = resolvedCrop();
+      const province = resolvedProvince();
+      const area = Number(fields.area.value);
+      if (!crop) return alert("请填写作物。");
+      if (!province) return alert("请填写地区。");
+      if (!(area > 0)) return alert("面积必须大于 0。");
+      const operations = collectOperationRows();
+      if (operations.some((operation) => operation.amount < 0)) return alert("金额不能小于 0。");
+      if (operations.every((operation) => operation.amount === 0 && !operation.item)) return alert("请至少填写一条有效操作。");
+
+      rememberCustom(CUSTOM_CROPS_KEY, BASE_CROPS, crop);
+      rememberCustom(CUSTOM_PROVINCES_KEY, BASE_PROVINCES, province);
+
+      const base = {
+        date: fields.date.value,
+        crop,
+        province,
+        area,
+        plot: fields.plot.value.trim() || "默认地块",
+        operator: fields.operator.value.trim() || "未填写",
+      };
+      const newRecords = operations.map((operation, index) => makeRecord(base, operation, index));
+      records = [...records, ...newRecords];
+      saveJson(RECORDS_KEY, records);
+      saveJson(DEFAULTS_KEY, {...base});
+      applyDefaults();
+      setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
+      renderAll();
+      const notice = document.querySelector("#submit-notice");
+      notice.textContent = `已提交 ${newRecords.length} 条当天操作。可到每日农事时间轴查看。`;
+      notice.classList.add("show");
+      showView("timeline-view");
+    });
+
+    document.querySelector("#fill-demo").addEventListener("click", () => {
+      const demo = demoRecords();
+      const demoIds = new Set(demo.map((record) => record.id));
+      const hasExistingDemo = records.some((record) => demoIds.has(record.id));
+      if (hasExistingDemo && !confirm("已存在经济作物演示数据，是否替换？")) return;
+      if (!hasExistingDemo && records.length > 0 && !confirm("当前已有本地记录，是否追加经济作物演示数据？")) return;
+      records = records.filter((record) => !demoIds.has(record.id));
+      records = [...records, ...demo];
+      saveJson(RECORDS_KEY, records);
+      saveJson(DEFAULTS_KEY, {date: "2026-05-20", crop: "番茄", province: "河南", area: 5, plot: "1号棚", operator: "老张"});
+      applyDefaults();
+      setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
+      renderAll();
+      const notice = document.querySelector("#submit-notice");
+      notice.textContent = "已生成河南 5 亩番茄经济作物全程演示账本，包含整地、定植、施肥、打药、采收、运输、销售，以及同一天多项操作。";
+      notice.classList.add("show");
+      showView("timeline-view");
+    });
+
+    document.querySelector("#clear-records").addEventListener("click", () => {
+      if (!confirm("确定清空本地记录吗？作物和地区下拉记忆不会清空。")) return;
+      records = [];
+      localStorage.removeItem(RECORDS_KEY);
+      renderAll();
+    });
+
+    applyDefaults();
+    setRows([{type: "打药", detail: "防病套餐"}, {type: "施肥", detail: "冲施肥"}]);
+    renderAll();
+  </script>
+</body>
+</html>

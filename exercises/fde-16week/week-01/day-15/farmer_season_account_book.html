@@ -240,10 +240,31 @@
     }
 
     .record {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
       border: 1px solid var(--border);
       border-radius: 17px;
       padding: 14px;
       background: #fff;
+    }
+
+    .record-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .delete-record {
+      flex: 0 0 auto;
+      border: 1px solid #ffd2cc;
+      border-radius: 11px;
+      padding: 8px 11px;
+      background: #fff0ef;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: none;
     }
 
     .record strong { color: var(--green-dark); }
@@ -334,7 +355,7 @@
     }
 
     .single-column {
-      max-width: 880px;
+      max-width: 1180px;
       margin: 0 auto;
     }
 
@@ -395,8 +416,8 @@
       <div class="topbar">
         <div class="nav-tabs" aria-label="页面导航">
           <button class="active" type="button" data-view-target="input-view">01 录入农事操作</button>
-          <button type="button" data-view-target="dashboard-view">02 本季收益看板</button>
-          <button type="button" data-view-target="timeline-view">03 农事时间轴</button>
+          <button type="button" data-view-target="timeline-view">02 农事时间轴</button>
+          <button type="button" data-view-target="dashboard-view">03 本季收益看板</button>
         </div>
       </div>
     </div>
@@ -441,8 +462,8 @@
             </div>
 
             <div class="field">
-              <label for="plot-name">地块名称</label>
-              <input id="plot-name" placeholder="例如：东地 / 1号田" value="1号田">
+              <label for="plot-name">地块名称（可选）</label>
+              <input id="plot-name" placeholder="只有一块地可不填；例如：东地 / 西地">
             </div>
 
             <div class="field">
@@ -511,7 +532,7 @@
 
     <section class="view" id="dashboard-view">
       <div class="card">
-        <h2>02｜本季收益看板</h2>
+        <h2>03｜本季收益看板</h2>
         <p class="hint">收入只统计“销售”类记录；其他操作默认统计为成本。利润 = 销售收入 - 总成本。</p>
         <div class="summary-grid">
           <div class="metric">
@@ -537,8 +558,8 @@
 
     <section class="view" id="timeline-view">
       <div class="card">
-        <h2>03｜农事时间轴</h2>
-        <p class="hint">按日期倒序查看这一季做过什么、花过什么钱、卖过什么钱。</p>
+        <h2>02｜农事时间轴</h2>
+        <p class="hint">按日期从前到后查看这一季做过什么、花过什么钱、卖过什么钱。</p>
         <div id="timeline-output"></div>
       </div>
     </section>
@@ -553,8 +574,8 @@
         <li>选择农事操作后，系统会自动带出细分操作、投入品和单位。例如“施肥”默认一体打包价，也可以改成底肥、返青肥等。</li>
         <li>填写数量和单价后，金额会自动计算；如果你直接知道总金额，也可以手动改金额。</li>
         <li>除“销售”之外，其他记录都会算成本；选择“销售”后会算收入。</li>
-        <li>点“02 本季收益看板”，查看总成本、销售收入、总利润和每亩利润。</li>
-        <li>点“03 农事时间轴”，查看这一季从整地到销售的完整记录。</li>
+        <li>点“02 农事时间轴”，查看这一季从整地到销售的完整记录。</li>
+        <li>点“03 本季收益看板”，查看总成本、销售收入、总利润和每亩利润。</li>
       </ol>
       <div class="actions">
         <button type="button" id="close-guide">知道了</button>
@@ -567,6 +588,7 @@
     const DEFAULTS_KEY = "day15_farmer_season_defaults";
     const CUSTOM_CROPS_KEY = "day15_custom_crops";
     const CUSTOM_PROVINCES_KEY = "day15_custom_provinces";
+    const DEMO_ID_PREFIX = "DEMO-HENAN-WHEAT-";
 
     const BASE_CROPS = ["小麦", "玉米", "水稻", "大豆", "油菜"];
     const BASE_PROVINCES = [
@@ -582,9 +604,9 @@
       "除草": ["一体打包价", "封闭除草", "茎叶除草", "人工除草", "补打除草", "其他"],
       "植保": ["一体打包价", "病害防治", "虫害防治", "一喷三防", "拌种包衣", "其他"],
       "灌溉排水": ["一体打包价", "冬灌", "返青水", "拔节水", "灌浆水", "排水降渍", "其他"],
-      "田间管理": ["查苗补苗", "防冻管理", "防倒伏", "巡田", "其他"],
-      "收获": ["机械收割", "人工收割", "烘干", "晾晒", "其他"],
-      "运输": ["田间转运", "粮点运输", "装卸", "其他"],
+      "田间管理": ["一体打包价", "查苗补苗", "防冻管理", "防倒伏", "巡田", "其他"],
+      "收获": ["一体打包价", "机械收割", "人工收割", "烘干", "晾晒", "其他"],
+      "运输": ["一体打包价", "田间转运", "粮点运输", "装卸", "其他"],
       "销售": ["小麦销售", "玉米销售", "大豆销售", "秸秆销售", "其他"],
       "其他": ["其他"],
     };
@@ -640,6 +662,7 @@
         "其他": {item: "灌溉排水费用", unit: "次", quantity: 1},
       },
       "田间管理": {
+        "一体打包价": {item: "田间管理一体打包价", unit: "亩", useAreaAsQuantity: true},
         "查苗补苗": {item: "人工管理", unit: "工"},
         "防冻管理": {item: "防冻管理", unit: "次", quantity: 1},
         "防倒伏": {item: "防倒伏药剂/作业", unit: "次", quantity: 1},
@@ -647,6 +670,7 @@
         "其他": {item: "田间管理", unit: "次", quantity: 1},
       },
       "收获": {
+        "一体打包价": {item: "收获一体打包价", unit: "亩", useAreaAsQuantity: true},
         "机械收割": {item: "机械收割", unit: "亩", useAreaAsQuantity: true},
         "人工收割": {item: "人工收割", unit: "工"},
         "烘干": {item: "烘干费", unit: "kg"},
@@ -654,6 +678,7 @@
         "其他": {item: "收获费用", unit: "亩", useAreaAsQuantity: true},
       },
       "运输": {
+        "一体打包价": {item: "运输一体打包价", unit: "亩", useAreaAsQuantity: true},
         "田间转运": {item: "田间转运费", unit: "次", quantity: 1},
         "粮点运输": {item: "粮点运输费", unit: "次", quantity: 1},
         "装卸": {item: "装卸费", unit: "次", quantity: 1},
@@ -782,7 +807,7 @@
       renderCropAndProvinceOptions();
       fields.date.value = defaults.date || todayString();
       fields.area.value = defaults.area || 10;
-      fields.plot.value = defaults.plot || "1号田";
+      fields.plot.value = defaults.plot === "默认地块" ? "" : (defaults.plot || "");
       fields.operator.value = defaults.operator || "老张";
       fields.type.value = defaults.type || "整地";
       refreshDetailOptions(defaults.detail || "");
@@ -817,6 +842,43 @@
 
     function makeRecordId() {
       return `DAY15-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    function makeDemoRecord(index, date, type, detail, item, quantity, unit, unitPrice, note) {
+      const amount = Number((quantity * unitPrice).toFixed(2));
+      return {
+        id: `${DEMO_ID_PREFIX}${String(index).padStart(2, "0")}`,
+        date,
+        crop: "小麦",
+        province: "河南",
+        area: 10,
+        plot: "默认地块",
+        operator: "老张",
+        type,
+        detail,
+        kind: entryKind(type),
+        item,
+        quantity,
+        unit,
+        unitPrice,
+        amount,
+        note,
+      };
+    }
+
+    function henanWheatDemoRecords() {
+      return [
+        makeDemoRecord(1, "2025-10-10", "整地", "一体打包价", "整地一体打包价", 10, "亩", 80, "河南 10 亩小麦演示账本：整地按 80 元/亩估算。"),
+        makeDemoRecord(2, "2025-10-18", "播种", "一体打包价", "播种一体打包价", 10, "亩", 105, "含种子和播种作业的简化打包演示价。"),
+        makeDemoRecord(3, "2025-10-20", "施肥", "一体打包价", "施肥一体打包价", 10, "亩", 230, "按底肥和追肥综合投入做演示估算。"),
+        makeDemoRecord(4, "2026-03-05", "除草", "一体打包价", "除草一体打包价", 10, "亩", 35, "春季除草按 35 元/亩估算。"),
+        makeDemoRecord(5, "2026-04-15", "植保", "一体打包价", "植保一体打包价", 10, "亩", 70, "含病虫害防治和一喷三防的简化演示价。"),
+        makeDemoRecord(6, "2026-04-20", "灌溉排水", "一体打包价", "灌溉排水一体打包价", 10, "亩", 30, "按灌溉水费、电费或排水作业综合估算。"),
+        makeDemoRecord(7, "2026-05-05", "田间管理", "一体打包价", "田间管理一体打包价", 10, "亩", 20, "巡田、查苗等田间管理简化估算。"),
+        makeDemoRecord(8, "2026-06-05", "收获", "一体打包价", "收获一体打包价", 10, "亩", 75, "小麦机械收割按 75 元/亩估算。"),
+        makeDemoRecord(9, "2026-06-06", "运输", "一体打包价", "运输一体打包价", 10, "亩", 20, "田间转运到粮点按 20 元/亩估算。"),
+        makeDemoRecord(10, "2026-06-08", "销售", "小麦销售", "小麦销售", 5000, "kg", 2.4, "按 500 kg/亩、2.40 元/kg 估算；仅用于演示。"),
+      ];
     }
 
     function sortedRecords() {
@@ -880,12 +942,15 @@
         return;
       }
       output.innerHTML = `<div class="timeline">${
-        sortedRecords().slice().reverse().map((record) => `
+        sortedRecords().map((record) => `
           <article class="record">
-            <strong>${record.date}｜${record.crop}｜${record.province}｜${record.plot}</strong>
-            <span class="pill">${record.kind}</span>
-            <p>${record.type}：${record.detail}｜${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}</p>
-            <p>面积：${record.area} 亩｜记录人：${record.operator}｜备注：${record.note || "无"}</p>
+            <div class="record-content">
+              <strong>${record.date}｜${record.crop}｜${record.province}｜${record.plot}</strong>
+              <span class="pill">${record.kind}</span>
+              <p>${record.type}：${record.detail}｜${record.item || "未填写项目"}｜${record.quantity || 0} ${record.unit} × ${record.unitPrice || 0} 元 = ${money(record.amount)}</p>
+              <p>面积：${record.area} 亩｜记录人：${record.operator}｜备注：${record.note || "无"}</p>
+            </div>
+            <button class="delete-record" type="button" data-record-id="${record.id}">删除</button>
           </article>
         `).join("")
       }</div>`;
@@ -895,6 +960,16 @@
       renderSummary();
       renderCategoryTable();
       renderTimeline();
+    }
+
+    function deleteRecord(recordId) {
+      const record = records.find((item) => item.id === recordId);
+      if (!record) return;
+      const label = `${record.date}｜${record.type}：${record.detail}｜${record.item || "未填写项目"}`;
+      if (!confirm(`确定删除这条记录吗？\n${label}`)) return;
+      records = records.filter((item) => item.id !== recordId);
+      saveJson(RECORDS_KEY, records);
+      renderAll();
     }
 
     function showView(viewId) {
@@ -928,6 +1003,12 @@
         guideModal.classList.remove("show");
         guideModal.setAttribute("aria-hidden", "true");
       }
+    });
+
+    document.querySelector("#timeline-output").addEventListener("click", (event) => {
+      const button = event.target.closest(".delete-record");
+      if (!button) return;
+      deleteRecord(button.dataset.recordId);
     });
 
     fields.crop.addEventListener("change", () => {
@@ -971,7 +1052,7 @@
         crop,
         province,
         area,
-        plot: fields.plot.value.trim() || "未命名地块",
+        plot: fields.plot.value.trim() || "默认地块",
         operator: fields.operator.value.trim() || "未填写",
         type: fields.type.value,
         detail: fields.detail.value,
@@ -1006,21 +1087,32 @@
     });
 
     document.querySelector("#fill-demo").addEventListener("click", () => {
-      fields.date.value = fields.date.value || todayString();
-      fields.crop.value = "小麦";
-      fields.province.value = "河南";
-      fields.area.value = 10;
-      fields.plot.value = "1号田";
-      fields.operator.value = fields.operator.value || "老张";
-      fields.type.value = "施肥";
-      refreshDetailOptions("底肥");
-      fields.item.value = "复合肥";
-      fields.quantity.value = 10;
-      fields.unit.value = "亩";
-      fields.unitPrice.value = 180;
-      calculateAmount();
-      fields.note.value = "示例：每亩底肥成本 180 元。";
-      updateCustomFields();
+      const demoRecords = henanWheatDemoRecords();
+      const demoIds = new Set(demoRecords.map((record) => record.id));
+      const hasExistingDemo = records.some((record) => demoIds.has(record.id));
+      if (hasExistingDemo && !confirm("已存在河南小麦演示账本，是否替换为最新演示数据？")) return;
+      if (!hasExistingDemo && records.length > 0 && !confirm("当前已有本地记录。是否继续追加 10 条河南小麦演示数据？")) return;
+
+      records = records.filter((record) => !demoIds.has(record.id));
+      records = [...records, ...demoRecords];
+      saveJson(RECORDS_KEY, records);
+      saveJson(DEFAULTS_KEY, {
+        date: "2026-06-08",
+        crop: "小麦",
+        province: "河南",
+        area: 10,
+        plot: "默认地块",
+        operator: "老张",
+        type: "销售",
+        detail: "小麦销售",
+        unit: "kg",
+      });
+      applyDefaults();
+      renderAll();
+      const notice = document.querySelector("#submit-notice");
+      notice.textContent = "已生成河南 10 亩小麦季演示账本：9 条成本记录 + 1 条销售记录。可到收益看板和农事时间轴查看。";
+      notice.classList.add("show");
+      showView("timeline-view");
     });
 
     document.querySelector("#clear-records").addEventListener("click", () => {
