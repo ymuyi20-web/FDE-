@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 08 育种生育期进度看板</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: #f5f7ef;
+      color: #16281a;
+    }
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0e5f3b, #17341f);
+      color: white;
+      border-radius: 28px;
+      padding: 32px;
+      box-shadow: 0 18px 40px rgba(20, 50, 29, 0.18);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 40px;
+    }
+    .hero p {
+      margin: 0;
+      color: #dcebd7;
+      line-height: 1.8;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .stat {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid #dfe8d8;
+    }
+    .stat strong {
+      display: block;
+      font-size: 32px;
+      color: #0e6b43;
+    }
+    .stat span {
+      color: #61705f;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border: 1px solid #dfe8d8;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(20, 50, 29, 0.10);
+    }
+    th, td {
+      border-bottom: 1px solid #dfe8d8;
+      border-right: 1px solid #dfe8d8;
+      padding: 18px;
+      vertical-align: top;
+    }
+    tr:last-child th, tr:last-child td {
+      border-bottom: 0;
+    }
+    th:last-child, td:last-child {
+      border-right: 0;
+    }
+    thead th {
+      background: #eef5e9;
+      color: #435440;
+      text-align: left;
+    }
+    .material {
+      width: 150px;
+      background: #f8fbf4;
+      font-size: 18px;
+    }
+    td strong {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+    td span, td em {
+      display: block;
+      margin-top: 6px;
+      color: #526350;
+      font-style: normal;
+      line-height: 1.5;
+    }
+    td em {
+      margin-top: 12px;
+      color: #0e6b43;
+      font-weight: 700;
+    }
+    .stage-early strong { color: #277a43; }
+    .stage-mid strong { color: #9a6400; }
+    .stage-late strong { color: #b54a2a; }
+    .stage-missing strong { color: #777; }
+    .stage-missing { background: #f3f3ef; }
+    .note {
+      margin-top: 20px;
+      color: #61705f;
+      line-height: 1.8;
+    }
+    @media (max-width: 800px) {
+      .stats { grid-template-columns: 1fr; }
+      table { font-size: 14px; }
+      th, td { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>育种生育期进度看板</h1>
+      <p>按“品种/材料 × 播期”展示当前生育期、播种日期、最近观察日期和下一步观察事项。</p>
+    </section>
+    <section class="stats">
+      <div class="stat"><strong>3</strong><span>材料数</span></div>
+      <div class="stat"><strong>3</strong><span>播期数</span></div>
+      <div class="stat"><strong>15</strong><span>记录数</span></div>
+    </section>
+    <table>
+      <thead>
+        <tr><th>品种/材料</th><th>第一播期</th><th>第二播期</th><th>第三播期</th></tr>
+      </thead>
+      <tbody>
+        <tr><th class='material'>稻香A</th><td class='stage-late'><strong>抽穗</strong><span>小区：A-01</span><span>播种：2026-05-01</span><span>最近：2026-07-18</span><em>记录抽穗整齐度</em></td><td class='stage-early'><strong>分蘖</strong><span>小区：A-02</span><span>播种：2026-05-08</span><span>最近：2026-06-10</span><em>复查分蘖进展</em></td><td class='stage-early'><strong>播种</strong><span>小区：A-03</span><span>播种：2026-05-15</span><span>最近：2026-05-15</span><em>观察出苗</em></td></tr><tr><th class='material'>稻香B</th><td class='stage-early'><strong>分蘖</strong><span>小区：B-01</span><span>播种：2026-05-01</span><span>最近：2026-06-10</span><em>复查分蘖进展</em></td><td class='stage-mid'><strong>拔节</strong><span>小区：B-02</span><span>播种：2026-05-08</span><span>最近：2026-06-25</span><em>关注孕穗节点</em></td><td class='stage-early'><strong>播种</strong><span>小区：B-03</span><span>播种：2026-05-15</span><span>最近：2026-05-15</span><em>观察出苗</em></td></tr><tr><th class='material'>组合C</th><td class='stage-mid'><strong>孕穗</strong><span>小区：C-01</span><span>播种：2026-05-01</span><span>最近：2026-07-10</span><em>准备抽穗观察</em></td><td class='stage-early'><strong>分蘖</strong><span>小区：C-02</span><span>播种：2026-05-08</span><span>最近：2026-06-18</span><em>复查分蘖进展</em></td><td class='stage-early'><strong>出苗</strong><span>小区：C-03</span><span>播种：2026-05-15</span><span>最近：2026-05-28</span><em>复查苗情</em></td></tr>
+      </tbody>
+    </table>
+    <p class="note">边界：本看板只展示已有记录和固定观察提醒，不判断材料优劣，不生成育种选择建议。</p>
+  </main>
+</body>
+</html>

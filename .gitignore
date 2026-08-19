@@ -1,9 +1,25 @@
 # Local Python environments and secrets
 .venv/
 integrations/gemini_mcp/.venv/
+integrations/gemini_mcp/.venv-old-*/
 .env
 *.key
 
 # Python cache
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# JavaScript dependencies
+node_modules/
+
+# Local previews, render caches, and temporary publish worktrees
+tmp/
+.tmp-day*/
+day15-packaged-price.patch
+
+# Operating-system metadata
+Thumbs.db
+.DS_Store

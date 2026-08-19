@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>育种基地记录原型｜朋友试用入口</title>
+  <style>
+    :root {
+      --green: #0f6a42;
+      --dark: #17251b;
+      --soil: #8a5528;
+      --paper: #fffdf7;
+      --line: #dfe7db;
+      --muted: #667466;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--dark);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(15, 106, 66, .16), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(138, 85, 40, .14), transparent 28%),
+        #f4f7ef;
+    }
+
+    main {
+      width: min(1040px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 34px 0 64px;
+    }
+
+    .hero {
+      padding: 34px;
+      border-radius: 30px;
+      color: white;
+      background: linear-gradient(135deg, #0e5f3b, #7b4a1e);
+      box-shadow: 0 22px 48px rgba(35, 50, 30, .18);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .16);
+      color: #e7f2df;
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 7vw, 54px);
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: #edf4e7;
+      line-height: 1.9;
+      font-size: 17px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 280px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: 0 16px 36px rgba(35, 50, 30, .10);
+    }
+
+    .card .number {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: white;
+      background: var(--green);
+      font-weight: 950;
+      margin-bottom: 16px;
+    }
+
+    .card:nth-child(2) .number {
+      background: var(--soil);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 26px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .card ul {
+      margin: 16px 0 0;
+      padding-left: 20px;
+      color: #485747;
+      line-height: 1.9;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 22px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      color: white;
+      background: var(--green);
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    a.button.secondary {
+      color: var(--green);
+      background: #e6f2e8;
+    }
+
+    .card:nth-child(2) a.button {
+      background: var(--soil);
+    }
+
+    .card:nth-child(2) a.button.secondary {
+      color: var(--soil);
+      background: #f3eadf;
+    }
+
+    .notice {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #eadcc8;
+      border-radius: 24px;
+      color: #624725;
+      background: #fff7ea;
+      line-height: 1.8;
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 253, 247, .82);
+    }
+
+    .feedback h2 {
+      margin-bottom: 12px;
+    }
+
+    .feedback ol {
+      margin: 0;
+      padding-left: 22px;
+      color: #485747;
+      line-height: 2;
+    }
+
+    @media (max-width: 780px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .card,
+      .feedback {
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="eyebrow">朋友试用版 · 原型阶段</span>
+      <h1>育种基地田间记录小原型</h1>
+      <p>
+        这不是正式系统，而是一版用于收集反馈的原型。先试“田间操作录入表单”，再看“农事操作日志汇总”，最后看“品种/材料 × 播期进度看板”，重点判断它是否贴近真实育种基地工作流。
+      </p>
+    </section>
+
+    <section class="cards">
+      <article class="card">
+        <div class="number">01</div>
+        <h2>田间操作录入表单</h2>
+        <p>用于试填整地、播种、施肥、除草、植保、晒田、灌溉、巡田等操作记录，支持自定义品种、播期和批量小区。</p>
+        <ul>
+          <li>验证手机录入是否省事；</li>
+          <li>验证操作类型和二级选项是否符合基地说法；</li>
+          <li>验证批量录入、默认值、重复提醒是否有用。</li>
+        </ul>
+        <div class="actions">
+          <a class="button" href="../day-11/field_input_form.html">打开录入表单</a>
+          <a class="button secondary" href="../day-11/FIELD_INPUT_RULES.md">查看字段规则</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="number">02</div>
+        <h2>农事操作日志汇总</h2>
+        <p>用于查看操作记录最终可以如何呈现：按日期排序、统计操作类型，并按品种/材料和播期回溯操作履历。</p>
+        <ul>
+          <li>验证“录完之后怎么汇总看”是否清楚；</li>
+          <li>验证按日期、按材料/播期两种视角是否有用；</li>
+          <li>验证朋友是否需要更多筛选和统计方式。</li>
+        </ul>
+        <div class="actions">
+          <a class="button" href="../day-10/operation_log.generated.html">打开日志汇总</a>
+          <a class="button secondary" href="../day-10/operation_log.generated.md">查看 Markdown 版</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="number">03</div>
+        <h2>品种/材料 × 播期进度看板</h2>
+        <p>用于查看不同材料在不同播期下的当前生育期、小区、播种日期、最近观察日期和下一步观察提醒。</p>
+        <ul>
+          <li>验证“材料优先”是否符合育种人员视角；</li>
+          <li>验证第一播期、第二播期、第三播期的展示方式；</li>
+          <li>验证看板是否方便快速掌握基地状态。</li>
+        </ul>
+        <div class="actions">
+          <a class="button" href="../day-08/breeding_stage_board.generated.html">打开进度看板</a>
+          <a class="button secondary" href="../day-08/breeding_stage_board.generated.md">查看 Markdown 版</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="notice">
+      <strong>试用边界：</strong>
+      当前表单数据只保存在试用者自己的浏览器本地，不会自动上传，也不会自动汇总到我这里。入口页里的“农事操作日志汇总”目前使用的是样例数据，用来展示未来录入数据可以如何呈现。如果愿意反馈试填数据，可以在表单里点“复制 CSV”再发给我。
+      <br>
+      <strong>新版闭环原型：</strong>
+      如果想体验“录入后立刻生成日志和进度看板”，可以打开
+      <a href="../day-14/closed_loop_prototype.html">Day14 闭环原型</a>。
+    </section>
+
+    <section class="feedback">
+      <h2>这次最想收集的反馈</h2>
+      <ol>
+        <li>品种/材料和播期的组织方式是否符合你们日常管理习惯？</li>
+        <li>整地、播种、施肥、除草、植保、晒田、灌溉这些分类是否贴近真实说法？</li>
+        <li>手机上录入是否麻烦？有没有哪个字段会让人不想填？</li>
+        <li>批量录入多个小区是否有用？小区填写方式是否顺手？</li>
+        <li>录入后的日志汇总方式是否清楚？按日期和按材料/播期回溯是否有用？</li>
+        <li>如果只保留三项最重要功能，你会保留哪三项？</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

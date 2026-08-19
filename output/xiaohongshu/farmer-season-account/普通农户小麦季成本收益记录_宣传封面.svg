@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1440" viewBox="0 0 1080 1440">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7ffe9"/>
+      <stop offset="46%" stop-color="#e8f5df"/>
+      <stop offset="100%" stop-color="#f9df8a"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c5f3b"/>
+      <stop offset="100%" stop-color="#1fa36c"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5b642"/>
+      <stop offset="100%" stop-color="#ffe6a0"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#164830" flood-opacity="0.18"/>
+    </filter>
+    <style>
+      .cn { font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif; }
+      .title { font-size: 82px; font-weight: 900; fill: #113d2a; letter-spacing: -3px; }
+      .subtitle { font-size: 35px; font-weight: 700; fill: #35634b; }
+      .small { font-size: 25px; font-weight: 700; fill: #5e715f; }
+      .white { fill: #fff; }
+      .metric-label { font-size: 24px; font-weight: 700; fill: #6a766d; }
+      .metric-num { font-size: 40px; font-weight: 900; fill: #0c5f3b; }
+      .timeline { font-size: 27px; font-weight: 800; fill: #25523a; }
+    </style>
+  </defs>
+
+  <rect width="1080" height="1440" fill="url(#bg)"/>
+  <circle cx="93" cy="102" r="190" fill="#ffffff" opacity="0.36"/>
+  <circle cx="1010" cy="188" r="240" fill="#ffffff" opacity="0.24"/>
+
+  <path d="M0 1055 C180 968 325 982 500 1048 C710 1126 877 1054 1080 984 L1080 1440 L0 1440 Z" fill="#dfb24d" opacity="0.68"/>
+  <path d="M0 1130 C185 1053 366 1070 547 1134 C735 1200 889 1153 1080 1082 L1080 1440 L0 1440 Z" fill="#c99638" opacity="0.48"/>
+
+  <g opacity="0.55">
+    <path d="M115 1115 L145 1275" stroke="#8f6424" stroke-width="9" stroke-linecap="round"/>
+    <path d="M145 1190 C95 1162 76 1129 83 1095 C124 1108 150 1141 145 1190Z" fill="#f6d06d"/>
+    <path d="M165 1178 C204 1137 242 1124 276 1137 C260 1181 222 1202 165 1178Z" fill="#f6d06d"/>
+    <path d="M862 1042 L820 1220" stroke="#8f6424" stroke-width="9" stroke-linecap="round"/>
+    <path d="M842 1136 C891 1100 928 1091 960 1108 C937 1152 897 1168 842 1136Z" fill="#f6d06d"/>
+    <path d="M812 1102 C765 1078 744 1045 750 1010 C794 1022 819 1053 812 1102Z" fill="#f6d06d"/>
+  </g>
+
+  <rect x="70" y="72" width="940" height="1196" rx="54" fill="#ffffff" opacity="0.76" filter="url(#shadow)"/>
+  <rect x="104" y="104" width="872" height="236" rx="38" fill="url(#green)"/>
+
+  <text x="138" y="176" class="cn white" font-size="30" font-weight="800">普通农户 · 一季经营账本</text>
+  <text x="138" y="268" class="cn white" font-size="70" font-weight="900">种地这季账</text>
+  <text x="138" y="314" class="cn white" font-size="28" font-weight="700" opacity="0.86">农事记录 / 成本收益 / 每亩利润</text>
+
+  <text x="108" y="470" class="cn title">一季种地</text>
+  <text x="108" y="565" class="cn title">到底赚了多少钱？</text>
+  <rect x="110" y="604" width="560" height="16" rx="8" fill="url(#gold)"/>
+  <text x="110" y="676" class="cn subtitle">每天录一条，收获时自动算清楚</text>
+
+  <g transform="translate(105 742)">
+    <rect width="870" height="300" rx="34" fill="#f8fbf6" stroke="#dce8dc"/>
+    <rect x="34" y="34" width="242" height="106" rx="22" fill="#ffffff" stroke="#dbe7de"/>
+    <text x="62" y="78" class="cn metric-label">总成本</text>
+    <text x="62" y="124" class="cn metric-num">4,860 元</text>
+
+    <rect x="314" y="34" width="242" height="106" rx="22" fill="#ffffff" stroke="#dbe7de"/>
+    <text x="342" y="78" class="cn metric-label">销售收入</text>
+    <text x="342" y="124" class="cn metric-num">7,800 元</text>
+
+    <rect x="594" y="34" width="242" height="106" rx="22" fill="#ffffff" stroke="#dbe7de"/>
+    <text x="622" y="78" class="cn metric-label">每亩利润</text>
+    <text x="622" y="124" class="cn metric-num">294 元/亩</text>
+
+    <line x1="64" y1="196" x2="806" y2="196" stroke="#dbe7de" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="92" cy="196" r="12" fill="#1fa36c"/>
+    <circle cx="300" cy="196" r="12" fill="#1fa36c"/>
+    <circle cx="508" cy="196" r="12" fill="#1fa36c"/>
+    <circle cx="716" cy="196" r="12" fill="#1fa36c"/>
+    <text x="58" y="250" class="cn timeline">整地</text>
+    <text x="260" y="250" class="cn timeline">播种</text>
+    <text x="468" y="250" class="cn timeline">施肥</text>
+    <text x="676" y="250" class="cn timeline">销售</text>
+  </g>
+
+  <g transform="translate(110 1096)">
+    <rect width="860" height="110" rx="30" fill="#113d2a"/>
+    <text x="48" y="48" class="cn white" font-size="30" font-weight="900">核心用途</text>
+    <text x="48" y="88" class="cn white" font-size="25" font-weight="700" opacity="0.88">把纸本流水账，变成能看利润的农事时间轴</text>
+  </g>
+
+  <text x="540" y="1335" text-anchor="middle" class="cn small">小麦 / 玉米 / 大豆均可记录 · 数据暂存在本地浏览器</text>
+</svg>

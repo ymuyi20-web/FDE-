@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小红书发布图｜水稻氮磷钾核算器</title>
+  <style>
+    :root {
+      --paper: #f8f3e7;
+      --ink: #17341f;
+      --muted: #6c765e;
+      --green: #15824f;
+      --deep: #0c4e31;
+      --lime: #d9f09a;
+      --rice: #efe1b4;
+      --line: rgba(23, 52, 31, 0.18);
+      --orange: #f4a33b;
+      --white: #fffdf6;
+      --red: #c64f3a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #d8ded4;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+      color: var(--ink);
+    }
+
+    .stage {
+      width: 1080px;
+      min-height: 1440px;
+      padding: 64px;
+      background:
+        radial-gradient(circle at 88% 10%, rgba(217, 240, 154, 0.65), transparent 280px),
+        linear-gradient(145deg, var(--paper), #fffaf0 72%, #eef7e5);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(23, 52, 31, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 52, 31, 0.03) 1px, transparent 1px);
+      background-size: 34px 34px;
+      pointer-events: none;
+    }
+
+    .slide {
+      width: 1080px;
+      min-height: 1440px;
+      position: relative;
+      margin-bottom: 48px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: rgba(21, 130, 79, 0.12);
+      color: var(--deep);
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .badge::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 7px rgba(21, 130, 79, 0.14);
+    }
+
+    h1 {
+      margin: 48px 0 24px;
+      font-size: 82px;
+      line-height: 1.07;
+      letter-spacing: -0.06em;
+      color: var(--ink);
+    }
+
+    h2 {
+      margin: 26px 0 20px;
+      font-size: 62px;
+      line-height: 1.12;
+      letter-spacing: -0.045em;
+    }
+
+    .lead {
+      font-size: 34px;
+      line-height: 1.65;
+      color: #39513e;
+      margin: 0;
+    }
+
+    .hero-card,
+    .card {
+      background: rgba(255, 253, 246, 0.86);
+      border: 2px solid var(--line);
+      border-radius: 38px;
+      padding: 38px;
+      box-shadow: 0 24px 48px rgba(37, 62, 34, 0.12);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card {
+      margin-top: 58px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .metric {
+      border: 2px dashed rgba(21, 130, 79, 0.35);
+      background: #fbfff4;
+      border-radius: 30px;
+      padding: 26px 20px;
+      min-height: 190px;
+    }
+
+    .metric .label {
+      font-size: 25px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .metric .num {
+      font-size: 58px;
+      line-height: 1;
+      color: var(--deep);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .metric .unit {
+      font-size: 23px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .footer-note {
+      position: absolute;
+      left: 64px;
+      right: 64px;
+      bottom: 56px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      font-size: 25px;
+      color: var(--muted);
+      z-index: 2;
+    }
+
+    .link-pill {
+      max-width: 620px;
+      padding: 16px 22px;
+      border-radius: 999px;
+      background: var(--deep);
+      color: #fff;
+      font-weight: 800;
+      font-size: 22px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rice-mark {
+      position: absolute;
+      right: -40px;
+      bottom: 90px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      border: 3px solid rgba(21, 130, 79, 0.18);
+      opacity: 0.9;
+    }
+
+    .rice-mark::before,
+    .rice-mark::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 280px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(21, 130, 79, 0.12);
+      transform-origin: left center;
+    }
+
+    .rice-mark::before { transform: rotate(-28deg); }
+    .rice-mark::after { transform: rotate(28deg); }
+
+    .field-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 27px;
+      margin-top: 24px;
+      overflow: hidden;
+      border-radius: 28px;
+    }
+
+    .field-table th,
+    .field-table td {
+      padding: 22px 20px;
+      border-bottom: 2px solid var(--line);
+      text-align: left;
+    }
+
+    .field-table th {
+      color: var(--muted);
+      background: #f1f7e9;
+      font-size: 23px;
+    }
+
+    .field-table tr:last-child td { border-bottom: 0; }
+
+    .inputbox {
+      display: inline-flex;
+      min-width: 160px;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border: 2px solid rgba(21, 130, 79, 0.28);
+      border-radius: 18px;
+      background: #fff;
+      font-weight: 900;
+      color: var(--deep);
+    }
+
+    .unit-small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .steps {
+      display: grid;
+      gap: 24px;
+      margin-top: 38px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 28px;
+      border-radius: 30px;
+      background: rgba(255, 253, 246, 0.82);
+      border: 2px solid var(--line);
+    }
+
+    .step-no {
+      width: 72px;
+      height: 72px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .step-title {
+      margin: 0 0 8px;
+      font-size: 35px;
+      font-weight: 900;
+    }
+
+    .step-text {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.55;
+      color: #45604a;
+    }
+
+    .formula {
+      padding: 36px;
+      background: #17341f;
+      color: #f8f3e7;
+      border-radius: 34px;
+      font-size: 31px;
+      line-height: 1.75;
+      margin-top: 34px;
+    }
+
+    .formula strong {
+      color: var(--lime);
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 32px;
+    }
+
+    .compare .card {
+      padding: 32px;
+      min-height: 260px;
+    }
+
+    .big-number {
+      margin-top: 24px;
+      font-size: 78px;
+      color: var(--green);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .warning {
+      margin-top: 32px;
+      padding: 28px;
+      border-radius: 30px;
+      background: #fff0dc;
+      border: 2px solid rgba(244, 163, 59, 0.36);
+      color: #5d3b05;
+      font-size: 29px;
+      line-height: 1.65;
+    }
+
+    .post-title {
+      font-size: 64px;
+      line-height: 1.15;
+      font-weight: 900;
+      margin-top: 34px;
+      letter-spacing: -0.045em;
+    }
+
+    .mini {
+      font-size: 23px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .phone {
+      margin-top: 26px;
+      border-radius: 44px;
+      background: #fdfdf7;
+      border: 10px solid #17341f;
+      padding: 28px;
+      box-shadow: 0 28px 50px rgba(23, 52, 31, 0.18);
+    }
+
+    .phone-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .screen-title {
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .screen-row {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 12px;
+      align-items: center;
+      border-top: 2px solid #edf2e9;
+      padding: 18px 0;
+      font-size: 25px;
+    }
+
+    .screen-value {
+      color: var(--green);
+      font-weight: 900;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <section class="slide" id="slide-01-cover">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">给水稻施肥算一笔明白账</span>
+      <h1>水稻当季<br>氮磷钾投入量<br>核算器</h1>
+      <p class="lead">填底肥、分蘖肥、穗肥的亩用量和含量，自动算出全季 N / P2O5 / K2O 投入量。</p>
+      <div class="hero-card">
+        <div class="metric">
+          <div class="label">不用装软件</div>
+          <div class="num">网页</div>
+          <div class="unit">打开就能用</div>
+        </div>
+        <div class="metric">
+          <div class="label">示例方案 N</div>
+          <div class="num">15.95</div>
+          <div class="unit">kg/亩</div>
+        </div>
+        <div class="metric">
+          <div class="label">目标产量</div>
+          <div class="num">可选</div>
+          <div class="unit">估算施氮范围</div>
+        </div>
+      </div>
+      <div class="rice-mark"></div>
+      <div class="footer-note">
+        <span>结果用于养分核算，不等于正式施肥处方</span>
+        <span class="link-pill">ymuyi20-web.github.io/FDE-/...</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-02-input">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">怎么填？第一步</span>
+      <h2>按施肥阶段填：<br>底肥、分蘖肥、穗肥</h2>
+      <p class="lead">朋友只需要填数值，单位都写在旁边。没有某个养分就填 0。</p>
+      <table class="field-table">
+        <thead>
+          <tr>
+            <th>阶段</th>
+            <th>肥料</th>
+            <th>亩用量</th>
+            <th>N</th>
+            <th>P2O5</th>
+            <th>K2O</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>底肥</td>
+            <td>三个15复合肥</td>
+            <td><span class="inputbox">35 <span class="unit-small">kg/亩</span></span></td>
+            <td>15%</td>
+            <td>15%</td>
+            <td>15%</td>
+          </tr>
+          <tr>
+            <td>分蘖肥</td>
+            <td>尿素</td>
+            <td><span class="inputbox">20 <span class="unit-small">kg/亩</span></span></td>
+            <td>46%</td>
+            <td>0%</td>
+            <td>0%</td>
+          </tr>
+          <tr>
+            <td>穗肥</td>
+            <td>复合肥 + 氯化钾</td>
+            <td><span class="inputbox">10+10 <span class="unit-small">kg/亩</span></span></td>
+            <td>自动算</td>
+            <td>自动算</td>
+            <td>自动算</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer-note">
+        <span>肥料标签口径：N - P2O5 - K2O</span>
+        <span>第 2 张 / 6 张</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-03-add">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">怎么填？第二步</span>
+      <h2>一个阶段可以有<br>不止一种肥料</h2>
+      <p class="lead">比如穗肥既用了三个15复合肥，又用了氯化钾，就点“添加一种穗肥”。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">1</div>
+          <div>
+            <p class="step-title">选择施肥阶段</p>
+            <p class="step-text">底肥、分蘖肥、穗肥分开填，避免把不同阶段混成一锅粥。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">2</div>
+          <div>
+            <p class="step-title">添加肥料行</p>
+            <p class="step-text">复合肥、尿素、氯化钾都可以分别填，系统自动做阶段合计。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">3</div>
+          <div>
+            <p class="step-title">点击计算结果</p>
+            <p class="step-text">输出每个阶段和全季的 N / P2O5 / K2O 投入量。</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">
+        <span>适合拿来核算方案，不是替代农艺师开方</span>
+        <span>第 3 张 / 6 张</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-04-result">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">结果怎么看？</span>
+      <h2>一眼看清<br>全季投入了多少养分</h2>
+      <div class="hero-card">
+        <div class="metric">
+          <div class="label">全季 N</div>
+          <div class="num">15.95</div>
+          <div class="unit">kg/亩</div>
+        </div>
+        <div class="metric">
+          <div class="label">全季 P2O5</div>
+          <div class="num">6.75</div>
+          <div class="unit">kg/亩</div>
+        </div>
+        <div class="metric">
+          <div class="label">全季 K2O</div>
+          <div class="num">12.75</div>
+          <div class="unit">kg/亩</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="phone-top">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="screen-title">阶段合计</span>
+        </div>
+        <div class="screen-row"><span>底肥：三个15复合肥 35 kg/亩</span><span class="screen-value">N 5.25</span></div>
+        <div class="screen-row"><span>分蘖肥：尿素 20 kg/亩</span><span class="screen-value">N 9.20</span></div>
+        <div class="screen-row"><span>穗肥：复合肥 + 氯化钾</span><span class="screen-value">N 1.50</span></div>
+      </div>
+      <div class="footer-note">
+        <span>重点：先把投入量算清楚，再谈推荐是否合理</span>
+        <span>第 4 张 / 6 张</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-05-yield">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">可选功能</span>
+      <h2>填目标产量<br>估算适宜施氮范围</h2>
+      <p class="lead">比如目标产量填 600 kg/亩，工具会按固定假设给出一个粗略范围。</p>
+      <div class="formula">
+        目标产量 <strong>600 kg/亩</strong><br>
+        作物需氮量 = 600 / 100 × 2 = <strong>12.00 kg/亩</strong><br>
+        土壤供氮按 50%，肥料利用率按 35%<br>
+        估算施氮量 ≈ <strong>15.43 至 18.86 kg N/亩</strong>
+      </div>
+      <div class="compare">
+        <div class="card">
+          <p class="mini">当前方案核算 N</p>
+          <div class="big-number">15.95</div>
+          <p class="mini">kg/亩</p>
+        </div>
+        <div class="card">
+          <p class="mini">目标产量估算范围</p>
+          <div class="big-number">15.43-18.86</div>
+          <p class="mini">kg N/亩</p>
+        </div>
+      </div>
+      <div class="footer-note">
+        <span>这是估算范围，不是正式推荐量</span>
+        <span>第 5 张 / 6 张</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-06-share">
+    <div class="stage">
+      <div class="grain"></div>
+      <span class="badge">适合谁用？</span>
+      <div class="post-title">想快速核算<br>一季水稻用了多少氮磷钾的人</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">✓</div>
+          <div>
+            <p class="step-title">种植户 / 农资门店</p>
+            <p class="step-text">把一套施肥方案先换算成 N、P2O5、K2O 投入量。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">✓</div>
+          <div>
+            <p class="step-title">农技交流 / 方案复盘</p>
+            <p class="step-text">讨论方案前，先把投入量口径统一，少一点“感觉差不多”。</p>
+          </div>
+        </div>
+      </div>
+      <div class="warning">
+        重要边界：本工具只做养分投入量核算和粗略估算，不替代土壤检测、田间观察、区域经验和专业审核。
+      </div>
+      <div class="footer-note">
+        <span class="link-pill">网页链接：ymuyi20-web.github.io/FDE-/...</span>
+        <span>第 6 张 / 6 张</span>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

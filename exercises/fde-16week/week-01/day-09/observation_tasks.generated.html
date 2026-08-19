@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 09 育种观察待办</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: #f7f4ee;
+      color: #261d14;
+    }
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+    }
+    .hero {
+      border-radius: 28px;
+      padding: 32px;
+      color: white;
+      background: linear-gradient(135deg, #7c3f19, #1f4d32);
+      box-shadow: 0 20px 44px rgba(58, 37, 18, 0.18);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 40px;
+    }
+    .hero p {
+      margin: 0;
+      color: #f3e7d7;
+      line-height: 1.8;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .stat {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid #e5ddcf;
+    }
+    .stat strong {
+      display: block;
+      font-size: 34px;
+    }
+    .stat span {
+      color: #6c6155;
+    }
+    .stat.overdue strong { color: #b42318; }
+    .stat.today strong { color: #b06a00; }
+    .stat.soon strong { color: #1d6f42; }
+    .stat.normal strong { color: #61705f; }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border: 1px solid #e5ddcf;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(58, 37, 18, 0.10);
+    }
+    th, td {
+      border-bottom: 1px solid #e5ddcf;
+      padding: 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: 0; }
+    thead th {
+      background: #f0e7da;
+      color: #594737;
+    }
+    td strong, td span {
+      display: block;
+    }
+    td span {
+      margin-top: 5px;
+      color: #6c6155;
+      font-size: 13px;
+    }
+    tr.overdue td:first-child strong { color: #b42318; }
+    tr.today td:first-child strong { color: #b06a00; }
+    tr.soon td:first-child strong { color: #1d6f42; }
+    tr.normal td:first-child strong { color: #61705f; }
+    .note {
+      margin-top: 20px;
+      color: #6c6155;
+      line-height: 1.8;
+    }
+    @media (max-width: 900px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      table { font-size: 14px; }
+      th, td { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>育种观察待办</h1>
+      <p>生成日期：2026-07-27。根据最近观察日期和生育期复查规则，列出今天应优先关注的材料、播期和小区。</p>
+    </section>
+    <section class="stats"><div class='stat overdue'><strong>9</strong><span>逾期</span></div><div class='stat today'><strong>0</strong><span>今日到期</span></div><div class='stat soon'><strong>0</strong><span>即将到期</span></div><div class='stat normal'><strong>0</strong><span>正常跟踪</span></div></section>
+    <table>
+      <thead>
+        <tr>
+          <th>状态</th>
+          <th>品种/材料</th>
+          <th>播期</th>
+          <th>小区</th>
+          <th>当前生育期</th>
+          <th>最近观察</th>
+          <th>应观察日期</th>
+          <th>提醒</th>
+        </tr>
+      </thead>
+      <tbody><tr class='overdue'><td><strong>逾期</strong><span>已逾期 66 天</span></td><td>稻香A</td><td>第三播期</td><td>A-03</td><td>播种</td><td>2026-05-15</td><td>2026-05-22</td><td>观察出苗</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 66 天</span></td><td>稻香B</td><td>第三播期</td><td>B-03</td><td>播种</td><td>2026-05-15</td><td>2026-05-22</td><td>观察出苗</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 50 天</span></td><td>组合C</td><td>第三播期</td><td>C-03</td><td>出苗</td><td>2026-05-28</td><td>2026-06-07</td><td>复查苗情</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 33 天</span></td><td>稻香A</td><td>第二播期</td><td>A-02</td><td>分蘖</td><td>2026-06-10</td><td>2026-06-24</td><td>复查分蘖进展</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 33 天</span></td><td>稻香B</td><td>第一播期</td><td>B-01</td><td>分蘖</td><td>2026-06-10</td><td>2026-06-24</td><td>复查分蘖进展</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 25 天</span></td><td>稻香B</td><td>第二播期</td><td>B-02</td><td>拔节</td><td>2026-06-25</td><td>2026-07-02</td><td>关注孕穗节点</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 25 天</span></td><td>组合C</td><td>第二播期</td><td>C-02</td><td>分蘖</td><td>2026-06-18</td><td>2026-07-02</td><td>复查分蘖进展</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 12 天</span></td><td>组合C</td><td>第一播期</td><td>C-01</td><td>孕穗</td><td>2026-07-10</td><td>2026-07-15</td><td>准备抽穗观察</td></tr><tr class='overdue'><td><strong>逾期</strong><span>已逾期 6 天</span></td><td>稻香A</td><td>第一播期</td><td>A-01</td><td>抽穗</td><td>2026-07-18</td><td>2026-07-21</td><td>记录抽穗整齐度</td></tr></tbody>
+    </table>
+    <p class="note">边界：本清单只生成观察提醒，不判断材料优劣，不替代育种专家判断。</p>
+  </main>
+</body>
+</html>
